@@ -1,0 +1,178 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+enum UserRole {
+  ADMIN
+  HOD
+  AGENT
+}
+
+enum UserStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}
+
+enum ComplaintStatus {
+  OPEN
+  RESOLVED
+}
+
+model User {
+  id                String       @id @default(cuid())
+  email             String       @unique
+  name              String
+  password          String
+  role              UserRole
+  status            UserStatus   @default(PENDING)
+  departmentId      String?
+  department        Department?  @relation(fields: [departmentId], references: [id], onDelete: SetNull)
+  phone             String?
+  employeeId        String?      @unique
+  qrCode            String?      @db.Text
+  emailVerified     DateTime?
+  verificationToken String?      @unique
+  resetToken        String?      @unique
+  resetTokenExpiry  DateTime?
+  profileUpdateRequest Json?
+  createdAt         DateTime     @default(now())
+  updatedAt         DateTime     @updatedAt
+  
+  ratings           Rating[]
+  notifications     Notification[]
+  profileUpdates    ProfileUpdateRequest[]
+  
+  @@index([email])
+  @@index([departmentId])
+  @@index([role])
+  @@index([status])
+}
+
+model Department {
+  id          String     @id @default(cuid())
+  name        String     @unique
+  description String?    @db.Text
+  isActive    Boolean    @default(true)
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+  
+  users       User[]
+  questions   Question[]
+  ratings     Rating[]
+  
+  @@index([name])
+}
+
+model Question {
+  id           String     @id @default(cuid())
+  departmentId String
+  department   Department @relation(fields: [departmentId], references: [id], onDelete: Cascade)
+  questionText String     @db.Text
+  order        Int        @default(0)
+  isActive     Boolean    @default(true)
+  createdAt    DateTime   @default(now())
+  updatedAt    DateTime   @updatedAt
+  
+  responses    Response[]
+  
+  @@index([departmentId])
+  @@index([isActive])
+}
+
+model Rating {
+  id             String          @id @default(cuid())
+  agentId        String
+  agent          User            @relation(fields: [agentId], references: [id], onDelete: Cascade)
+  departmentId   String
+  department     Department      @relation(fields: [departmentId], references: [id], onDelete: Cascade)
+  
+  // Customer Information
+  customerName   String
+  customerContact String?
+  policyNumber   String?
+  isAnonymous    Boolean         @default(false)
+  
+  // Feedback
+  feedbackText   String?         @db.Text
+  isComplaint    Boolean         @default(false)
+  complaintStatus ComplaintStatus @default(OPEN)
+  resolvedAt     DateTime?
+  resolvedBy     String?
+  
+  // Metadata
+  ipAddress      String?
+  userAgent      String?         @db.Text
+  createdAt      DateTime        @default(now())
+  updatedAt      DateTime        @updatedAt
+  
+  responses      Response[]
+  
+  @@index([agentId])
+  @@index([departmentId])
+  @@index([isComplaint])
+  @@index([complaintStatus])
+  @@index([createdAt])
+}
+
+model Response {
+  id         String   @id @default(cuid())
+  ratingId   String
+  rating     Rating   @relation(fields: [ratingId], references: [id], onDelete: Cascade)
+  questionId String
+  question   Question @relation(fields: [questionId], references: [id], onDelete: Cascade)
+  score      Int      // 1-5 Likert scale
+  createdAt  DateTime @default(now())
+  
+  @@index([ratingId])
+  @@index([questionId])
+}
+
+model Notification {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  title     String
+  message   String   @db.Text
+  type      String   // 'rating', 'complaint', 'approval', 'system'
+  isRead    Boolean  @default(false)
+  link      String?
+  createdAt DateTime @default(now())
+  
+  @@index([userId])
+  @@index([isRead])
+  @@index([createdAt])
+}
+
+model ProfileUpdateRequest {
+  id          String   @id @default(cuid())
+  userId      String
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  requestData Json     // Stores the requested changes
+  status      UserStatus @default(PENDING)
+  reviewedAt  DateTime?
+  reviewedBy  String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  @@index([userId])
+  @@index([status])
+}
+
+model SystemSettings {
+  id        String   @id @default(cuid())
+  key       String   @unique
+  value     String   @db.Text
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  
+  @@index([key])
+}
