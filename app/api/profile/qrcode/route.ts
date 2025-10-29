@@ -19,14 +19,14 @@ export async function GET(request: NextRequest) {
     }
 
     // Generate rating URL
-    const baseUrl = process.env.NEXTAUTH_URL || 'http://localhost:3000';
+    const baseUrl = process.env.APP_URL;
     const ratingUrl = `${baseUrl}/rate/${idToUse}`;
 
     // Use QRCode.js to generate QR code
     // For production, you might want to use a QR code service or library
     // For now, we'll use a free API service
     const qrApiUrl = `https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${encodeURIComponent(ratingUrl)}`;
-
+    console.log(qrApiUrl);
     // Fetch the QR code image
     const response = await fetch(qrApiUrl);
     

@@ -38,9 +38,10 @@ export default function ProfilePage() {
         const blob = await response.blob();
         const url = URL.createObjectURL(blob);
         setQrCodeUrl(url);
+        console.log(url);
       }
     } catch (error) {
-      console.error('Error generating QR code:', error);
+      console.log('Error generating QR code:', error);
     }
   };
 
