@@ -46,17 +46,25 @@ const Html5QrcodePlugin = ({
         console.log('Html5QrcodePlugin: Creating scanner instance');
         scannerRef.current = new Html5Qrcode(qrcodeRegionId);
 
-        // Configure scanner
+        // Configure scanner with optimized settings
         const config = {
           fps: 10,
-          qrbox: { width: 250, height: 250 },
-          aspectRatio: 1.0
+          qrbox: { width: 300, height: 300 }, // Larger scan area
+          aspectRatio: 1.0,
+          disableFlip: false,
+          experimentalFeatures: {
+            useBarCodeDetectorIfSupported: true
+          },
+          rememberLastUsedCamera: true,
+          showTorchButtonIfSupported: true
         };
 
         // Try back camera first
         console.log('Html5QrcodePlugin: Starting scanner with back camera');
         await scannerRef.current.start(
-          { facingMode: 'environment' },
+          { 
+            facingMode: 'environment'
+          },
           config,
           (decodedText: string) => {
             if (!active) return;
@@ -66,8 +74,13 @@ const Html5QrcodePlugin = ({
           (errorMessage: string) => {
             if (!active) return;
             console.log('Html5QrcodePlugin: Scan error:', errorMessage);
-            if (!errorMessage.includes('permission')) {
-              onError(errorMessage);
+            
+            // Only show user-friendly errors
+            if (errorMessage.includes('NotFoundException')) {
+              // This is normal - it means no QR code is visible
+              return;
+            } else if (!errorMessage.includes('permission')) {
+              onError('Please ensure the QR code is clearly visible and well-lit');
             }
           }
         ).catch(async () => {
@@ -85,8 +98,13 @@ const Html5QrcodePlugin = ({
               (errorMessage: string) => {
                 if (!active) return;
                 console.log('Html5QrcodePlugin: Scan error (front):', errorMessage);
-                if (!errorMessage.includes('permission')) {
-                  onError(errorMessage);
+                
+                // Only show user-friendly errors for front camera
+                if (errorMessage.includes('NotFoundException')) {
+                  // Normal - no QR code visible
+                  return;
+                } else if (!errorMessage.includes('permission')) {
+                  onError('Please ensure the QR code is clearly visible and well-lit');
                 }
               }
             );
