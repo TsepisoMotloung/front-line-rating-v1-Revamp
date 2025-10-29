@@ -1,9 +1,10 @@
 {
+  "/_not-found/page": "app/_not-found/page.js",
   "/page": "app/page.js",
-  "/dashboard/profile/page": "app/dashboard/profile/page.js",
-  "/rate/[agentId]/page": "app/rate/[agentId]/page.js",
-  "/dashboard/notifications/page": "app/dashboard/notifications/page.js",
-  "/auth/register/page": "app/auth/register/page.js",
+  "/auth/login/page": "app/auth/login/page.js",
+  "/rate/scan/page": "app/rate/scan/page.js",
   "/api/auth/[...nextauth]/route": "app/api/auth/[...nextauth]/route.js",
-  "/auth/login/page": "app/auth/login/page.js"
+  "/dashboard/page": "app/dashboard/page.js",
+  "/api/dashboard/agent-stats/route": "app/api/dashboard/agent-stats/route.js",
+  "/dashboard/profile/page": "app/dashboard/profile/page.js"
 }
