@@ -1,10 +1,5 @@
 {
-  "/_not-found/page": "app/_not-found/page.js",
-  "/page": "app/page.js",
-  "/auth/login/page": "app/auth/login/page.js",
-  "/rate/scan/page": "app/rate/scan/page.js",
   "/api/auth/[...nextauth]/route": "app/api/auth/[...nextauth]/route.js",
-  "/dashboard/page": "app/dashboard/page.js",
-  "/api/dashboard/agent-stats/route": "app/api/dashboard/agent-stats/route.js",
-  "/dashboard/profile/page": "app/dashboard/profile/page.js"
+  "/page": "app/page.js",
+  "/rate/scan/page": "app/rate/scan/page.js"
 }

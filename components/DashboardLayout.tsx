@@ -90,11 +90,11 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
               </button>
               
               <Link href="/dashboard" className="flex items-center space-x-2">
-                <img 
-                  src="/logo.png" 
-                  alt="Frontline Rating" 
-                  className="w-7 h-7 sm:w-8 sm:h-8" 
-                />
+                  <img
+                    src="/logo.png"
+                    alt="Frontline Rating"
+                    className="h-7 w-[2.33rem] sm:h-8 sm:w-[2.67rem]"
+                  />
                 <span className="text-base sm:text-lg font-bold text-neutral-900 hidden sm:block">
                   Frontline Rating System
                 </span>

@@ -1,1 +1,1 @@
-self.__REACT_LOADABLE_MANIFEST="{\"app/rate/scan/page.tsx -> react-qr-scanner\":{\"id\":\"app/rate/scan/page.tsx -> react-qr-scanner\",\"files\":[\"static/chunks/_app-pages-browser_node_modules_react-qr-scanner_dist_react-qr-scanner_umd_js.js\"]}}"
+self.__REACT_LOADABLE_MANIFEST="{\"app/rate/scan/page.tsx -> ./Html5QrcodePlugin\":{\"id\":\"app/rate/scan/page.tsx -> ./Html5QrcodePlugin\",\"files\":[\"static/chunks/_app-pages-browser_app_rate_scan_Html5QrcodePlugin_tsx.js\"]}}"

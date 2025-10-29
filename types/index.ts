@@ -1,3 +1,26 @@
+export interface Complaint {
+  id: string;
+  agent: User;
+  agentId: string;
+  department: Department;
+  departmentId: string;
+  customerName: string;
+  customerContact?: string;
+  policyNumber?: string;
+  isAnonymous: boolean;
+  feedbackText?: string;
+  isComplaint: boolean;
+  complaintStatus: 'OPEN' | 'RESOLVED';
+  resolvedAt?: string;
+  resolvedBy?: string;
+  createdAt: string;
+  updatedAt: string;
+  responses: Array<{
+    id: string;
+    question: Question;
+    score: number;
+  }>;
+}
 import { User, Department, Rating, Question, Response, Notification } from '@prisma/client';
 
 declare module 'next-auth' {

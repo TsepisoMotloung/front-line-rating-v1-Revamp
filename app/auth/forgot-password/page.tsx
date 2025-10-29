@@ -45,7 +45,7 @@ export default function ForgotPasswordPage() {
         <div className="w-full max-w-md">
           <div className="text-center mb-8">
             <Link href="/" className="inline-flex items-center space-x-2">
-              <img src="/logo.png" alt="Frontline Rating" className="w-12 h-12" />
+              <img src="/logo.png" alt="Frontline Rating" className="h-12 w-16" />
               <span className="text-2xl font-bold text-neutral-900">Frontline Rating System</span>
             </Link>
           </div>
