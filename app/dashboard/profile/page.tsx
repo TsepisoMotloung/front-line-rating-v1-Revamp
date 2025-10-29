@@ -21,7 +21,7 @@ export default function ProfilePage() {
       setFormData({
         name: session.user.name || '',
         email: session.user.email || '',
-        employeeId: session.user.employeeId || '',
+        employeeId: session.user.id || '',
       });
       if (session.user.role === 'AGENT') {
         generateQRCode();
