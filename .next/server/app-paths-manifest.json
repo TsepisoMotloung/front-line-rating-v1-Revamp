@@ -1,7 +1,9 @@
 {
-  "/dashboard/page": "app/dashboard/page.js",
-  "/api/dashboard/agent-stats/route": "app/api/dashboard/agent-stats/route.js",
-  "/api/auth/[...nextauth]/route": "app/api/auth/[...nextauth]/route.js",
   "/page": "app/page.js",
+  "/dashboard/profile/page": "app/dashboard/profile/page.js",
+  "/rate/[agentId]/page": "app/rate/[agentId]/page.js",
+  "/dashboard/notifications/page": "app/dashboard/notifications/page.js",
+  "/auth/register/page": "app/auth/register/page.js",
+  "/api/auth/[...nextauth]/route": "app/api/auth/[...nextauth]/route.js",
   "/auth/login/page": "app/auth/login/page.js"
 }

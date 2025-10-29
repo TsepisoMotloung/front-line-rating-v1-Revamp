@@ -23,55 +23,56 @@ interface Department {
 
 export default function RateAgentPage() {
   const [searchQuery, setSearchQuery] = useState('');
-  const [selectedDepartment, setSelectedDepartment] = useState('');
   const [agents, setAgents] = useState<Agent[]>([]);
-  const [departments, setDepartments] = useState<Department[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [hasSearched, setHasSearched] = useState(false);
 
   useEffect(() => {
-    fetchDepartments();
-  }, []);
-
-  const fetchDepartments = async () => {
-    try {
-      const response = await fetch('/api/departments');
-      if (response.ok) {
-        const data = await response.json();
-        setDepartments(data);
-      }
-    } catch (error) {
-      console.error('Error fetching departments:', error);
+    // live-search as user types with debounce
+    if (!searchQuery || searchQuery.trim() === '') {
+      setAgents([]);
+      setHasSearched(false);
+      setIsLoading(false);
+      return;
     }
-  };
 
-  const handleSearch = async (e: React.FormEvent) => {
-    e.preventDefault();
+    const controller = new AbortController();
     setIsLoading(true);
     setHasSearched(true);
 
-    try {
-      const params = new URLSearchParams();
-      if (searchQuery) params.append('query', searchQuery);
-      if (selectedDepartment) params.append('departmentId', selectedDepartment);
+    const id = setTimeout(async () => {
+      try {
+        const params = new URLSearchParams();
+        params.append('query', searchQuery.trim());
 
-      const response = await fetch(`/api/agents/search?${params}`);
-      if (response.ok) {
-        const data = await response.json();
+        const res = await fetch(`/api/agents/search?${params.toString()}`, { signal: controller.signal });
+        if (!res.ok) {
+          console.error('Failed to search agents');
+          toast.error('Failed to search agents');
+          setAgents([]);
+          return;
+        }
+        const data = await res.json();
         setAgents(data);
         if (data.length === 0) {
+          // show friendly notice but don't spam toasts while typing
+          // only show toast when user stops typing for debounce period and no results
           toast.error('No agents found matching your search');
         }
-      } else {
-        toast.error('Failed to search agents');
+      } catch (err: any) {
+        if (err.name === 'AbortError') return;
+        console.error('Error searching agents:', err);
+        toast.error('An error occurred while searching');
+      } finally {
+        setIsLoading(false);
       }
-    } catch (error) {
-      console.error('Error searching agents:', error);
-      toast.error('An error occurred while searching');
-    } finally {
-      setIsLoading(false);
-    }
-  };
+    }, 300);
+
+    return () => {
+      controller.abort();
+      clearTimeout(id);
+    };
+  }, [searchQuery]);
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-white to-neutral-50">
@@ -80,10 +81,8 @@ export default function RateAgentPage() {
         <div className="container-custom">
           <div className="flex justify-between items-center py-4">
             <Link href="/" className="flex items-center space-x-2">
-              <div className="w-10 h-10 bg-primary-600 rounded-lg flex items-center justify-center">
-                <Star className="w-6 h-6 text-white" fill="white" />
-              </div>
-              <span className="text-xl font-bold text-neutral-900">Frontline Rating</span>
+              <img src="/logo.png" alt="Frontline Rating" className="w-10 h-10" />
+              <span className="text-xl font-bold text-neutral-900">Frontline Rating System</span>
             </Link>
             <Link href="/" className="text-neutral-600 hover:text-neutral-900">
               ← Back to Home
@@ -105,18 +104,18 @@ export default function RateAgentPage() {
             </p>
           </div>
 
-          {/* Alternative Option */}
-          <div className="bg-blue-50 border border-blue-200 rounded-lg p-6 mb-8">
+          {/* QR Code Scanner Option */}
+          <div className="bg-primary-50 border border-primary-200 rounded-lg p-6 mb-8">
             <div className="flex items-start space-x-4">
-              <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center flex-shrink-0">
-                <QrCode className="w-6 h-6 text-blue-600" />
+              <div className="w-12 h-12 bg-primary-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                <QrCode className="w-6 h-6 text-primary-600" />
               </div>
               <div className="flex-1">
-                <h3 className="font-semibold text-blue-900 mb-2">Have a QR Code?</h3>
-                <p className="text-sm text-blue-800 mb-4">
+                <h3 className="font-semibold text-primary-900 mb-2">Have a QR Code?</h3>
+                <p className="text-sm text-primary-800 mb-4">
                   If your agent provided a QR code, you can scan it for faster access to the rating form.
                 </p>
-                <Link href="/rate/scan" className="btn btn-sm bg-blue-600 text-white hover:bg-blue-700">
+                <Link href="/rate/scan" className="btn btn-sm btn-primary">
                   Scan QR Code
                 </Link>
               </div>
@@ -126,10 +125,10 @@ export default function RateAgentPage() {
           {/* Search Form */}
           <div className="card">
             <div className="card-body">
-              <form onSubmit={handleSearch} className="space-y-6">
+              <form onSubmit={(e) => e.preventDefault()} className="space-y-6">
                 <div>
                   <label htmlFor="search" className="label">
-                    Agent Name or Employee ID
+                    Agent Name
                   </label>
                   <div className="relative">
                     <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
@@ -141,42 +140,23 @@ export default function RateAgentPage() {
                       value={searchQuery}
                       onChange={(e) => setSearchQuery(e.target.value)}
                       className="input pl-10"
-                      placeholder="Enter agent name or employee ID..."
+                      placeholder="Start typing an agent name..."
                     />
                   </div>
                 </div>
-
-                <div>
-                  <label htmlFor="department" className="label">
-                    Department (Optional)
-                  </label>
-                  <div className="relative">
-                    <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                      <Building2 className="h-5 w-5 text-neutral-400" />
-                    </div>
-                    <select
-                      id="department"
-                      value={selectedDepartment}
-                      onChange={(e) => setSelectedDepartment(e.target.value)}
-                      className="input pl-10"
-                    >
-                      <option value="">All Departments</option>
-                      {departments.map((dept) => (
-                        <option key={dept.id} value={dept.id}>
-                          {dept.name}
-                        </option>
-                      ))}
-                    </select>
-                  </div>
+                <div className="flex">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setSearchQuery('');
+                      setAgents([]);
+                      setHasSearched(false);
+                    }}
+                    className="btn btn-secondary w-full"
+                  >
+                    Clear Search
+                  </button>
                 </div>
-
-                <button
-                  type="submit"
-                  disabled={isLoading || !searchQuery}
-                  className="btn btn-primary w-full"
-                >
-                  {isLoading ? 'Searching...' : 'Search Agents'}
-                </button>
               </form>
             </div>
           </div>
@@ -242,7 +222,7 @@ export default function RateAgentPage() {
                     <button
                       onClick={() => {
                         setSearchQuery('');
-                        setSelectedDepartment('');
+                        setAgents([]);
                         setHasSearched(false);
                       }}
                       className="btn btn-secondary"

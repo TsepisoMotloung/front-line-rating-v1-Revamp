@@ -45,10 +45,8 @@ export default function ForgotPasswordPage() {
         <div className="w-full max-w-md">
           <div className="text-center mb-8">
             <Link href="/" className="inline-flex items-center space-x-2">
-              <div className="w-12 h-12 bg-primary-600 rounded-lg flex items-center justify-center">
-                <Star className="w-7 h-7 text-white" fill="white" />
-              </div>
-              <span className="text-2xl font-bold text-neutral-900">Frontline Rating</span>
+              <img src="/logo.png" alt="Frontline Rating" className="w-12 h-12" />
+              <span className="text-2xl font-bold text-neutral-900">Frontline Rating System</span>
             </Link>
           </div>
 
@@ -67,7 +65,7 @@ export default function ForgotPasswordPage() {
                 Please check your inbox and follow the instructions to reset your password.
               </p>
 
-              <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6 text-left text-sm text-blue-800">
+                <div className="bg-primary-50 border border-primary-200 rounded-lg p-4 mb-6 text-left text-sm text-primary-800">
                 <p className="mb-2">Didn't receive the email?</p>
                 <ul className="space-y-1 ml-4">
                   <li>• Check your spam or junk folder</li>
@@ -95,9 +93,7 @@ export default function ForgotPasswordPage() {
         {/* Logo and Title */}
         <div className="text-center mb-8">
           <Link href="/" className="inline-flex items-center space-x-2 mb-4">
-            <div className="w-12 h-12 bg-primary-600 rounded-lg flex items-center justify-center">
-              <Star className="w-7 h-7 text-white" fill="white" />
-            </div>
+            <img src="/logo.png" alt="Frontline Rating" className="w-12 h-12" />
             <span className="text-2xl font-bold text-neutral-900">Frontline Rating</span>
           </Link>
           <h1 className="text-2xl font-bold text-neutral-900 mt-4">Forgot Password?</h1>

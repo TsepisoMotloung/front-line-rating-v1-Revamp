@@ -73,50 +73,57 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
     <div className="min-h-screen bg-neutral-50">
       {/* Top Navigation */}
       <nav className="bg-white border-b border-neutral-200 fixed top-0 left-0 right-0 z-30">
-        <div className="px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center h-16">
+        <div className="max-w-[2000px] mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex justify-between items-center h-14 sm:h-16">
             {/* Logo and Mobile Menu Button */}
-            <div className="flex items-center space-x-4">
+            <div className="flex items-center space-x-3 sm:space-x-4">
               <button
                 onClick={() => setIsSidebarOpen(!isSidebarOpen)}
-                className="lg:hidden p-2 rounded-lg hover:bg-neutral-100"
+                className="lg:hidden p-1.5 sm:p-2 rounded-lg hover:bg-neutral-100 focus:outline-none focus:ring-2 focus:ring-primary-500"
+                aria-label="Toggle menu"
               >
                 {isSidebarOpen ? (
-                  <X className="w-6 h-6" />
+                  <X className="w-5 h-5 sm:w-6 sm:h-6" />
                 ) : (
-                  <Menu className="w-6 h-6" />
+                  <Menu className="w-5 h-5 sm:w-6 sm:h-6" />
                 )}
               </button>
               
               <Link href="/dashboard" className="flex items-center space-x-2">
-                <div className="w-8 h-8 bg-primary-600 rounded-lg flex items-center justify-center">
-                  <Star className="w-5 h-5 text-white" fill="white" />
-                </div>
-                <span className="text-lg font-bold text-neutral-900 hidden sm:block">
-                  Frontline Rating
+                <img 
+                  src="/logo.png" 
+                  alt="Frontline Rating" 
+                  className="w-7 h-7 sm:w-8 sm:h-8" 
+                />
+                <span className="text-base sm:text-lg font-bold text-neutral-900 hidden sm:block">
+                  Frontline Rating System
                 </span>
               </Link>
             </div>
 
             {/* Right Side */}
-            <div className="flex items-center space-x-4">
+            <div className="flex items-center space-x-2 sm:space-x-4">
               {/* Notifications */}
               <Link
                 href="/dashboard/notifications"
-                className="p-2 rounded-lg hover:bg-neutral-100 relative"
+                className="p-1.5 sm:p-2 rounded-lg hover:bg-neutral-100 focus:outline-none focus:ring-2 focus:ring-primary-500 relative"
+                aria-label="Notifications"
               >
-                <Bell className="w-6 h-6 text-neutral-600" />
+                <Bell className="w-5 h-5 sm:w-6 sm:h-6 text-neutral-600" />
                 <span className="absolute top-1 right-1 w-2 h-2 bg-primary-600 rounded-full"></span>
               </Link>
 
               {/* Profile Dropdown */}
               <div className="relative group">
-                <button className="flex items-center space-x-3 p-2 rounded-lg hover:bg-neutral-100">
-                  <div className="w-8 h-8 bg-primary-100 rounded-full flex items-center justify-center">
-                    <User className="w-5 h-5 text-primary-600" />
+                <button 
+                  className="flex items-center space-x-2 sm:space-x-3 p-1.5 sm:p-2 rounded-lg hover:bg-neutral-100 focus:outline-none focus:ring-2 focus:ring-primary-500"
+                  aria-label="User menu"
+                >
+                  <div className="w-7 h-7 sm:w-8 sm:h-8 bg-primary-100 rounded-full flex items-center justify-center">
+                    <User className="w-4 h-4 sm:w-5 sm:h-5 text-primary-600" />
                   </div>
                   <div className="hidden md:block text-left">
-                    <p className="text-sm font-medium text-neutral-900">
+                    <p className="text-sm font-medium text-neutral-900 truncate max-w-[120px]">
                       {session?.user?.name}
                     </p>
                     <p className="text-xs text-neutral-500">
@@ -126,25 +133,18 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
                 </button>
 
                 {/* Dropdown Menu */}
-                <div className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg border border-neutral-200 py-2 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all">
+                <div className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg border border-neutral-200 py-1.5 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all">
                   <Link
                     href="/dashboard/profile"
-                    className="flex items-center space-x-2 px-4 py-2 hover:bg-neutral-50"
+                    className="flex items-center space-x-2 px-4 py-2 text-sm hover:bg-neutral-50 focus:outline-none focus:bg-neutral-100"
                   >
                     <User className="w-4 h-4" />
                     <span>Profile</span>
                   </Link>
-                  <Link
-                    href="/dashboard/settings"
-                    className="flex items-center space-x-2 px-4 py-2 hover:bg-neutral-50"
-                  >
-                    <Settings className="w-4 h-4" />
-                    <span>Settings</span>
-                  </Link>
-                  <hr className="my-2" />
+                  <hr className="my-1.5" />
                   <button
                     onClick={() => signOut({ callbackUrl: '/' })}
-                    className="flex items-center space-x-2 px-4 py-2 hover:bg-neutral-50 w-full text-left text-primary-600"
+                    className="flex items-center space-x-2 px-4 py-2 text-sm hover:bg-neutral-50 w-full text-left text-primary-600 focus:outline-none focus:bg-neutral-100"
                   >
                     <LogOut className="w-4 h-4" />
                     <span>Sign Out</span>
@@ -158,11 +158,11 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
 
       {/* Sidebar */}
       <aside
-        className={`fixed left-0 top-16 bottom-0 w-64 bg-white border-r border-neutral-200 z-20 transition-transform duration-300 lg:translate-x-0 ${
+        className={`fixed left-0 top-14 sm:top-16 bottom-0 w-[240px] sm:w-64 bg-white border-r border-neutral-200 z-20 transition-all duration-300 transform lg:translate-x-0 ${
           isSidebarOpen ? 'translate-x-0' : '-translate-x-full'
-        }`}
+        } overflow-y-auto scrollbar-thin scrollbar-thumb-neutral-200`}
       >
-        <nav className="p-4 space-y-2">
+        <nav className="p-3 sm:p-4 space-y-1 sm:space-y-2">
           {navItems.map((item) => {
             const isActive = pathname === item.href;
             return (
@@ -170,14 +170,14 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
                 key={item.href}
                 href={item.href}
                 onClick={() => setIsSidebarOpen(false)}
-                className={`flex items-center space-x-3 px-4 py-3 rounded-lg transition-colors ${
+                className={`flex items-center space-x-3 px-3 sm:px-4 py-2.5 sm:py-3 rounded-lg transition-colors ${
                   isActive
                     ? 'bg-primary-50 text-primary-600 font-medium'
                     : 'text-neutral-600 hover:bg-neutral-50'
-                }`}
+                } focus:outline-none focus:ring-2 focus:ring-primary-500`}
               >
-                <item.icon className="w-5 h-5" />
-                <span>{item.label}</span>
+                <item.icon className="w-5 h-5 flex-shrink-0" />
+                <span className="truncate">{item.label}</span>
               </Link>
             );
           })}
@@ -187,14 +187,15 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
       {/* Mobile Sidebar Overlay */}
       {isSidebarOpen && (
         <div
-          className="fixed inset-0 bg-black bg-opacity-50 z-10 lg:hidden"
+          className="fixed inset-0 bg-black/50 backdrop-blur-sm z-10 lg:hidden"
           onClick={() => setIsSidebarOpen(false)}
+          aria-hidden="true"
         />
       )}
 
       {/* Main Content */}
-      <main className="pt-16 lg:pl-64">
-        <div className="p-4 sm:p-6 lg:p-8">{children}</div>
+      <main className="pt-14 sm:pt-16 lg:pl-64 min-h-screen bg-neutral-50">
+        <div className="p-4 sm:p-6 lg:p-8 max-w-[2000px] mx-auto">{children}</div>
       </main>
     </div>
   );

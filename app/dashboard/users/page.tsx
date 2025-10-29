@@ -97,6 +97,58 @@ export default function UsersPage() {
     }
   };
 
+  const handleActivate = async (userId: string) => {
+    try {
+      const response = await fetch(`/api/users/${userId}/activate`, {
+        method: 'PUT',
+      });
+
+      if (!response.ok) throw new Error('Failed to activate user');
+
+      toast.success('User activated');
+      fetchUsers();
+    } catch (error) {
+      console.error('Error activating user:', error);
+      toast.error('Failed to activate user');
+    }
+  };
+
+  const handleDeactivate = async (userId: string) => {
+    if (!confirm('Are you sure you want to deactivate this user?')) return;
+
+    try {
+      const response = await fetch(`/api/users/${userId}/deactivate`, {
+        method: 'PUT',
+      });
+
+      if (!response.ok) throw new Error('Failed to deactivate user');
+
+      toast.success('User deactivated');
+      fetchUsers();
+    } catch (error) {
+      console.error('Error deactivating user:', error);
+      toast.error('Failed to deactivate user');
+    }
+  };
+
+  const handleDelete = async (userId: string) => {
+    if (!confirm('This will permanently delete the user and related data. Continue?')) return;
+
+    try {
+      const response = await fetch(`/api/users/${userId}/delete`, {
+        method: 'DELETE',
+      });
+
+      if (!response.ok) throw new Error('Failed to delete user');
+
+      toast.success('User deleted');
+      fetchUsers();
+    } catch (error) {
+      console.error('Error deleting user:', error);
+      toast.error('Failed to delete user');
+    }
+  };
+
   const pendingCount = users.filter(u => u.status === 'PENDING').length;
 
   return (
@@ -186,7 +238,7 @@ export default function UsersPage() {
                             <div className="flex gap-2">
                               <button
                                 onClick={() => handleApprove(user.id)}
-                                className="btn btn-sm bg-green-600 text-white hover:bg-green-700"
+                                className="btn btn-sm btn-primary"
                                 title="Approve"
                               >
                                 <UserCheck className="w-4 h-4" />
@@ -197,6 +249,44 @@ export default function UsersPage() {
                                 title="Reject"
                               >
                                 <UserX className="w-4 h-4" />
+                              </button>
+                            </div>
+                          )}
+
+                          {user.status === 'APPROVED' && (
+                            <div className="flex gap-2">
+                              <button
+                                onClick={() => handleDeactivate(user.id)}
+                                className="btn btn-sm btn-warning"
+                                title="Deactivate"
+                              >
+                                Deactivate
+                              </button>
+                              <button
+                                onClick={() => handleDelete(user.id)}
+                                className="btn btn-sm btn-danger"
+                                title="Delete"
+                              >
+                                Delete
+                              </button>
+                            </div>
+                          )}
+
+                          {user.status === 'REJECTED' && (
+                            <div className="flex gap-2">
+                              <button
+                                onClick={() => handleActivate(user.id)}
+                                className="btn btn-sm btn-primary"
+                                title="Activate"
+                              >
+                                Activate
+                              </button>
+                              <button
+                                onClick={() => handleDelete(user.id)}
+                                className="btn btn-sm btn-danger"
+                                title="Delete"
+                              >
+                                Delete
                               </button>
                             </div>
                           )}

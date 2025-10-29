@@ -177,10 +177,8 @@ export default function RatingFormPage({ params }: { params: { agentId: string }
         <div className="container-custom">
           <div className="flex justify-between items-center py-4">
             <Link href="/" className="flex items-center space-x-2">
-              <div className="w-10 h-10 bg-primary-600 rounded-lg flex items-center justify-center">
-                <Star className="w-6 h-6 text-white" fill="white" />
-              </div>
-              <span className="text-xl font-bold text-neutral-900">Frontline Rating</span>
+              <img src="/logo.png" alt="Frontline Rating" className="w-10 h-10" />
+              <span className="text-xl font-bold text-neutral-900">Frontline Rating System</span>
             </Link>
             <Link href="/rate" className="text-neutral-600 hover:text-neutral-900">
               ← Back to Search

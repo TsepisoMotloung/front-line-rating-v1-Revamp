@@ -9,10 +9,8 @@ export default function Home() {
         <div className="container-custom">
           <div className="flex justify-between items-center py-4">
             <div className="flex items-center space-x-2">
-              <div className="w-10 h-10 bg-primary-600 rounded-lg flex items-center justify-center">
-                <Star className="w-6 h-6 text-white" fill="white" />
-              </div>
-              <span className="text-xl font-bold text-neutral-900">Frontline Rating</span>
+              <img src="/logo.png" alt="Frontline Rating" className="w-10 h-10" />
+              <span className="text-xl font-bold text-neutral-900">Frontline Rating System</span>
             </div>
             <div className="flex items-center space-x-4">
               <Link
@@ -182,9 +180,7 @@ export default function Home() {
           <div className="grid md:grid-cols-3 gap-8">
             <div>
               <div className="flex items-center space-x-2 mb-4">
-                <div className="w-8 h-8 bg-primary-600 rounded-lg flex items-center justify-center">
-                  <Star className="w-5 h-5 text-white" fill="white" />
-                </div>
+                <img src="/logo.png" alt="Frontline Rating" className="w-8 h-8" />
                 <span className="text-lg font-bold">Frontline Rating</span>
               </div>
               <p className="text-neutral-400">

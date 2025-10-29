@@ -9,10 +9,8 @@ export default function RatingSuccessPage() {
         <div className="container-custom">
           <div className="flex justify-between items-center py-4">
             <Link href="/" className="flex items-center space-x-2">
-              <div className="w-10 h-10 bg-primary-600 rounded-lg flex items-center justify-center">
-                <Star className="w-6 h-6 text-white" fill="white" />
-              </div>
-              <span className="text-xl font-bold text-neutral-900">Frontline Rating</span>
+              <img src="/logo.png" alt="Frontline Rating" className="w-10 h-10" />
+              <span className="text-xl font-bold text-neutral-900">Frontline Rating System</span>
             </Link>
           </div>
         </div>
@@ -23,8 +21,8 @@ export default function RatingSuccessPage() {
         <div className="max-w-2xl mx-auto">
           <div className="card">
             <div className="card-body text-center py-12">
-              <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6">
-                <CheckCircle className="w-12 h-12 text-green-600" />
+              <div className="w-20 h-20 bg-primary-100 rounded-full flex items-center justify-center mx-auto mb-6">
+                <CheckCircle className="w-12 h-12 text-primary-600" />
               </div>
 
               <h1 className="text-3xl font-bold text-neutral-900 mb-4">
@@ -35,9 +33,9 @@ export default function RatingSuccessPage() {
                 Your rating has been successfully submitted. We appreciate you taking the time to share your experience with us.
               </p>
 
-              <div className="bg-blue-50 border border-blue-200 rounded-lg p-6 mb-8 text-left">
-                <h3 className="font-semibold text-blue-900 mb-3">What Happens Next?</h3>
-                <ul className="space-y-2 text-sm text-blue-800">
+              <div className="bg-primary-50 border border-primary-200 rounded-lg p-6 mb-8 text-left">
+                <h4 className="font-semibold text-primary-900 mb-4">What happens next?</h4>
+                <ul className="space-y-3 text-primary-800">
                   <li className="flex items-start">
                     <span className="mr-2">•</span>
                     <span>Your feedback will be reviewed by our quality team</span>

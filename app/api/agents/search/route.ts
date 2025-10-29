@@ -13,26 +13,15 @@ export async function GET(request: NextRequest) {
       status: 'APPROVED',
     };
 
-    if (query) {
-      where.OR = [
-        {
-          name: {
-            contains: query,
-            mode: 'insensitive',
-          },
-        },
-        {
-          employeeId: {
-            contains: query,
-            mode: 'insensitive',
-          },
-        },
-      ];
+    if (query && query.trim() !== '') {
+      // Only search by agent name (case-insensitive depending on DB collation)
+      where.name = { contains: query };
+    } else {
+      // If no query provided, return empty result to avoid returning all agents
+      return NextResponse.json([], { status: 200 });
     }
 
-    if (departmentId) {
-      where.departmentId = departmentId;
-    }
+    // departmentId is ignored for this simplified name-only search
 
     // Search for agents
     const agents = await prisma.user.findMany({
@@ -58,9 +47,6 @@ export async function GET(request: NextRequest) {
     return NextResponse.json(agents);
   } catch (error) {
     console.error('Error searching agents:', error);
-    return NextResponse.json(
-      { error: 'Failed to search agents' },
-      { status: 500 }
-    );
+    return NextResponse.json([], { status: 200 });
   }
 }

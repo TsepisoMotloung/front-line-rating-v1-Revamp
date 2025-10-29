@@ -237,9 +237,9 @@ export default function QuestionsPage() {
         </div>
 
         {/* Info Card */}
-        <div className="bg-blue-50 border border-blue-200 rounded-lg p-6">
-          <h3 className="font-semibold text-blue-900 mb-2">Tips for Great Questions</h3>
-          <ul className="space-y-1 text-sm text-blue-800">
+          <div className="bg-primary-50 border border-primary-200 rounded-lg p-6">
+            <h3 className="font-semibold text-primary-900 mb-2">Tips for Great Questions</h3>
+            <ul className="space-y-1 text-sm text-primary-800">
             <li>• Keep questions clear and specific</li>
             <li>• Focus on measurable aspects of service quality</li>
             <li>• Use positive language</li>

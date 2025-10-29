@@ -50,10 +50,8 @@ export default function LoginPage() {
         {/* Logo and Title */}
         <div className="text-center mb-8">
           <Link href="/" className="inline-flex items-center space-x-2 mb-4">
-            <div className="w-12 h-12 bg-primary-600 rounded-lg flex items-center justify-center">
-              <Star className="w-7 h-7 text-white" fill="white" />
-            </div>
-            <span className="text-2xl font-bold text-neutral-900">Frontline Rating</span>
+            <img src="/logo.png" alt="Frontline Rating" className="w-12 h-12" />
+            <span className="text-2xl font-bold text-neutral-900">Frontline Rating System</span>
           </Link>
           <h1 className="text-2xl font-bold text-neutral-900 mt-4">Welcome Back</h1>
           <p className="text-neutral-600 mt-2">Sign in to your account to continue</p>

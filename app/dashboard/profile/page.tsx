@@ -77,7 +77,7 @@ export default function ProfilePage() {
     <DashboardLayout>
       <div className="space-y-6">
         <div>
-          <h1 className="text-3xl font-bold text-neutral-900">Profile Settings</h1>
+          <h1 className="text-3xl font-bold text-neutral-900">My Profile</h1>
           <p className="text-neutral-600 mt-2">
             Manage your account information and preferences
           </p>
@@ -267,11 +267,11 @@ export default function ProfilePage() {
                           <span>Regenerate</span>
                         </button>
                       </div>
-                      <div className="mt-6 p-4 bg-blue-50 border border-blue-200 rounded-lg text-left">
-                        <h4 className="font-semibold text-blue-900 text-sm mb-2">
+                      <div className="mt-6 p-4 bg-primary-50 border border-primary-200 rounded-lg text-left">
+                        <h4 className="font-semibold text-primary-900 text-sm mb-2">
                           How to use:
                         </h4>
-                        <ul className="text-xs text-blue-800 space-y-1">
+                        <ul className="text-xs text-primary-800 space-y-1">
                           <li>• Print and display at your desk</li>
                           <li>• Add to your email signature</li>
                           <li>• Share on business cards</li>
