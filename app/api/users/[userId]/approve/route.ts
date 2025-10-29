@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
 import prisma from '@/lib/prisma';
-import { sendApprovalEmail } from '@/lib/email';
+import { sendApprovalNotificationEmail } from '@/lib/email';
 
 export async function PUT(
   request: NextRequest,
@@ -30,7 +30,7 @@ export async function PUT(
 
     // Send approval email
     try {
-      await sendApprovalEmail(user.email, user.name);
+      await sendApprovalNotificationEmail(user.email, user.name, true);
     } catch (emailError) {
       console.error('Failed to send approval email:', emailError);
     }
