@@ -97,10 +97,10 @@ export default function RateAgentPage() {
           {/* Header */}
           <div className="text-center mb-12">
             <h1 className="text-4xl font-bold text-neutral-900 mb-4">
-              Find Your Agent
+              Find Your Agent or Frontline Employee
             </h1>
             <p className="text-lg text-neutral-600">
-              Search for the agent who served you to share your feedback
+              Search for the agent or employee who served you to share your feedback
             </p>
           </div>
 
@@ -128,7 +128,7 @@ export default function RateAgentPage() {
               <form onSubmit={(e) => e.preventDefault()} className="space-y-6">
                 <div>
                   <label htmlFor="search" className="label">
-                    Agent Name
+                    Agent or Employee Name
                   </label>
                   <div className="relative">
                     <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
@@ -140,7 +140,7 @@ export default function RateAgentPage() {
                       value={searchQuery}
                       onChange={(e) => setSearchQuery(e.target.value)}
                       className="input pl-10"
-                      placeholder="Start typing an agent name..."
+                      placeholder="Start typing an agent/empoyee name..."
                     />
                   </div>
                 </div>

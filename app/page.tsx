@@ -51,9 +51,9 @@ export default function Home() {
             
             
             <h1 className="text-5xl lg:text-7xl font-bold text-neutral-900 mb-6 leading-tight">
-              Rate Your Service
+              
               <span className="block bg-gradient-to-r from-primary-600 text-primary-6000 to-primary-600 bg-clip-text text-transparent">
-                Experience
+                Rate Our Service
               </span>
             </h1>
             
@@ -68,7 +68,7 @@ export default function Home() {
                 className="btn btn-primary btn-lg flex items-center space-x-2 w-full sm:w-auto shadow-xl shadow-primary-500/30 hover:shadow-2xl hover:shadow-primary-500/40 hover:-translate-y-1 transition-all duration-300"
               >
                 <Search className="w-5 h-5" />
-                <span>Search Agent</span>
+                <span>Search and Rate</span>
               </Link>
               <Link
                 href="/rate/scan"
@@ -145,7 +145,7 @@ export default function Home() {
                   Recognition
                 </h3>
                 <p className="text-neutral-600 leading-relaxed">
-                  Outstanding agents are recognized and rewarded based on customer satisfaction
+                  Outstanding agents or frontline employees are recognized and rewarded based on customer satisfaction
                 </p>
               </div>
             </div>
@@ -200,10 +200,10 @@ export default function Home() {
                 </div>
                 <div className="flex-1">
                   <h3 className="text-xl font-bold text-white mb-3">
-                    Find Your Agent
+                    Find Your Agent or Employee
                   </h3>
                   <p className="text-primary-100 leading-relaxed text-lg">
-                    Search for your agent by name or scan their QR code
+                    Search for your agent or employee by name or scan their QR code
                   </p>
                 </div>
               </div>
@@ -231,7 +231,7 @@ export default function Home() {
                     Submit Feedback
                   </h3>
                   <p className="text-primary-100 leading-relaxed text-lg">
-                    Add optional comments and submit your rating anonymously or with your details
+                    Add optional comments and submit your rating
                   </p>
                 </div>
               </div>
@@ -265,7 +265,7 @@ export default function Home() {
               <ul className="space-y-3 text-neutral-400">
                 <li>
                   <Link href="/rate" className="hover:text-primary-400 transition-colors inline-flex items-center group">
-                    <span className="group-hover:translate-x-1 transition-transform">Rate Agent</span>
+                    <span className="group-hover:translate-x-1 transition-transform">Rate Agent or Employee</span>
                   </Link>
                 </li>
                 <li>

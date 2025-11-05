@@ -209,7 +209,7 @@ export default function RatingFormPage({ params }: { params: { agentId: string }
           {/* Rating Form */}
           <div className="card">
             <div className="card-header">
-              <h3 className="text-xl font-semibold text-neutral-900">Rate Your Service Experience</h3>
+              <h3 className="text-xl font-semibold text-neutral-900">Rate Our Service</h3>
               <p className="text-sm text-neutral-600 mt-1">
                 Your feedback helps us improve our service quality
               </p>
@@ -241,7 +241,7 @@ export default function RatingFormPage({ params }: { params: { agentId: string }
                 <div className="border-t pt-6">
                   <h4 className="font-semibold text-neutral-900 mb-4">Your Information</h4>
                   
-                  <div className="flex items-center mb-4">
+                  {/* <div className="flex items-center mb-4">
                     <input
                       type="checkbox"
                       id="anonymous"
@@ -252,7 +252,7 @@ export default function RatingFormPage({ params }: { params: { agentId: string }
                     <label htmlFor="anonymous" className="ml-2 text-sm text-neutral-700">
                       Submit anonymously
                     </label>
-                  </div>
+                  </div> */}
 
                   {!formData.isAnonymous && (
                     <div className="space-y-4">
@@ -271,14 +271,14 @@ export default function RatingFormPage({ params }: { params: { agentId: string }
                             value={formData.customerName}
                             onChange={(e) => setFormData({ ...formData, customerName: e.target.value })}
                             className="input pl-10"
-                            placeholder="John Doe"
+                            placeholder="Tsepiso Motloung"
                           />
                         </div>
                       </div>
 
                       <div>
                         <label htmlFor="customerContact" className="label">
-                          Contact (Phone or Email)
+                          Phone Number
                         </label>
                         <div className="relative">
                           <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
@@ -290,7 +290,7 @@ export default function RatingFormPage({ params }: { params: { agentId: string }
                             value={formData.customerContact}
                             onChange={(e) => setFormData({ ...formData, customerContact: e.target.value })}
                             className="input pl-10"
-                            placeholder="+266 5000 0000 or email@example.com"
+                            placeholder="+266 5000 0000"
                           />
                         </div>
                       </div>

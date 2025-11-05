@@ -138,7 +138,7 @@ export default function RegisterPage() {
                       value={formData.name}
                       onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                       className="input pl-10"
-                      placeholder="John Doe"
+                      placeholder="Tsepiso Motloung"
                     />
                   </div>
                 </div>
@@ -159,7 +159,7 @@ export default function RegisterPage() {
                       value={formData.email}
                       onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                       className="input pl-10"
-                      placeholder="john@example.com"
+                      placeholder="user@example.com"
                     />
                   </div>
                 </div>
