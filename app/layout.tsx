@@ -7,9 +7,9 @@ import Providers from './providers';
 const inter = Inter({ subsets: ['latin'] });
 
 export const metadata: Metadata = {
-  title: 'Frontline Rating System',
-  description: 'Professional rating system for frontline employees and agents',
-  keywords: ['rating', 'feedback', 'customer service', 'performance'],
+  title: 'Alliance Insurance Service Feedback',
+  description: 'Comprehensive service feedback system for Alliance Insurance - rate agents, employees, and company-wide service',
+  keywords: ['insurance feedback', 'service rating', 'agent rating', 'customer feedback', 'performance'],
 };
 
 export default function RootLayout({

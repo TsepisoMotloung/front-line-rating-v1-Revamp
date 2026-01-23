@@ -9,9 +9,9 @@ export default function Home() {
         <div className="container-custom">
           <div className="flex justify-between items-center py-4">
             <div className="flex items-center space-x-2">
-              <img src="/logo.png" alt="Frontline Rating" className="h-10 w-[3.33rem]" />
+              <img src="/logo.png" alt="Alliance Insurance" className="h-10 w-[3.33rem]" />
               <span className="text-xl font-bold bg-gradient-to-r from-primary-600 to-primary-800 bg-clip-text text-transparent">
-                Frontline Rating System
+                Alliance Insurance Service Feedback
               </span>
             </div>
             <div className="flex items-center space-x-4">
@@ -53,12 +53,12 @@ export default function Home() {
             <h1 className="text-5xl lg:text-7xl font-bold text-neutral-900 mb-6 leading-tight">
               
               <span className="block bg-gradient-to-r from-primary-600 text-primary-6000 to-primary-600 bg-clip-text text-transparent">
-                Rate Our Service
+                Share Your Service Experience
               </span>
             </h1>
             
             <p className="text-xl lg:text-2xl text-neutral-600 mb-12 max-w-3xl mx-auto leading-relaxed">
-              Share your feedback and help us improve our service quality. Your opinion matters and drives positive change.
+              Rate our agents, employees, or company-wide service. Your valuable feedback helps us deliver excellence and recognize outstanding performance.
             </p>
 
             {/* CTA Buttons */}
@@ -68,14 +68,14 @@ export default function Home() {
                 className="btn btn-primary btn-lg flex items-center space-x-2 w-full sm:w-auto shadow-xl shadow-primary-500/30 hover:shadow-2xl hover:shadow-primary-500/40 hover:-translate-y-1 transition-all duration-300"
               >
                 <Search className="w-5 h-5" />
-                <span>Search and Rate</span>
+                <span>Rate an Agent or Employee</span>
               </Link>
               <Link
-                href="/rate/scan"
+                href="/rate/alliance"
                 className="btn btn-outline btn-lg flex items-center space-x-2 w-full sm:w-auto hover:bg-neutral-50 hover:-translate-y-1 transition-all duration-300"
               >
-                <QrCode className="w-5 h-5" />
-                <span>Scan QR Code</span>
+                <Star className="w-5 h-5" />
+                <span>Rate Alliance as a Company</span>
               </Link>
             </div>
 
@@ -112,10 +112,10 @@ export default function Home() {
               </span>
             </div>
             <h2 className="text-4xl lg:text-5xl font-bold text-neutral-900 mb-6">
-              Why Your Feedback Matters
+              Your Feedback Powers Excellence
             </h2>
             <p className="text-lg lg:text-xl text-neutral-600 max-w-2xl mx-auto">
-              Your ratings help us maintain high service standards and recognize outstanding performance
+              Rate our team members and company service to help us maintain the highest standards and recognize excellence
             </p>
           </div>
 
@@ -130,7 +130,7 @@ export default function Home() {
                   Quality Assurance
                 </h3>
                 <p className="text-neutral-600 leading-relaxed">
-                  Help us maintain and improve service quality through your valuable feedback
+                  Rate agents, employees, and company service to help us maintain the highest standards and improve continuously
                 </p>
               </div>
             </div>
@@ -142,10 +142,10 @@ export default function Home() {
                   <Award className="w-10 h-10 text-white" />
                 </div>
                 <h3 className="text-xl font-bold text-neutral-900 mb-3">
-                  Recognition
+                  Team Recognition
                 </h3>
                 <p className="text-neutral-600 leading-relaxed">
-                  Outstanding agents or frontline employees are recognized and rewarded based on customer satisfaction
+                  Exceptional agents and employees are recognized and rewarded based on your ratings and feedback
                 </p>
               </div>
             </div>
@@ -185,10 +185,10 @@ export default function Home() {
               </span>
             </div>
             <h2 className="text-4xl lg:text-5xl font-bold text-white mb-6">
-              How It Works
+              Simple and Quick
             </h2>
             <p className="text-lg lg:text-xl text-primary-100 max-w-2xl mx-auto">
-              Rating your service experience is quick and easy
+              Share your feedback in just a few minutes
             </p>
           </div>
 
@@ -200,10 +200,10 @@ export default function Home() {
                 </div>
                 <div className="flex-1">
                   <h3 className="text-xl font-bold text-white mb-3">
-                    Find Your Agent or Employee
+                    Choose What to Rate
                   </h3>
                   <p className="text-primary-100 leading-relaxed text-lg">
-                    Search for your agent or employee by name or scan their QR code
+                    Select to rate an Agent, Employee, or Alliance as a company overall
                   </p>
                 </div>
               </div>
@@ -214,10 +214,10 @@ export default function Home() {
                 </div>
                 <div className="flex-1">
                   <h3 className="text-xl font-bold text-white mb-3">
-                    Rate the Service
+                    Provide Your Feedback
                   </h3>
                   <p className="text-primary-100 leading-relaxed text-lg">
-                    Answer a few questions about your experience on a scale of 1-5
+                    Answer a few questions about your experience on a scale of 1-5 stars
                   </p>
                 </div>
               </div>
@@ -228,10 +228,24 @@ export default function Home() {
                 </div>
                 <div className="flex-1">
                   <h3 className="text-xl font-bold text-white mb-3">
-                    Submit Feedback
+                    Share Comments & Submit
                   </h3>
                   <p className="text-primary-100 leading-relaxed text-lg">
-                    Add optional comments and submit your rating
+                    Add detailed comments and submit your rating anonymously
+                  </p>
+                </div>
+              </div>
+
+              <div className="flex items-start space-x-6 bg-white/10 backdrop-blur-sm rounded-2xl p-8 border border-white/20 hover:bg-white/15 transition-all duration-300">
+                <div className="flex-shrink-0 w-16 h-16 bg-white rounded-2xl flex items-center justify-center text-primary-600 font-bold text-2xl shadow-xl">
+                  4
+                </div>
+                <div className="flex-1">
+                  <h3 className="text-xl font-bold text-white mb-3">
+                    We Take Action
+                  </h3>
+                  <p className="text-primary-100 leading-relaxed text-lg">
+                    Your feedback helps recognize top performers and drive service improvements
                   </p>
                 </div>
               </div>
@@ -250,13 +264,13 @@ export default function Home() {
           <div className="grid md:grid-cols-3 gap-12">
             <div>
               <div className="flex items-center space-x-2 mb-6">
-                <img src="/logo.png" alt="Frontline Rating" className="h-10 w-[3.33rem]" />
+                <img src="/logo.png" alt="Alliance Insurance" className="h-10 w-[3.33rem]" />
                 <span className="text-xl font-bold bg-gradient-to-r from-primary-400 to-primary-600 bg-clip-text text-transparent">
-                  Frontline Rating
+                  Alliance Insurance
                 </span>
               </div>
               <p className="text-neutral-400 leading-relaxed">
-                Professional rating system for measuring and improving service quality
+                Comprehensive service feedback platform for measuring and improving insurance service excellence
               </p>
             </div>
 
@@ -265,7 +279,12 @@ export default function Home() {
               <ul className="space-y-3 text-neutral-400">
                 <li>
                   <Link href="/rate" className="hover:text-primary-400 transition-colors inline-flex items-center group">
-                    <span className="group-hover:translate-x-1 transition-transform">Rate Agent or Employee</span>
+                    <span className="group-hover:translate-x-1 transition-transform">Rate an Agent or Employee</span>
+                  </Link>
+                </li>
+                <li>
+                  <Link href="/rate/alliance" className="hover:text-primary-400 transition-colors inline-flex items-center group">
+                    <span className="group-hover:translate-x-1 transition-transform">Rate Alliance Company</span>
                   </Link>
                 </li>
                 <li>
@@ -290,7 +309,7 @@ export default function Home() {
           </div>
 
           <div className="border-t border-neutral-800 mt-12 pt-8 text-center text-neutral-400">
-            <p>&copy; {new Date().getFullYear()} Frontline Rating System. All rights reserved.</p>
+            <p>&copy; {new Date().getFullYear()} Alliance Insurance Service Feedback. All rights reserved.</p>
           </div>
         </div>
       </footer>

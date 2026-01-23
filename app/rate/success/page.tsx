@@ -10,7 +10,7 @@ export default function RatingSuccessPage() {
           <div className="flex justify-between items-center py-4">
             <Link href="/" className="flex items-center space-x-2">
               <img src="/logo.png" alt="Frontline Rating" className="h-10 w-[3.33rem]" />
-              <span className="text-xl font-bold text-neutral-900">Frontline Rating System</span>
+              <span className="text-xl font-bold text-neutral-900\">Alliance Insurance Service Feedback</span>
             </Link>
           </div>
         </div>
