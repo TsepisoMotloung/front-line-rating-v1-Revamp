@@ -72,6 +72,12 @@ export default function AdminDashboard() {
           </p>
         </div>
         <div className="flex gap-3">
+          <Link href="/dashboard/admin/alliance-questions" className="btn btn-outline">
+            Manage Alliance Questions
+          </Link>
+          <Link href="/dashboard/analytics" className="btn btn-outline">
+            Ratings Analytics
+          </Link>
           <Link href="/dashboard/users" className="btn btn-outline">
             Manage Users
           </Link>

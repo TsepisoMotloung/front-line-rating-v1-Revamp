@@ -234,28 +234,50 @@ export async function POST(request: NextRequest) {
 export async function GET(request: NextRequest) {
   try {
     const searchParams = request.nextUrl.searchParams;
-    const agentId = searchParams.get('agentId');
+    const ratingType = searchParams.get('ratingType');
+    const agentId = searchParams.get('userId');
     const departmentId = searchParams.get('departmentId');
-    const isComplaint = searchParams.get('isComplaint');
-    const limit = parseInt(searchParams.get('limit') || '50');
+    const startDate = searchParams.get('startDate');
+    const endDate = searchParams.get('endDate');
+    const searchQuery = searchParams.get('search');
+    const limit = parseInt(searchParams.get('limit') || '100');
 
+    // Build where clause
     const where: any = {};
 
-    if (agentId) where.agentId = agentId;
-    if (departmentId) where.departmentId = departmentId;
-    if (isComplaint !== null) where.isComplaint = isComplaint === 'true';
+    if (ratingType) where.ratingType = ratingType;
+    if (agentId && ratingType !== 'ALLIANCE') where.agentId = agentId;
+    if (departmentId && ratingType !== 'ALLIANCE') where.departmentId = departmentId;
 
+    // Date range filtering
+    if (startDate || endDate) {
+      where.createdAt = {};
+      if (startDate) where.createdAt.gte = new Date(startDate);
+      if (endDate) where.createdAt.lte = new Date(endDate);
+    }
+
+    // Search by customer name or feedback
+    if (searchQuery) {
+      where.OR = [
+        { customerName: { contains: searchQuery } },
+        { feedbackText: { contains: searchQuery } },
+      ];
+    }
+
+    // Fetch ratings
     const ratings = await prisma.rating.findMany({
       where,
       include: {
         agent: {
           select: {
+            id: true,
             name: true,
             employeeId: true,
           },
         },
         department: {
           select: {
+            id: true,
             name: true,
           },
         },
@@ -275,7 +297,78 @@ export async function GET(request: NextRequest) {
       take: limit,
     });
 
-    return NextResponse.json(ratings);
+    // Calculate average scores
+    const ratingsWithAverages = ratings.map((rating) => ({
+      ...rating,
+      averageScore:
+        rating.responses.length > 0
+          ? rating.responses.reduce((sum, r) => sum + r.score, 0) / rating.responses.length
+          : 0,
+    }));
+
+    // Calculate analytics
+    const totalRatings = ratingsWithAverages.length;
+    const averageRating =
+      totalRatings > 0
+        ? ratingsWithAverages.reduce((sum, r) => sum + r.averageScore, 0) / totalRatings
+        : 0;
+
+    const allianceRatings = ratingsWithAverages.filter((r) => r.ratingType === 'ALLIANCE');
+    const agentRatings = ratingsWithAverages.filter((r) => r.ratingType === 'AGENT');
+
+    const satisfactionRate =
+      totalRatings > 0
+        ? Math.round(
+            (ratingsWithAverages.filter((r) => r.averageScore >= 4).length / totalRatings) * 100
+          )
+        : 0;
+
+    // Trend data (grouped by date)
+    const trendMap = new Map<string, { sum: number; count: number }>();
+    ratingsWithAverages.forEach((rating) => {
+      const date = new Date(rating.createdAt).toISOString().split('T')[0];
+      const existing = trendMap.get(date) || { sum: 0, count: 0 };
+      trendMap.set(date, {
+        sum: existing.sum + rating.averageScore,
+        count: existing.count + 1,
+      });
+    });
+
+    const trendData = Array.from(trendMap.entries())
+      .map(([date, data]) => ({
+        date,
+        average: parseFloat((data.sum / data.count).toFixed(2)),
+      }))
+      .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime())
+      .slice(-30); // Last 30 days
+
+    // Ratings by type
+    const ratingsByType = [
+      {
+        name: 'Alliance',
+        value: allianceRatings.length,
+      },
+      {
+        name: 'Employee',
+        value: agentRatings.length,
+      },
+    ];
+
+    const analytics = {
+      totalRatings,
+      averageRating: parseFloat(averageRating.toFixed(2)),
+      alliances: allianceRatings.length,
+      agents: agentRatings.length,
+      satisfactionRate,
+      trendData,
+      ratingsByType,
+      topAgents: [], // Can be enhanced later
+    };
+
+    return NextResponse.json({
+      ratings: ratingsWithAverages,
+      analytics,
+    });
   } catch (error) {
     console.error('Error fetching ratings:', error);
     return NextResponse.json(
