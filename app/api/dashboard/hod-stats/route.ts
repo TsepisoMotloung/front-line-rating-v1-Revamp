@@ -176,23 +176,25 @@ export async function GET(request: NextRequest) {
       take: 5,
     });
 
-    const complaintsWithScores = recentComplaints.map((complaint) => {
-      let totalScore = 0;
-      complaint.responses.forEach((r) => {
-        totalScore += r.score;
-      });
-      const averageScore = complaint.responses.length > 0 ? totalScore / complaint.responses.length : 0;
+    const complaintsWithScores = recentComplaints
+      .filter((complaint) => complaint.agent !== null)
+      .map((complaint) => {
+        let totalScore = 0;
+        complaint.responses.forEach((r) => {
+          totalScore += r.score;
+        });
+        const averageScore = complaint.responses.length > 0 ? totalScore / complaint.responses.length : 0;
 
-      return {
-        id: complaint.id,
-        agentName: complaint.agent.name,
-        customerName: complaint.customerName,
-        feedbackText: complaint.feedbackText,
-        complaintStatus: complaint.complaintStatus,
-        averageScore,
-        createdAt: complaint.createdAt,
-      };
-    });
+        return {
+          id: complaint.id,
+          agentName: complaint.agent!.name,
+          customerName: complaint.customerName,
+          feedbackText: complaint.feedbackText,
+          complaintStatus: complaint.complaintStatus,
+          averageScore,
+          createdAt: complaint.createdAt,
+        };
+      });
 
     return NextResponse.json({
       totalAgents,

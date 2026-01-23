@@ -27,6 +27,12 @@ enum ComplaintStatus {
   RESOLVED
 }
 
+enum RatingType {
+  AGENT          // Customer rating an agent
+  COMPANY        // Customer rating Alliance Insurance company
+  INTERNAL       // Internal rating (employee to employee)
+}
+
 model User {
   id                String       @id @default(cuid())
   email             String       @unique
@@ -48,6 +54,8 @@ model User {
   updatedAt         DateTime     @updatedAt
   
   ratings           Rating[]
+  ratingsGiven      InternalRating[] @relation("RaterUser")
+  ratingsReceived   InternalRating[] @relation("RatedUser")
   notifications     Notification[]
   profileUpdates    ProfileUpdateRequest[]
   
@@ -90,10 +98,11 @@ model Question {
 
 model Rating {
   id             String          @id @default(cuid())
-  agentId        String
-  agent          User            @relation(fields: [agentId], references: [id], onDelete: Cascade)
-  departmentId   String
-  department     Department      @relation(fields: [departmentId], references: [id], onDelete: Cascade)
+  ratingType     RatingType      @default(AGENT)
+  agentId        String?
+  agent          User?           @relation(fields: [agentId], references: [id], onDelete: Cascade)
+  departmentId   String?
+  department     Department?     @relation(fields: [departmentId], references: [id], onDelete: Cascade)
   
   // Customer Information
   customerName   String
@@ -116,6 +125,7 @@ model Rating {
   
   responses      Response[]
   
+  @@index([ratingType])
   @@index([agentId])
   @@index([departmentId])
   @@index([isComplaint])
@@ -175,4 +185,29 @@ model SystemSettings {
   updatedAt DateTime @updatedAt
   
   @@index([key])
+}
+
+model InternalRating {
+  id            String   @id @default(cuid())
+  raterId       String
+  rater         User     @relation("RaterUser", fields: [raterId], references: [id], onDelete: Cascade)
+  ratedId       String
+  rated         User     @relation("RatedUser", fields: [ratedId], references: [id], onDelete: Cascade)
+  
+  // Rating Details
+  category      String   // 'professionalism', 'teamwork', 'performance', 'communication', 'reliability'
+  score         Int      // 1-5 rating
+  
+  // Feedback
+  feedbackText  String?  @db.Text
+  isAnonymous   Boolean  @default(false)
+  
+  // Metadata
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  
+  @@index([raterId])
+  @@index([ratedId])
+  @@index([category])
+  @@index([createdAt])
 }

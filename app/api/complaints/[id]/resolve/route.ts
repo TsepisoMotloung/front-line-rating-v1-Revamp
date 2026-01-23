@@ -40,15 +40,17 @@ export async function PUT(
       },
     });
 
-    // Create notification for agent
-    await prisma.notification.create({
-      data: {
-        userId: complaint.agentId,
-        title: 'Complaint Resolved',
-        message: `A complaint from ${complaint.customerName} has been marked as resolved`,
-        type: 'complaint',
-      },
-    });
+    // Create notification for agent (only if agentId exists)
+    if (complaint.agentId) {
+      await prisma.notification.create({
+        data: {
+          userId: complaint.agentId,
+          title: 'Complaint Resolved',
+          message: `A complaint from ${complaint.customerName} has been marked as resolved`,
+          type: 'complaint',
+        },
+      });
+    }
 
     return NextResponse.json({
       message: 'Complaint resolved successfully',

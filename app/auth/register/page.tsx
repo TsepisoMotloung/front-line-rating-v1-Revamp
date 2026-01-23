@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { Star, Mail, Lock, User, Phone, Building2, Hash, AlertCircle, CheckCircle } from 'lucide-react';
 import toast from 'react-hot-toast';
+import ReCAPTCHA from 'react-google-recaptcha';
 
 interface Department {
   id: string;
@@ -16,6 +17,7 @@ export default function RegisterPage() {
   const [isLoading, setIsLoading] = useState(false);
   const [departments, setDepartments] = useState<Department[]>([]);
   const [error, setError] = useState('');
+  const [recaptchaToken, setRecaptchaToken] = useState<string | null>(null);
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -70,13 +72,22 @@ export default function RegisterPage() {
       return;
     }
 
+    if (!recaptchaToken) {
+      setError('Please complete the reCAPTCHA verification');
+      toast.error('Please complete the reCAPTCHA verification');
+      return;
+    }
+
     setIsLoading(true);
 
     try {
       const response = await fetch('/api/auth/register', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(formData),
+        body: JSON.stringify({
+          ...formData,
+          recaptchaToken,
+        }),
       });
 
       const data = await response.json();
@@ -302,6 +313,13 @@ export default function RegisterPage() {
                 <span className="text-sm">
                   Your account will require administrator approval before you can log in.
                 </span>
+              </div>
+
+              <div className="flex justify-center">
+                <ReCAPTCHA
+                  sitekey={process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY || ''}
+                  onChange={(token) => setRecaptchaToken(token)}
+                />
               </div>
 
               <button

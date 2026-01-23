@@ -6,6 +6,7 @@ export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
     const {
+      ratingType,
       agentId,
       customerName,
       customerContact,
@@ -17,9 +18,9 @@ export async function POST(request: NextRequest) {
     } = body;
 
     // Validate required fields
-    if (!agentId || !customerName) {
+    if (!customerName) {
       return NextResponse.json(
-        { error: 'Missing required fields' },
+        { error: 'Missing required fields: customerName' },
         { status: 400 }
       );
     }
@@ -27,6 +28,53 @@ export async function POST(request: NextRequest) {
     if (!responses || !Array.isArray(responses) || responses.length === 0) {
       return NextResponse.json(
         { error: 'At least one response is required' },
+        { status: 400 }
+      );
+    }
+
+    // Handle different rating types
+    if (ratingType === 'COMPANY') {
+      // Company rating - no agent or department required
+      const ipAddress = request.headers.get('x-forwarded-for') || request.headers.get('x-real-ip') || 'unknown';
+      const userAgent = request.headers.get('user-agent') || 'unknown';
+
+      const rating = await prisma.rating.create({
+        data: {
+          ratingType: 'COMPANY',
+          customerName,
+          customerContact,
+          policyNumber,
+          isAnonymous,
+          isComplaint,
+          feedbackText,
+          complaintStatus: isComplaint ? 'OPEN' : undefined,
+          ipAddress,
+          userAgent,
+          responses: {
+            create: responses.map((r: any) => ({
+              questionId: r.questionId,
+              score: r.score,
+            })),
+          },
+        },
+        include: {
+          responses: true,
+        },
+      });
+
+      return NextResponse.json(
+        {
+          message: 'Company rating submitted successfully',
+          rating: { id: rating.id },
+        },
+        { status: 201 }
+      );
+    }
+
+    // Default AGENT rating
+    if (!agentId) {
+      return NextResponse.json(
+        { error: 'Missing required fields: agentId' },
         { status: 400 }
       );
     }

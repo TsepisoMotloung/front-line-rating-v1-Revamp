@@ -33,6 +33,7 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
 
     const commonItems = [
       { href: '/dashboard', icon: LayoutDashboard, label: 'Dashboard' },
+      { href: '/dashboard/internal-ratings', icon: Users, label: 'Internal Ratings' },
     ];
 
     if (role === 'ADMIN') {

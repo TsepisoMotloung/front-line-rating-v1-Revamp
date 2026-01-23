@@ -6,11 +6,13 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { Star, Mail, Lock, AlertCircle } from 'lucide-react';
 import toast from 'react-hot-toast';
+import ReCAPTCHA from 'react-google-recaptcha';
 
 export default function LoginPage() {
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
+  const [recaptchaToken, setRecaptchaToken] = useState<string | null>(null);
   const [formData, setFormData] = useState({
     email: '',
     password: '',
@@ -19,12 +21,20 @@ export default function LoginPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
+    
+    if (!recaptchaToken) {
+      setError('Please complete the reCAPTCHA verification');
+      toast.error('Please complete the reCAPTCHA verification');
+      return;
+    }
+    
     setIsLoading(true);
 
     try {
       const result = await signIn('credentials', {
         email: formData.email,
         password: formData.password,
+        recaptchaToken,
         redirect: false,
       });
 
@@ -125,6 +135,13 @@ export default function LoginPage() {
                 >
                   Forgot password?
                 </Link>
+              </div>
+
+              <div className="flex justify-center">
+                <ReCAPTCHA
+                  sitekey={process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY || ''}
+                  onChange={(token) => setRecaptchaToken(token)}
+                />
               </div>
 
               <button

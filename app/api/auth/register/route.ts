@@ -7,7 +7,7 @@ import { sendVerificationEmail } from '@/lib/email';
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-    const { name, email, password, phone, employeeId, role, departmentId } = body;
+    const { name, email, password, phone, employeeId, role, departmentId, recaptchaToken } = body;
 
     // Validate required fields
     if (!name || !email || !password || !role) {
@@ -15,6 +15,31 @@ export async function POST(request: NextRequest) {
         { error: 'Missing required fields' },
         { status: 400 }
       );
+    }
+
+    // Verify reCAPTCHA
+    if (recaptchaToken) {
+      try {
+        const recaptchaResponse = await fetch('https://www.google.com/recaptcha/api/siteverify', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+          },
+          body: `secret=${process.env.RECAPTCHA_SECRET_KEY}&response=${recaptchaToken}`,
+        });
+
+        const recaptchaData = await recaptchaResponse.json();
+
+        if (!recaptchaData.success || recaptchaData.score < 0.5) {
+          return NextResponse.json(
+            { error: 'reCAPTCHA verification failed' },
+            { status: 400 }
+          );
+        }
+      } catch (recaptchaError) {
+        console.error('reCAPTCHA verification error:', recaptchaError);
+        // Continue without failing if reCAPTCHA verification fails (optional)
+      }
     }
 
     // Check if user already exists
