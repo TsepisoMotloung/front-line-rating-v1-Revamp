@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { signIn } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
@@ -8,33 +8,61 @@ import { Star, Mail, Lock, AlertCircle } from 'lucide-react';
 import toast from 'react-hot-toast';
 import ReCAPTCHA from 'react-google-recaptcha';
 
+declare global {
+  interface Window {
+    grecaptcha: any;
+  }
+}
+
 export default function LoginPage() {
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
   const [recaptchaToken, setRecaptchaToken] = useState<string | null>(null);
+  const [recaptchaReady, setRecaptchaReady] = useState(false);
   const [formData, setFormData] = useState({
     email: '',
     password: '',
   });
 
+  useEffect(() => {
+    // Load reCAPTCHA script for v3
+    const script = document.createElement('script');
+    script.src = `https://www.google.com/recaptcha/api.js?render=${process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY}`;
+    script.async = true;
+    script.defer = true;
+    script.onload = () => setRecaptchaReady(true);
+    document.head.appendChild(script);
+
+    return () => {
+      if (document.head.contains(script)) {
+        document.head.removeChild(script);
+      }
+    };
+  }, []);
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
     
-    if (!recaptchaToken) {
-      setError('Please complete the reCAPTCHA verification');
-      toast.error('Please complete the reCAPTCHA verification');
+    if (!recaptchaReady) {
+      setError('reCAPTCHA is not ready. Please try again.');
+      toast.error('reCAPTCHA is not ready. Please try again.');
       return;
     }
-    
+
     setIsLoading(true);
 
     try {
+      // Get reCAPTCHA v3 token
+      const token = await window.grecaptcha.execute(process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY, {
+        action: 'login',
+      });
+
       const result = await signIn('credentials', {
         email: formData.email,
         password: formData.password,
-        recaptchaToken,
+        recaptchaToken: token,
         redirect: false,
       });
 
@@ -137,12 +165,11 @@ export default function LoginPage() {
                 </Link>
               </div>
 
-              <div className="flex justify-center">
-                <ReCAPTCHA
-                  sitekey={process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY || ''}
-                  onChange={(token) => setRecaptchaToken(token)}
-                />
-              </div>
+              {!recaptchaReady && (
+                <div className="text-center text-sm text-neutral-600">
+                  Loading security verification...
+                </div>
+              )}
 
               <button
                 type="submit"

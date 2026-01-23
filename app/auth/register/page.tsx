@@ -7,6 +7,12 @@ import { Star, Mail, Lock, User, Phone, Building2, Hash, AlertCircle, CheckCircl
 import toast from 'react-hot-toast';
 import ReCAPTCHA from 'react-google-recaptcha';
 
+declare global {
+  interface Window {
+    grecaptcha: any;
+  }
+}
+
 interface Department {
   id: string;
   name: string;
@@ -17,7 +23,7 @@ export default function RegisterPage() {
   const [isLoading, setIsLoading] = useState(false);
   const [departments, setDepartments] = useState<Department[]>([]);
   const [error, setError] = useState('');
-  const [recaptchaToken, setRecaptchaToken] = useState<string | null>(null);
+  const [recaptchaReady, setRecaptchaReady] = useState(false);
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -31,6 +37,20 @@ export default function RegisterPage() {
 
   useEffect(() => {
     fetchDepartments();
+
+    // Load reCAPTCHA script for v3
+    const script = document.createElement('script');
+    script.src = `https://www.google.com/recaptcha/api.js?render=${process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY}`;
+    script.async = true;
+    script.defer = true;
+    script.onload = () => setRecaptchaReady(true);
+    document.head.appendChild(script);
+
+    return () => {
+      if (document.head.contains(script)) {
+        document.head.removeChild(script);
+      }
+    };
   }, []);
 
   const fetchDepartments = async () => {
@@ -72,15 +92,20 @@ export default function RegisterPage() {
       return;
     }
 
-    if (!recaptchaToken) {
-      setError('Please complete the reCAPTCHA verification');
-      toast.error('Please complete the reCAPTCHA verification');
+    if (!recaptchaReady) {
+      setError('reCAPTCHA is not ready. Please try again.');
+      toast.error('reCAPTCHA is not ready. Please try again.');
       return;
     }
 
     setIsLoading(true);
 
     try {
+      // Get reCAPTCHA v3 token
+      const recaptchaToken = await window.grecaptcha.execute(process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY, {
+        action: 'register',
+      });
+
       const response = await fetch('/api/auth/register', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -315,12 +340,11 @@ export default function RegisterPage() {
                 </span>
               </div>
 
-              <div className="flex justify-center">
-                <ReCAPTCHA
-                  sitekey={process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY || ''}
-                  onChange={(token) => setRecaptchaToken(token)}
-                />
-              </div>
+              {!recaptchaReady && (
+                <div className="text-center text-sm text-neutral-600">
+                  Loading security verification...
+                </div>
+              )}
 
               <button
                 type="submit"
