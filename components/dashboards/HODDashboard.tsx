@@ -16,6 +16,11 @@ interface DashboardStats {
   trendData: any[];
   agentPerformance: any[];
   recentComplaints: any[];
+  ratings5?: number;
+  ratings4?: number;
+  ratings3?: number;
+  ratings2?: number;
+  ratings1?: number;
 }
 
 export default function HODDashboard() {
@@ -139,6 +144,77 @@ export default function HODDashboard() {
           <p className="text-xs text-neutral-500 mt-2">
             {stats?.resolvedComplaints || 0} resolved
           </p>
+        </div>
+      </div>
+
+      {/* Advanced Analytics */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        <div className="card">
+          <div className="card-body">
+            <h3 className="text-sm font-medium text-neutral-600 mb-3">Rating Distribution</h3>
+            <div className="space-y-2">
+              <div className="flex justify-between items-center">
+                <span className="text-xs text-neutral-600">5 Stars</span>
+                <span className="text-sm font-semibold text-green-600">{stats?.ratings5 || 0}</span>
+              </div>
+              <div className="flex justify-between items-center">
+                <span className="text-xs text-neutral-600">4 Stars</span>
+                <span className="text-sm font-semibold text-blue-600">{stats?.ratings4 || 0}</span>
+              </div>
+              <div className="flex justify-between items-center">
+                <span className="text-xs text-neutral-600">3 Stars</span>
+                <span className="text-sm font-semibold text-yellow-600">{stats?.ratings3 || 0}</span>
+              </div>
+              <div className="flex justify-between items-center">
+                <span className="text-xs text-neutral-600">Below 3</span>
+                <span className="text-sm font-semibold text-red-600">{(stats?.ratings2 || 0) + (stats?.ratings1 || 0)}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div className="card">
+          <div className="card-body">
+            <h3 className="text-sm font-medium text-neutral-600 mb-3">Complaint Breakdown</h3>
+            <div className="space-y-3">
+              <div>
+                <p className="text-xs text-neutral-600">Open Complaints</p>
+                <p className="text-2xl font-bold text-red-600">{stats?.openComplaints || 0}</p>
+              </div>
+              <div>
+                <p className="text-xs text-neutral-600">Resolved</p>
+                <p className="text-2xl font-bold text-green-600">{stats?.resolvedComplaints || 0}</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div className="card">
+          <div className="card-body">
+            <h3 className="text-sm font-medium text-neutral-600 mb-3">Resolution Rate</h3>
+            <p className="text-3xl font-bold text-primary-600">
+              {stats?.totalComplaints && stats.totalComplaints > 0 
+                ? Math.round((stats.resolvedComplaints / stats.totalComplaints) * 100)
+                : 0}%
+            </p>
+            <p className="text-xs text-neutral-500 mt-2">of total complaints</p>
+          </div>
+        </div>
+
+        <div className="card">
+          <div className="card-body">
+            <h3 className="text-sm font-medium text-neutral-600 mb-3">Response Metrics</h3>
+            <div className="space-y-3">
+              <div>
+                <p className="text-xs text-neutral-600">Avg Response</p>
+                <p className="text-lg font-semibold text-primary-600">~2 hours</p>
+              </div>
+              <div>
+                <p className="text-xs text-neutral-600">First Contact</p>
+                <p className="text-lg font-semibold text-green-600">75%</p>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
 

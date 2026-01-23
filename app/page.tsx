@@ -11,7 +11,7 @@ export default function Home() {
             <div className="flex items-center space-x-2">
               <img src="/logo.png" alt="Alliance Insurance" className="h-10 w-[3.33rem]" />
               <span className="text-xl font-bold bg-gradient-to-r from-primary-600 to-primary-800 bg-clip-text text-transparent">
-                Alliance Insurance Service Feedback
+                Service Feedback Platform
               </span>
             </div>
             <div className="flex items-center space-x-4">
@@ -309,7 +309,7 @@ export default function Home() {
           </div>
 
           <div className="border-t border-neutral-800 mt-12 pt-8 text-center text-neutral-400">
-            <p>&copy; {new Date().getFullYear()} Alliance Insurance Service Feedback. All rights reserved.</p>
+            <p>&copy; {new Date().getFullYear()} Service Feedback Platform - Alliance Insurance. All rights reserved.</p>
           </div>
         </div>
       </footer>

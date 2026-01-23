@@ -82,7 +82,7 @@ export default function RateAgentPage() {
           <div className="flex justify-between items-center py-4">
             <Link href="/" className="flex items-center space-x-2">
               <img src="/logo.png" alt="Frontline Rating" className="h-10 w-[3.33rem]" />
-              <span className="text-xl font-bold text-neutral-900\">Alliance Insurance Service Feedback</span>
+              <span className="text-xl font-bold text-neutral-900\">Service Feedback Platform</span>
             </Link>
             <Link href="/" className="text-neutral-600 hover:text-neutral-900">
               ← Back to Home
@@ -107,13 +107,13 @@ export default function RateAgentPage() {
           {/* Rating Options */}
           <div className="grid md:grid-cols-2 gap-6 mb-12">
             {/* Rate an Agent/Employee */}
-            <div className="card hover:shadow-lg transition-all">
+            {/* <div className="card hover:shadow-lg transition-all">
               <div className="card-body">
                 <div className="w-12 h-12 bg-primary-100 rounded-lg flex items-center justify-center mb-4">
                   <User className="w-6 h-6 text-primary-600" />
                 </div>
                 <h2 className="text-xl font-semibold text-neutral-900 mb-2">
-                  Rate an Employee
+                  Rate Employee or Agent
                 </h2>
                 <p className="text-neutral-600 text-sm mb-6">
                   Share your feedback about an agent or employee who served you
@@ -122,7 +122,7 @@ export default function RateAgentPage() {
                   Get Started
                 </Link>
               </div>
-            </div>
+            </div> */}
 
             {/* Rate Alliance Insurance */}
             <div className="card hover:shadow-lg transition-all">

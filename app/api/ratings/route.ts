@@ -354,6 +354,54 @@ export async function GET(request: NextRequest) {
       },
     ];
 
+    // Rating distribution (5-star breakdown)
+    const ratings5 = ratingsWithAverages.filter((r) => r.averageScore >= 4.5).length;
+    const ratings4 = ratingsWithAverages.filter((r) => r.averageScore >= 4 && r.averageScore < 4.5).length;
+    const ratings3 = ratingsWithAverages.filter((r) => r.averageScore >= 3 && r.averageScore < 4).length;
+    const ratings2 = ratingsWithAverages.filter((r) => r.averageScore >= 2 && r.averageScore < 3).length;
+    const ratings1 = ratingsWithAverages.filter((r) => r.averageScore < 2).length;
+
+    // Top agents
+    const agentMap = new Map<string, { name: string; scores: number[]; count: number }>();
+    agentRatings.forEach((rating) => {
+      if (rating.agent) {
+        const existing = agentMap.get(rating.agent.id) || {
+          name: rating.agent.name,
+          scores: [],
+          count: 0,
+        };
+        existing.scores.push(rating.averageScore);
+        existing.count += 1;
+        agentMap.set(rating.agent.id, existing);
+      }
+    });
+
+    const topAgents = Array.from(agentMap.values())
+      .map((agent) => ({
+        name: agent.name,
+        average: agent.scores.reduce((a, b) => a + b, 0) / agent.scores.length,
+        count: agent.count,
+      }))
+      .sort((a, b) => b.average - a.average)
+      .slice(0, 5);
+
+    // By department
+    const deptMap = new Map<string, { name: string; count: number }>();
+    ratingsWithAverages.forEach((rating) => {
+      if (rating.department) {
+        const existing = deptMap.get(rating.department.id) || {
+          name: rating.department.name,
+          count: 0,
+        };
+        existing.count += 1;
+        deptMap.set(rating.department.id, existing);
+      }
+    });
+
+    const byDepartment = Array.from(deptMap.values())
+      .sort((a, b) => b.count - a.count)
+      .slice(0, 5);
+
     const analytics = {
       totalRatings,
       averageRating: parseFloat(averageRating.toFixed(2)),
@@ -362,7 +410,13 @@ export async function GET(request: NextRequest) {
       satisfactionRate,
       trendData,
       ratingsByType,
-      topAgents: [], // Can be enhanced later
+      ratings5,
+      ratings4,
+      ratings3,
+      ratings2,
+      ratings1,
+      topAgents,
+      byDepartment,
     };
 
     return NextResponse.json({

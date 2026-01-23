@@ -56,6 +56,21 @@ export async function GET(request: NextRequest) {
     const averageRating = totalResponses > 0 ? totalScore / totalResponses : 0;
     const satisfactionPercentage = Math.round((averageRating / 5) * 100);
 
+    // Calculate rating distribution
+    const ratingsWithAverages = ratings.map((rating) => ({
+      ...rating,
+      averageScore:
+        rating.responses.length > 0
+          ? rating.responses.reduce((sum, r) => sum + r.score, 0) / rating.responses.length
+          : 0,
+    }));
+
+    const ratings5 = ratingsWithAverages.filter((r) => r.averageScore >= 4.5).length;
+    const ratings4 = ratingsWithAverages.filter((r) => r.averageScore >= 4 && r.averageScore < 4.5).length;
+    const ratings3 = ratingsWithAverages.filter((r) => r.averageScore >= 3 && r.averageScore < 4).length;
+    const ratings2 = ratingsWithAverages.filter((r) => r.averageScore >= 2 && r.averageScore < 3).length;
+    const ratings1 = ratingsWithAverages.filter((r) => r.averageScore < 2).length;
+
     // Get complaints
     const totalComplaints = await prisma.rating.count({
       where: {
@@ -204,6 +219,11 @@ export async function GET(request: NextRequest) {
       totalComplaints,
       openComplaints,
       resolvedComplaints,
+      ratings5,
+      ratings4,
+      ratings3,
+      ratings2,
+      ratings1,
       trendData,
       agentPerformance: agentPerformance.sort((a, b) => b.avgRating - a.avgRating),
       recentComplaints: complaintsWithScores,

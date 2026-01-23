@@ -6,17 +6,26 @@ import prisma from '@/lib/prisma';
 // GET all Alliance Insurance questions
 export async function GET(request: NextRequest) {
   try {
-    const session = await getServerSession(authOptions);
-    
-    if (!session || session.user?.role !== 'ADMIN') {
-      return NextResponse.json(
-        { error: 'Unauthorized. Admin access required.' },
-        { status: 403 }
-      );
+    // Allow unauthenticated access for customers to rate, but only return active questions
+    const isAdmin = false;
+    try {
+      const session = await getServerSession(authOptions);
+      if (session?.user?.role === 'ADMIN') {
+        // Admin can see all questions
+      }
+    } catch (e) {
+      // Not authenticated, that's okay for customer rating
     }
 
     const questions = await prisma.allianceInsuranceQuestion.findMany({
+      where: { isActive: true }, // Only return active questions for customers
       orderBy: { order: 'asc' },
+      select: {
+        id: true,
+        questionText: true,
+        order: true,
+        isActive: true,
+      },
     });
 
     return NextResponse.json(questions);

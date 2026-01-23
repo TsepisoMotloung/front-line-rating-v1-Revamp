@@ -125,7 +125,7 @@ export default function RateCompanyPage() {
           <div className="flex justify-between items-center py-4">
             <Link href="/" className="flex items-center space-x-2">
               <img src="/logo.png" alt="Frontline Rating" className="h-10 w-[3.33rem]" />
-              <span className="text-xl font-bold text-neutral-900\">Alliance Insurance Service Feedback</span>
+              <span className="text-xl font-bold text-neutral-900\">Service Feedback Platform</span>
             </Link>
             <div className="flex items-center space-x-2">
               <Link href="/rate" className="text-neutral-600 hover:text-neutral-900 flex items-center space-x-1">

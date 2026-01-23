@@ -20,7 +20,7 @@ export default function RatingsPage() {
       <footer className="bg-neutral-900 text-white py-8 mt-16">
         <div className="container-custom text-center">
           <img src="/logo.png" alt="Frontline Rating" className="h-8 w-6 mx-auto mb-2" />
-          <p className="text-neutral-400\">&copy; {new Date().getFullYear()} Alliance Insurance Service Feedback. All rights reserved.</p>
+          <p className="text-neutral-400\">&copy; {new Date().getFullYear()} Service Feedback Platform. All rights reserved.</p>
         </div>
       </footer>
     </div>

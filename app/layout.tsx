@@ -7,7 +7,7 @@ import Providers from './providers';
 const inter = Inter({ subsets: ['latin'] });
 
 export const metadata: Metadata = {
-  title: 'Alliance Insurance Service Feedback',
+  title: 'Service Feedback Platform',
   description: 'Comprehensive service feedback system for Alliance Insurance - rate agents, employees, and company-wide service',
   keywords: ['insurance feedback', 'service rating', 'agent rating', 'customer feedback', 'performance'],
 };
