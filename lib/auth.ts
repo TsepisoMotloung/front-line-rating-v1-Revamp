@@ -3,6 +3,24 @@ import CredentialsProvider from 'next-auth/providers/credentials';
 import bcrypt from 'bcrypt';
 import prisma from './prisma';
 
+async function verifyHcaptchaToken(token: string): Promise<boolean> {
+  try {
+    const response = await fetch('https://hcaptcha.com/siteverify', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/x-www-form-urlencoded',
+      },
+      body: `secret=${encodeURIComponent(process.env.HCAPTCHA_SECRET || '')}&response=${encodeURIComponent(token)}`,
+    });
+
+    const data = await response.json();
+    return data.success === true;
+  } catch (error) {
+    console.error('hCaptcha verification error:', error);
+    return false;
+  }
+}
+
 export const authOptions: NextAuthOptions = {
   providers: [
     CredentialsProvider({
@@ -10,33 +28,21 @@ export const authOptions: NextAuthOptions = {
       credentials: {
         email: { label: 'Email', type: 'email' },
         password: { label: 'Password', type: 'password' },
-        recaptchaToken: { label: 'reCAPTCHA Token', type: 'text' },
+        hcaptchaToken: { label: 'hCaptcha Token', type: 'text' },
       },
       async authorize(credentials, req) {
         if (!credentials?.email || !credentials?.password) {
           throw new Error('Please enter your email and password');
         }
 
-        // Verify reCAPTCHA
-        if (credentials.recaptchaToken) {
-          try {
-            const recaptchaResponse = await fetch('https://www.google.com/recaptcha/api/siteverify', {
-              method: 'POST',
-              headers: {
-                'Content-Type': 'application/x-www-form-urlencoded',
-              },
-              body: `secret=${process.env.RECAPTCHA_SECRET_KEY}&response=${credentials.recaptchaToken}`,
-            });
+        if (!credentials?.hcaptchaToken) {
+          throw new Error('hCaptcha verification failed');
+        }
 
-            const recaptchaData = await recaptchaResponse.json();
-
-            if (!recaptchaData.success || recaptchaData.score < 0.5) {
-              throw new Error('reCAPTCHA verification failed');
-            }
-          } catch (recaptchaError) {
-            console.error('reCAPTCHA verification error:', recaptchaError);
-            throw new Error('reCAPTCHA verification failed');
-          }
+        // Verify hCaptcha token server-side
+        const hcaptchaValid = await verifyHcaptchaToken(credentials.hcaptchaToken);
+        if (!hcaptchaValid) {
+          throw new Error('hCaptcha verification failed');
         }
 
         const user = await prisma.user.findUnique({

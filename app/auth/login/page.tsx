@@ -1,74 +1,54 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useRef } from 'react';
 import { signIn } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { Star, Mail, Lock, AlertCircle } from 'lucide-react';
+import { Mail, Lock, AlertCircle } from 'lucide-react';
 import toast from 'react-hot-toast';
-import ReCAPTCHA from 'react-google-recaptcha';
-
-declare global {
-  interface Window {
-    grecaptcha: any;
-  }
-}
+import HCaptcha from '@hcaptcha/react-hcaptcha';
 
 export default function LoginPage() {
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
-  const [recaptchaToken, setRecaptchaToken] = useState<string | null>(null);
-  const [recaptchaReady, setRecaptchaReady] = useState(false);
+  const [hcaptchaToken, setHcaptchaToken] = useState<string | null>(null);
+  const hcaptchaRef = useRef<any>(null);
   const [formData, setFormData] = useState({
     email: '',
     password: '',
   });
 
-  useEffect(() => {
-    // Load reCAPTCHA script for v3
-    const script = document.createElement('script');
-    script.src = `https://www.google.com/recaptcha/api.js?render=${process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY}`;
-    script.async = true;
-    script.defer = true;
-    script.onload = () => setRecaptchaReady(true);
-    document.head.appendChild(script);
-
-    return () => {
-      if (document.head.contains(script)) {
-        document.head.removeChild(script);
-      }
-    };
-  }, []);
+  const handleHcaptchaVerify = (token: string) => {
+    setHcaptchaToken(token);
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
     
-    if (!recaptchaReady) {
-      setError('reCAPTCHA is not ready. Please try again.');
-      toast.error('reCAPTCHA is not ready. Please try again.');
+    if (!hcaptchaToken) {
+      setError('Please complete the hCaptcha verification');
+      toast.error('Please complete the hCaptcha verification');
       return;
     }
-
+    
     setIsLoading(true);
 
     try {
-      // Get reCAPTCHA v3 token
-      const token = await window.grecaptcha.execute(process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY, {
-        action: 'login',
-      });
-
       const result = await signIn('credentials', {
         email: formData.email,
         password: formData.password,
-        recaptchaToken: token,
+        hcaptchaToken,
         redirect: false,
       });
 
       if (result?.error) {
         setError(result.error);
         toast.error(result.error);
+        // Reset captcha on error
+        hcaptchaRef.current?.resetCaptcha();
+        setHcaptchaToken(null);
       } else {
         toast.success('Login successful!');
         router.push('/dashboard');
@@ -165,15 +145,17 @@ export default function LoginPage() {
                 </Link>
               </div>
 
-              {!recaptchaReady && (
-                <div className="text-center text-sm text-neutral-600">
-                  Loading security verification...
-                </div>
-              )}
+              <div className="my-6 flex justify-center">
+                <HCaptcha
+                  ref={hcaptchaRef}
+                  sitekey={process.env.NEXT_PUBLIC_HCAPTCHA_SITEKEY || ''}
+                  onVerify={handleHcaptchaVerify}
+                />
+              </div>
 
               <button
                 type="submit"
-                disabled={isLoading}
+                disabled={isLoading || !hcaptchaToken}
                 className="btn btn-primary w-full"
               >
                 {isLoading ? 'Signing in...' : 'Sign In'}

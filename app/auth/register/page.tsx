@@ -1,17 +1,11 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { Star, Mail, Lock, User, Phone, Building2, Hash, AlertCircle, CheckCircle } from 'lucide-react';
 import toast from 'react-hot-toast';
-import ReCAPTCHA from 'react-google-recaptcha';
-
-declare global {
-  interface Window {
-    grecaptcha: any;
-  }
-}
+import HCaptcha from '@hcaptcha/react-hcaptcha';
 
 interface Department {
   id: string;
@@ -23,7 +17,8 @@ export default function RegisterPage() {
   const [isLoading, setIsLoading] = useState(false);
   const [departments, setDepartments] = useState<Department[]>([]);
   const [error, setError] = useState('');
-  const [recaptchaReady, setRecaptchaReady] = useState(false);
+  const [hcaptchaToken, setHcaptchaToken] = useState<string | null>(null);
+  const hcaptchaRef = useRef<any>(null);
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -37,20 +32,6 @@ export default function RegisterPage() {
 
   useEffect(() => {
     fetchDepartments();
-
-    // Load reCAPTCHA script for v3
-    const script = document.createElement('script');
-    script.src = `https://www.google.com/recaptcha/api.js?render=${process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY}`;
-    script.async = true;
-    script.defer = true;
-    script.onload = () => setRecaptchaReady(true);
-    document.head.appendChild(script);
-
-    return () => {
-      if (document.head.contains(script)) {
-        document.head.removeChild(script);
-      }
-    };
   }, []);
 
   const fetchDepartments = async () => {
@@ -63,6 +44,10 @@ export default function RegisterPage() {
     } catch (error) {
       console.error('Error fetching departments:', error);
     }
+  };
+
+  const handleHcaptchaVerify = (token: string) => {
+    setHcaptchaToken(token);
   };
 
   const validateForm = () => {
@@ -92,26 +77,21 @@ export default function RegisterPage() {
       return;
     }
 
-    if (!recaptchaReady) {
-      setError('reCAPTCHA is not ready. Please try again.');
-      toast.error('reCAPTCHA is not ready. Please try again.');
+    if (!hcaptchaToken) {
+      setError('Please complete the hCaptcha verification');
+      toast.error('Please complete the hCaptcha verification');
       return;
     }
 
     setIsLoading(true);
 
     try {
-      // Get reCAPTCHA v3 token
-      const recaptchaToken = await window.grecaptcha.execute(process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY, {
-        action: 'register',
-      });
-
       const response = await fetch('/api/auth/register', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           ...formData,
-          recaptchaToken,
+          hcaptchaToken,
         }),
       });
 
@@ -126,6 +106,9 @@ export default function RegisterPage() {
     } catch (error: any) {
       setError(error.message);
       toast.error(error.message);
+      // Reset captcha on error
+      hcaptchaRef.current?.resetCaptcha();
+      setHcaptchaToken(null);
     } finally {
       setIsLoading(false);
     }
@@ -340,15 +323,17 @@ export default function RegisterPage() {
                 </span>
               </div>
 
-              {!recaptchaReady && (
-                <div className="text-center text-sm text-neutral-600">
-                  Loading security verification...
-                </div>
-              )}
+              <div className="my-6 flex justify-center">
+                <HCaptcha
+                  ref={hcaptchaRef}
+                  sitekey={process.env.NEXT_PUBLIC_HCAPTCHA_SITEKEY || ''}
+                  onVerify={handleHcaptchaVerify}
+                />
+              </div>
 
               <button
                 type="submit"
-                disabled={isLoading}
+                disabled={isLoading || !hcaptchaToken}
                 className="btn btn-primary w-full"
               >
                 {isLoading ? 'Creating Account...' : 'Create Account'}

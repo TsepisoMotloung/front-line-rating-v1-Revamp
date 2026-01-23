@@ -17,6 +17,7 @@
     "postinstall": "prisma generate"
   },
   "dependencies": {
+    "@hcaptcha/react-hcaptcha": "^2.0.2",
     "@hookform/resolvers": "^3.3.4",
     "@prisma/client": "^5.14.0",
     "bcrypt": "^5.1.1",

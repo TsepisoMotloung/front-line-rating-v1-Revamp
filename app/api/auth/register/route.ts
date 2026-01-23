@@ -4,10 +4,44 @@ import prisma from '@/lib/prisma';
 import { generateRandomString } from '@/lib/utils';
 import { sendVerificationEmail } from '@/lib/email';
 
+async function verifyHcaptchaToken(token: string): Promise<boolean> {
+  try {
+    const response = await fetch('https://hcaptcha.com/siteverify', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/x-www-form-urlencoded',
+      },
+      body: `secret=${encodeURIComponent(process.env.HCAPTCHA_SECRET || '')}&response=${encodeURIComponent(token)}`,
+    });
+
+    const data = await response.json();
+    return data.success === true;
+  } catch (error) {
+    console.error('hCaptcha verification error:', error);
+    return false;
+  }
+}
+
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-    const { name, email, password, phone, employeeId, role, departmentId, recaptchaToken } = body;
+    const { name, email, password, phone, employeeId, role, departmentId, hcaptchaToken } = body;
+
+    // Validate hCaptcha token
+    if (!hcaptchaToken) {
+      return NextResponse.json(
+        { error: 'hCaptcha verification failed' },
+        { status: 400 }
+      );
+    }
+
+    const hcaptchaValid = await verifyHcaptchaToken(hcaptchaToken);
+    if (!hcaptchaValid) {
+      return NextResponse.json(
+        { error: 'hCaptcha verification failed' },
+        { status: 400 }
+      );
+    }
 
     // Validate required fields
     if (!name || !email || !password || !role) {
@@ -15,31 +49,6 @@ export async function POST(request: NextRequest) {
         { error: 'Missing required fields' },
         { status: 400 }
       );
-    }
-
-    // Verify reCAPTCHA
-    if (recaptchaToken) {
-      try {
-        const recaptchaResponse = await fetch('https://www.google.com/recaptcha/api/siteverify', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/x-www-form-urlencoded',
-          },
-          body: `secret=${process.env.RECAPTCHA_SECRET_KEY}&response=${recaptchaToken}`,
-        });
-
-        const recaptchaData = await recaptchaResponse.json();
-
-        if (!recaptchaData.success || recaptchaData.score < 0.5) {
-          return NextResponse.json(
-            { error: 'reCAPTCHA verification failed' },
-            { status: 400 }
-          );
-        }
-      } catch (recaptchaError) {
-        console.error('reCAPTCHA verification error:', recaptchaError);
-        // Continue without failing if reCAPTCHA verification fails (optional)
-      }
     }
 
     // Check if user already exists
