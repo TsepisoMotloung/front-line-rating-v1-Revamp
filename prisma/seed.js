@@ -12,7 +12,9 @@ async function main() {
   await prisma.rating.deleteMany();
   await prisma.notification.deleteMany();
   await prisma.profileUpdateRequest.deleteMany();
+  await prisma.allianceInsuranceQuestion.deleteMany();
   await prisma.question.deleteMany();
+  await prisma.internalRating.deleteMany();
   await prisma.user.deleteMany();
   await prisma.department.deleteMany();
   await prisma.systemSettings.deleteMany();
@@ -277,6 +279,39 @@ async function main() {
   });
 
   console.log('✅ Questions created');
+
+  // Create Alliance Insurance Questions
+  console.log('🏢 Creating Alliance Insurance rating questions...');
+  await prisma.allianceInsuranceQuestion.createMany({
+    data: [
+      {
+        questionText: 'How would you rate the overall quality of our insurance products?',
+        order: 1,
+        isActive: true,
+      },
+      {
+        questionText: 'How satisfied are you with our premium pricing?',
+        order: 2,
+        isActive: true,
+      },
+      {
+        questionText: 'How would you rate the transparency of our policy terms and conditions?',
+        order: 3,
+        isActive: true,
+      },
+      {
+        questionText: 'How likely are you to recommend Alliance Insurance to others?',
+        order: 4,
+        isActive: true,
+      },
+      {
+        questionText: 'How satisfied are you with the claims processing experience?',
+        order: 5,
+        isActive: true,
+      },
+    ],
+  });
+  console.log('✅ Alliance Insurance questions created');
 
   // Create Sample Ratings
   console.log('⭐ Creating sample ratings...');

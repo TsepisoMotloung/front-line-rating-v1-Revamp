@@ -100,23 +100,23 @@ export default function RateAgentPage() {
               Share Your Rating
             </h1>
             <p className="text-lg text-neutral-600">
-              Help us improve by rating our agents, employees, and company service
+              Help us improve by rating our employees, agents, and Alliance Insurance
             </p>
           </div>
 
           {/* Rating Options */}
           <div className="grid md:grid-cols-2 gap-6 mb-12">
-            {/* Rate an Agent */}
+            {/* Rate an Agent/Employee */}
             <div className="card hover:shadow-lg transition-all">
               <div className="card-body">
                 <div className="w-12 h-12 bg-primary-100 rounded-lg flex items-center justify-center mb-4">
                   <User className="w-6 h-6 text-primary-600" />
                 </div>
                 <h2 className="text-xl font-semibold text-neutral-900 mb-2">
-                  Rate an Agent
+                  Rate an Employee
                 </h2>
                 <p className="text-neutral-600 text-sm mb-6">
-                  Share your feedback about an agent or frontline employee who served you
+                  Share your feedback about an agent or employee who served you
                 </p>
                 <Link href="#search" className="btn btn-primary w-full">
                   Get Started
@@ -124,7 +124,7 @@ export default function RateAgentPage() {
               </div>
             </div>
 
-            {/* Rate the Company */}
+            {/* Rate Alliance Insurance */}
             <div className="card hover:shadow-lg transition-all">
               <div className="card-body">
                 <div className="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center mb-4">
@@ -134,9 +134,9 @@ export default function RateAgentPage() {
                   Rate Alliance Insurance
                 </h2>
                 <p className="text-neutral-600 text-sm mb-6">
-                  Share your overall feedback about Alliance Insurance company
+                  Share your overall feedback about Alliance Insurance as a company
                 </p>
-                <Link href="/rate/company" className="btn bg-green-600 hover:bg-green-700 text-white w-full">
+                <Link href="/rate/alliance" className="btn bg-green-600 hover:bg-green-700 text-white w-full">
                   Rate Company
                 </Link>
               </div>
@@ -146,10 +146,10 @@ export default function RateAgentPage() {
           {/* Search Section */}
           <div id="search" className="scroll-mt-8">
             <h2 className="text-2xl font-bold text-neutral-900 mb-6">
-              Find Your Agent or Frontline Employee
+              Find Your Employee or Agent
             </h2>
             <p className="text-neutral-600 mb-8">
-              Search for the agent or employee who served you to share your feedback
+              Search for the employee or agent who served you to share your feedback
             </p>
 
             {/* QR Code Scanner Option */}

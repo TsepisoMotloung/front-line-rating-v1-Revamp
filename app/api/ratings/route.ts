@@ -33,14 +33,14 @@ export async function POST(request: NextRequest) {
     }
 
     // Handle different rating types
-    if (ratingType === 'COMPANY') {
-      // Company rating - no agent or department required
+    if (ratingType === 'ALLIANCE') {
+      // Alliance Insurance rating - no agent or department required
       const ipAddress = request.headers.get('x-forwarded-for') || request.headers.get('x-real-ip') || 'unknown';
       const userAgent = request.headers.get('user-agent') || 'unknown';
 
       const rating = await prisma.rating.create({
         data: {
-          ratingType: 'COMPANY',
+          ratingType: 'ALLIANCE',
           customerName,
           customerContact,
           policyNumber,
@@ -64,7 +64,46 @@ export async function POST(request: NextRequest) {
 
       return NextResponse.json(
         {
-          message: 'Company rating submitted successfully',
+          message: 'Alliance Insurance rating submitted successfully',
+          rating: { id: rating.id },
+        },
+        { status: 201 }
+      );
+    }
+
+    // Legacy COMPANY rating (for backward compatibility)
+    if (ratingType === 'COMPANY') {
+      // Company rating - no agent or department required
+      const ipAddress = request.headers.get('x-forwarded-for') || request.headers.get('x-real-ip') || 'unknown';
+      const userAgent = request.headers.get('user-agent') || 'unknown';
+
+      const rating = await prisma.rating.create({
+        data: {
+          ratingType: 'ALLIANCE',
+          customerName,
+          customerContact,
+          policyNumber,
+          isAnonymous,
+          isComplaint,
+          feedbackText,
+          complaintStatus: isComplaint ? 'OPEN' : undefined,
+          ipAddress,
+          userAgent,
+          responses: {
+            create: responses.map((r: any) => ({
+              questionId: r.questionId,
+              score: r.score,
+            })),
+          },
+        },
+        include: {
+          responses: true,
+        },
+      });
+
+      return NextResponse.json(
+        {
+          message: 'Alliance Insurance rating submitted successfully',
           rating: { id: rating.id },
         },
         { status: 201 }
