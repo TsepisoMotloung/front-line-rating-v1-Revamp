@@ -236,6 +236,7 @@ export default function RegisterPage() {
                     className="input"
                   >
                     <option value="AGENT">Agent</option>
+                    <option value="EMPLOYEE">Employee</option>
                     <option value="HOD">Head of Department</option>
                   </select>
                 </div>

@@ -65,6 +65,13 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
       ];
     }
 
+    if (role === 'EMPLOYEE') {
+      return [
+        ...commonItems,
+        { href: '/dashboard/my-ratings', icon: Star, label: 'My Ratings' },
+      ];
+    }
+
     return commonItems;
   };
 
