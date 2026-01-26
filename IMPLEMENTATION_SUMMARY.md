@@ -1,7 +1,7 @@
 # Implementation Summary: reCAPTCHA, Alliance Insurance Rating & Internal Employee Ratings
 
 ## Overview
-This document summarizes the new features added to the Frontline Rating System:
+This document summarizes the new features added to the Service Feedback Platform:
 1. **reCAPTCHA Integration** - Added to login and registration pages
 2. **Alliance Insurance Company Rating** - Customers can rate the company itself
 3. **Internal Employee Ratings** - Employees can rate each other across multiple categories

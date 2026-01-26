@@ -56,7 +56,7 @@ export async function sendVerificationEmail(email: string, token: string) {
           </div>
           <div class="content">
             <p>Hello,</p>
-            <p>Thank you for registering with Frontline Rating System. Please verify your email address by clicking the button below:</p>
+            <p>Thank you for registering with Service Feedback Platform. Please verify your email address by clicking the button below:</p>
             <div style="text-align: center;">
               <a href="${verificationUrl}" class="button">Verify Email Address</a>
             </div>
@@ -66,7 +66,7 @@ export async function sendVerificationEmail(email: string, token: string) {
             <p>If you didn't create an account, please ignore this email.</p>
           </div>
           <div class="footer">
-            <p>&copy; ${new Date().getFullYear()} Frontline Rating System. All rights reserved.</p>
+            <p>&copy; ${new Date().getFullYear()} Service Feedback Platform. All rights reserved.</p>
           </div>
         </div>
       </body>
@@ -114,7 +114,7 @@ export async function sendPasswordResetEmail(email: string, token: string) {
             <p>If you didn't request a password reset, please ignore this email.</p>
           </div>
           <div class="footer">
-            <p>&copy; ${new Date().getFullYear()} Frontline Rating System. All rights reserved.</p>
+            <p>&copy; ${new Date().getFullYear()} Service Feedback Platform. All rights reserved.</p>
           </div>
         </div>
       </body>
@@ -155,7 +155,7 @@ export async function sendApprovalNotificationEmail(email: string, name: string,
             <p>Hello ${name},</p>
             <p>Your account registration has been <strong>${statusText}</strong>.</p>
             ${approved ? `
-              <p>You can now log in to the Frontline Rating System using your credentials.</p>
+              <p>You can now log in to the Service Feedback Platform using your credentials.</p>
               <div style="text-align: center;">
                 <a href="${process.env.APP_URL}/auth/login" class="button">Login Now</a>
               </div>
@@ -164,7 +164,7 @@ export async function sendApprovalNotificationEmail(email: string, name: string,
             `}
           </div>
           <div class="footer">
-            <p>&copy; ${new Date().getFullYear()} Frontline Rating System. All rights reserved.</p>
+            <p>&copy; ${new Date().getFullYear()} Service Feedback Platform. All rights reserved.</p>
           </div>
         </div>
       </body>
@@ -216,7 +216,7 @@ export async function sendNewRatingNotificationEmail(
             </div>
           </div>
           <div class="footer">
-            <p>&copy; ${new Date().getFullYear()} Frontline Rating System. All rights reserved.</p>
+            <p>&copy; ${new Date().getFullYear()} Service Feedback Platform. All rights reserved.</p>
           </div>
         </div>
       </body>

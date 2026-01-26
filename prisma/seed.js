@@ -389,7 +389,7 @@ async function main() {
     data: [
       {
         key: 'app_name',
-        value: 'Frontline Rating System',
+        value: 'Service Feedback Platform',
       },
       {
         key: 'allow_anonymous_ratings',

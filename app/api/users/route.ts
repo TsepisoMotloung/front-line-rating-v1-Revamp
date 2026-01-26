@@ -12,6 +12,11 @@ export async function GET(request: NextRequest) {
     }
 
     const users = await prisma.user.findMany({
+      where: {
+        role: {
+          not: 'ADMIN', // Exclude admin users from list
+        },
+      },
       include: {
         department: {
           select: {

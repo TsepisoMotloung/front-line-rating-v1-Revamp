@@ -22,6 +22,8 @@ export default function UsersPage() {
   const [isLoading, setIsLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
   const [statusFilter, setStatusFilter] = useState('ALL');
+  const [selectedUsers, setSelectedUsers] = useState<Set<string>>(new Set());
+  const [bulkAction, setBulkAction] = useState<string>('');
 
   useEffect(() => {
     fetchUsers();
@@ -149,6 +151,82 @@ export default function UsersPage() {
     }
   };
 
+  const toggleUserSelection = (userId: string) => {
+    const newSelected = new Set(selectedUsers);
+    if (newSelected.has(userId)) {
+      newSelected.delete(userId);
+    } else {
+      newSelected.add(userId);
+    }
+    setSelectedUsers(newSelected);
+  };
+
+  const selectAllUsers = () => {
+    if (selectedUsers.size === filteredUsers.length) {
+      setSelectedUsers(new Set());
+    } else {
+      setSelectedUsers(new Set(filteredUsers.map(u => u.id)));
+    }
+  };
+
+  const executeBulkAction = async () => {
+    if (selectedUsers.size === 0) {
+      toast.error('Please select at least one user');
+      return;
+    }
+
+    if (!bulkAction) {
+      toast.error('Please select an action');
+      return;
+    }
+
+    if (!confirm(`Apply "${bulkAction}" to ${selectedUsers.size} user(s)? This action cannot be undone.`)) {
+      return;
+    }
+
+    try {
+      let actionUrl = '';
+      if (bulkAction === 'APPROVE') actionUrl = '/api/users/{id}/approve';
+      else if (bulkAction === 'REJECT') actionUrl = '/api/users/{id}/reject';
+      else if (bulkAction === 'ACTIVATE') actionUrl = '/api/users/{id}/activate';
+      else if (bulkAction === 'DEACTIVATE') actionUrl = '/api/users/{id}/deactivate';
+      else if (bulkAction === 'DELETE') actionUrl = '/api/users/{id}/delete';
+
+      let successCount = 0;
+      const errors: string[] = [];
+
+      for (const userId of selectedUsers) {
+        try {
+          const url = actionUrl.replace('{id}', userId);
+          const method = bulkAction === 'DELETE' ? 'DELETE' : 'PUT';
+          const response = await fetch(url, { method });
+          if (response.ok) {
+            successCount++;
+          } else {
+            errors.push(`Failed to ${bulkAction} user ${userId}`);
+          }
+        } catch (error) {
+          errors.push(`Error processing user ${userId}`);
+        }
+      }
+
+      setSelectedUsers(new Set());
+      setBulkAction('');
+      fetchUsers();
+
+      if (successCount > 0) {
+        toast.success(`${bulkAction} applied to ${successCount} user(s)`);
+      }
+      if (errors.length > 0) {
+        toast.error(`${errors.length} action(s) failed. Check console for details.`);
+        console.error('Bulk action errors:', errors);
+      }
+    } catch (error) {
+      console.error('Error executing bulk action:', error);
+      toast.error('Failed to execute bulk action');
+    }
+  };
+
   const pendingCount = users.filter(u => u.status === 'PENDING').length;
 
   return (
@@ -169,27 +247,64 @@ export default function UsersPage() {
 
         <div className="card">
           <div className="card-body">
-            <div className="flex flex-col md:flex-row gap-4 mb-6">
-              <div className="flex-1 relative">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-neutral-400" />
-                <input
-                  type="text"
-                  placeholder="Search users..."
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  className="input pl-10"
-                />
+            <div className="space-y-4 mb-6">
+              <div className="flex flex-col md:flex-row gap-4">
+                <div className="flex-1 relative">
+                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-neutral-400" />
+                  <input
+                    type="text"
+                    placeholder="Search users..."
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    className="input pl-10"
+                  />
+                </div>
+                <select
+                  value={statusFilter}
+                  onChange={(e) => setStatusFilter(e.target.value)}
+                  className="input w-full md:w-48"
+                >
+                  <option value="ALL">All Status</option>
+                  <option value="PENDING">Pending</option>
+                  <option value="APPROVED">Approved</option>
+                  <option value="REJECTED">Rejected</option>
+                </select>
               </div>
-              <select
-                value={statusFilter}
-                onChange={(e) => setStatusFilter(e.target.value)}
-                className="input w-full md:w-48"
-              >
-                <option value="ALL">All Status</option>
-                <option value="PENDING">Pending</option>
-                <option value="APPROVED">Approved</option>
-                <option value="REJECTED">Rejected</option>
-              </select>
+
+              {selectedUsers.size > 0 && (
+                <div className="bg-primary-50 border border-primary-200 rounded-lg p-4 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+                  <div className="text-sm font-medium text-primary-900">
+                    {selectedUsers.size} user(s) selected
+                  </div>
+                  <div className="flex gap-2">
+                    <select
+                      value={bulkAction}
+                      onChange={(e) => setBulkAction(e.target.value)}
+                      className="input text-sm"
+                    >
+                      <option value="">-- Select Action --</option>
+                      <option value="APPROVE">Approve</option>
+                      <option value="REJECT">Reject</option>
+                      <option value="ACTIVATE">Activate</option>
+                      <option value="DEACTIVATE">Deactivate</option>
+                      <option value="DELETE">Delete</option>
+                    </select>
+                    <button
+                      onClick={executeBulkAction}
+                      className="btn btn-sm btn-primary"
+                      disabled={!bulkAction}
+                    >
+                      Apply
+                    </button>
+                    <button
+                      onClick={() => setSelectedUsers(new Set())}
+                      className="btn btn-sm btn-secondary"
+                    >
+                      Clear Selection
+                    </button>
+                  </div>
+                </div>
+              )}
             </div>
 
             {isLoading ? (
@@ -201,6 +316,15 @@ export default function UsersPage() {
                 <table className="table">
                   <thead>
                     <tr>
+                      <th className="w-12">
+                        <input
+                          type="checkbox"
+                          checked={selectedUsers.size === filteredUsers.length && filteredUsers.length > 0}
+                          onChange={selectAllUsers}
+                          className="checkbox"
+                          title="Select all"
+                        />
+                      </th>
                       <th>User</th>
                       <th>Role</th>
                       <th>Department</th>
@@ -212,6 +336,14 @@ export default function UsersPage() {
                   <tbody>
                     {filteredUsers.map((user) => (
                       <tr key={user.id}>
+                        <td>
+                          <input
+                            type="checkbox"
+                            checked={selectedUsers.has(user.id)}
+                            onChange={() => toggleUserSelection(user.id)}
+                            className="checkbox"
+                          />
+                        </td>
                         <td>
                           <div>
                             <div className="font-semibold text-neutral-900">{user.name}</div>

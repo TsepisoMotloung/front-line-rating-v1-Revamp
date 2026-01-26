@@ -97,7 +97,7 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
                     className="h-7 w-[2.33rem] sm:h-8 sm:w-[2.67rem]"
                   />
                 <span className="text-base sm:text-lg font-bold text-neutral-900 hidden sm:block">
-                  Frontline Rating System
+                  Service Feedback Platform
                 </span>
               </Link>
             </div>
