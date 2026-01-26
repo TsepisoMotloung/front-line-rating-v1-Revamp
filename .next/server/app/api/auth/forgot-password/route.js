@@ -1,4 +1,4 @@
-"use strict";(()=>{var e={};e.id=9118,e.ids=[9118],e.modules={20399:e=>{e.exports=require("next/dist/compiled/next-server/app-page.runtime.prod.js")},30517:e=>{e.exports=require("next/dist/compiled/next-server/app-route.runtime.prod.js")},61282:e=>{e.exports=require("child_process")},84770:e=>{e.exports=require("crypto")},80665:e=>{e.exports=require("dns")},17702:e=>{e.exports=require("events")},92048:e=>{e.exports=require("fs")},32615:e=>{e.exports=require("http")},35240:e=>{e.exports=require("https")},98216:e=>{e.exports=require("net")},19801:e=>{e.exports=require("os")},55315:e=>{e.exports=require("path")},76162:e=>{e.exports=require("stream")},82452:e=>{e.exports=require("tls")},17360:e=>{e.exports=require("url")},21764:e=>{e.exports=require("util")},71568:e=>{e.exports=require("zlib")},85996:(e,r,t)=>{t.r(r),t.d(r,{originalPathname:()=>f,patchFetch:()=>m,requestAsyncStorage:()=>h,routeModule:()=>u,serverHooks:()=>g,staticGenerationAsyncStorage:()=>x});var o={};t.r(o),t.d(o,{POST:()=>c});var a=t(49303),s=t(88716),i=t(60670),n=t(87070),d=t(83493),l=t(50650),p=t(36119);async function c(e){try{let{email:r}=await e.json();if(!r)return n.NextResponse.json({error:"Email is required"},{status:400});let t=await d.Z.user.findUnique({where:{email:r}});if(!t)return n.NextResponse.json({message:"If an account with that email exists, a password reset link has been sent."});let o=(0,l.zs)(32),a=new Date(Date.now()+36e5);await d.Z.user.update({where:{id:t.id},data:{resetToken:o,resetTokenExpiry:a}});try{await (0,p.LS)(r,o)}catch(e){return console.error("Failed to send password reset email:",e),n.NextResponse.json({error:"Failed to send reset email. Please try again."},{status:500})}return n.NextResponse.json({message:"If an account with that email exists, a password reset link has been sent."})}catch(e){return console.error("Forgot password error:",e),n.NextResponse.json({error:"An error occurred. Please try again."},{status:500})}}let u=new a.AppRouteRouteModule({definition:{kind:s.x.APP_ROUTE,page:"/api/auth/forgot-password/route",pathname:"/api/auth/forgot-password",filename:"route",bundlePath:"app/api/auth/forgot-password/route"},resolvedPagePath:"/workspaces/front-line-rating-v1-Revamp/app/api/auth/forgot-password/route.ts",nextConfigOutput:"",userland:o}),{requestAsyncStorage:h,staticGenerationAsyncStorage:x,serverHooks:g}=u,f="/api/auth/forgot-password/route";function m(){return(0,i.patchFetch)({serverHooks:g,staticGenerationAsyncStorage:x})}},36119:(e,r,t)=>{t.d(r,{LS:()=>i,Xg:()=>d,YW:()=>n,zk:()=>s});let o=t(55245).createTransport({host:process.env.EMAIL_SERVER_HOST,port:Number(process.env.EMAIL_SERVER_PORT),secure:!1,auth:{user:process.env.EMAIL_SERVER_USER,pass:process.env.EMAIL_SERVER_PASSWORD}});async function a({to:e,subject:r,html:t}){try{let a=await o.sendMail({from:process.env.EMAIL_FROM,to:e,subject:r,html:t});return console.log("Email sent:",a.messageId),{success:!0,messageId:a.messageId}}catch(e){return console.error("Error sending email:",e),{success:!1,error:e}}}async function s(e,r){let t=`${process.env.APP_URL}/auth/verify-email?token=${r}`;return a({to:e,subject:"Verify Your Email Address",html:`
+"use strict";(()=>{var e={};e.id=9118,e.ids=[9118],e.modules={20399:e=>{e.exports=require("next/dist/compiled/next-server/app-page.runtime.prod.js")},30517:e=>{e.exports=require("next/dist/compiled/next-server/app-route.runtime.prod.js")},61282:e=>{e.exports=require("child_process")},84770:e=>{e.exports=require("crypto")},80665:e=>{e.exports=require("dns")},17702:e=>{e.exports=require("events")},92048:e=>{e.exports=require("fs")},32615:e=>{e.exports=require("http")},35240:e=>{e.exports=require("https")},98216:e=>{e.exports=require("net")},19801:e=>{e.exports=require("os")},55315:e=>{e.exports=require("path")},76162:e=>{e.exports=require("stream")},82452:e=>{e.exports=require("tls")},17360:e=>{e.exports=require("url")},21764:e=>{e.exports=require("util")},71568:e=>{e.exports=require("zlib")},85996:(e,r,t)=>{t.r(r),t.d(r,{originalPathname:()=>f,patchFetch:()=>m,requestAsyncStorage:()=>h,routeModule:()=>u,serverHooks:()=>g,staticGenerationAsyncStorage:()=>x});var o={};t.r(o),t.d(o,{POST:()=>p});var a=t(49303),s=t(88716),i=t(60670),n=t(87070),d=t(83493),l=t(50650),c=t(36119);async function p(e){try{let{email:r}=await e.json();if(!r)return n.NextResponse.json({error:"Email is required"},{status:400});let t=await d.Z.user.findUnique({where:{email:r}});if(!t)return n.NextResponse.json({message:"If an account with that email exists, a password reset link has been sent."});let o=(0,l.zs)(32),a=new Date(Date.now()+36e5);await d.Z.user.update({where:{id:t.id},data:{resetToken:o,resetTokenExpiry:a}});try{await (0,c.LS)(r,o)}catch(e){return console.error("Failed to send password reset email:",e),n.NextResponse.json({error:"Failed to send reset email. Please try again."},{status:500})}return n.NextResponse.json({message:"If an account with that email exists, a password reset link has been sent."})}catch(e){return console.error("Forgot password error:",e),n.NextResponse.json({error:"An error occurred. Please try again."},{status:500})}}let u=new a.AppRouteRouteModule({definition:{kind:s.x.APP_ROUTE,page:"/api/auth/forgot-password/route",pathname:"/api/auth/forgot-password",filename:"route",bundlePath:"app/api/auth/forgot-password/route"},resolvedPagePath:"/workspaces/front-line-rating-v1-Revamp/app/api/auth/forgot-password/route.ts",nextConfigOutput:"",userland:o}),{requestAsyncStorage:h,staticGenerationAsyncStorage:x,serverHooks:g}=u,f="/api/auth/forgot-password/route";function m(){return(0,i.patchFetch)({serverHooks:g,staticGenerationAsyncStorage:x})}},36119:(e,r,t)=>{t.d(r,{LS:()=>i,Xg:()=>d,YW:()=>n,zk:()=>s});let o=t(55245).createTransport({host:process.env.EMAIL_SERVER_HOST,port:Number(process.env.EMAIL_SERVER_PORT),secure:!1,auth:{user:process.env.EMAIL_SERVER_USER,pass:process.env.EMAIL_SERVER_PASSWORD}});async function a({to:e,subject:r,html:t}){try{let a=await o.sendMail({from:process.env.EMAIL_FROM,to:e,subject:r,html:t});return console.log("Email sent:",a.messageId),{success:!0,messageId:a.messageId}}catch(e){return console.error("Error sending email:",e),{success:!1,error:e}}}async function s(e,r){let t=`${process.env.APP_URL}/auth/verify-email?token=${r}`;return a({to:e,subject:"Verify Your Email Address",html:`
     <!DOCTYPE html>
     <html>
       <head>
@@ -29,7 +29,7 @@
             <p>If you didn't create an account, please ignore this email.</p>
           </div>
           <div class="footer">
-            <p>&copy; ${new Date().getFullYear()} Service Feedback Platform. All rights reserved.</p>
+            <p>&copy; ${new Date().getFullYear()} Alliance Insurance Service Feedback Platform. All rights reserved.</p>
           </div>
         </div>
       </body>
@@ -65,7 +65,7 @@
             <p>If you didn't request a password reset, please ignore this email.</p>
           </div>
           <div class="footer">
-            <p>&copy; ${new Date().getFullYear()} Service Feedback Platform. All rights reserved.</p>
+            <p>&copy; ${new Date().getFullYear()} Alliance Insurance Service Feedback Platform. All rights reserved.</p>
           </div>
         </div>
       </body>
@@ -102,7 +102,7 @@
             `}
           </div>
           <div class="footer">
-            <p>&copy; ${new Date().getFullYear()} Service Feedback Platform. All rights reserved.</p>
+            <p>&copy; ${new Date().getFullYear()} Alliance Insurance Service Feedback Platform. All rights reserved.</p>
           </div>
         </div>
       </body>
@@ -136,7 +136,7 @@
             </div>
           </div>
           <div class="footer">
-            <p>&copy; ${new Date().getFullYear()} Service Feedback Platform. All rights reserved.</p>
+            <p>&copy; ${new Date().getFullYear()} Alliance Insurance Service Feedback Platform. All rights reserved.</p>
           </div>
         </div>
       </body>

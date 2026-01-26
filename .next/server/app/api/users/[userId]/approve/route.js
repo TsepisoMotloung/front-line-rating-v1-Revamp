@@ -29,7 +29,7 @@
             <p>If you didn't create an account, please ignore this email.</p>
           </div>
           <div class="footer">
-            <p>&copy; ${new Date().getFullYear()} Service Feedback Platform. All rights reserved.</p>
+            <p>&copy; ${new Date().getFullYear()} Alliance Insurance Service Feedback Platform. All rights reserved.</p>
           </div>
         </div>
       </body>
@@ -65,7 +65,7 @@
             <p>If you didn't request a password reset, please ignore this email.</p>
           </div>
           <div class="footer">
-            <p>&copy; ${new Date().getFullYear()} Service Feedback Platform. All rights reserved.</p>
+            <p>&copy; ${new Date().getFullYear()} Alliance Insurance Service Feedback Platform. All rights reserved.</p>
           </div>
         </div>
       </body>
@@ -102,7 +102,7 @@
             `}
           </div>
           <div class="footer">
-            <p>&copy; ${new Date().getFullYear()} Service Feedback Platform. All rights reserved.</p>
+            <p>&copy; ${new Date().getFullYear()} Alliance Insurance Service Feedback Platform. All rights reserved.</p>
           </div>
         </div>
       </body>
@@ -136,7 +136,7 @@
             </div>
           </div>
           <div class="footer">
-            <p>&copy; ${new Date().getFullYear()} Service Feedback Platform. All rights reserved.</p>
+            <p>&copy; ${new Date().getFullYear()} Alliance Insurance Service Feedback Platform. All rights reserved.</p>
           </div>
         </div>
       </body>
