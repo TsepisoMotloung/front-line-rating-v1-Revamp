@@ -45,14 +45,15 @@ export default function ComplaintsPage() {
     try {
       const params = new URLSearchParams({ isComplaint: 'true' });
       if (session?.user.role === 'AGENT') {
-        params.append('agentId', session.user.id);
+        params.append('userId', session.user.id);
       } else if (session?.user.role === 'HOD' && session.user.departmentId) {
         params.append('departmentId', session.user.departmentId);
       }
       const response = await fetch(`/api/ratings?${params}`);
       if (response.ok) {
         const data = await response.json();
-        setComplaints(data);
+        // Extract ratings array from the API response which has { ratings: [...], analytics: {...} }
+        setComplaints(Array.isArray(data.ratings) ? data.ratings : []);
       }
     } catch (error) {
       console.error('Error fetching complaints:', error);
@@ -63,6 +64,11 @@ export default function ComplaintsPage() {
   };
 
   const filterComplaints = () => {
+    if (!Array.isArray(complaints)) {
+      setFilteredComplaints([]);
+      return;
+    }
+
     if (statusFilter === 'ALL') {
       setFilteredComplaints(complaints);
     } else {
