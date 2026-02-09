@@ -104,44 +104,7 @@ export default function RateAgentPage() {
             </p>
           </div>
 
-          {/* Rating Options */}
-          <div className="grid md:grid-cols-2 gap-6 mb-12">
-            {/* Rate an Agent/Employee */}
-            {/* <div className="card hover:shadow-lg transition-all">
-              <div className="card-body">
-                <div className="w-12 h-12 bg-primary-100 rounded-lg flex items-center justify-center mb-4">
-                  <User className="w-6 h-6 text-primary-600" />
-                </div>
-                <h2 className="text-xl font-semibold text-neutral-900 mb-2">
-                  Rate Employee or Agent
-                </h2>
-                <p className="text-neutral-600 text-sm mb-6">
-                  Share your feedback about an agent or employee who served you
-                </p>
-                <Link href="#search" className="btn btn-primary w-full">
-                  Get Started
-                </Link>
-              </div>
-            </div> */}
-
-            {/* Rate Alliance Insurance */}
-            <div className="card hover:shadow-lg transition-all">
-              <div className="card-body">
-                <div className="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center mb-4">
-                  <Building2 className="w-6 h-6 text-green-600" />
-                </div>
-                <h2 className="text-xl font-semibold text-neutral-900 mb-2">
-                  Rate Alliance Insurance
-                </h2>
-                <p className="text-neutral-600 text-sm mb-6">
-                  Share your overall feedback about Alliance Insurance as a company
-                </p>
-                <Link href="/rate/alliance" className="btn bg-green-600 hover:bg-green-700 text-white w-full">
-                  Rate Company
-                </Link>
-              </div>
-            </div>
-          </div>
+          
 
           {/* Search Section */}
           <div id="search" className="scroll-mt-8">
@@ -283,6 +246,28 @@ export default function RateAgentPage() {
               </div>
             )}
           </div>
+
+          {/* Rating Options */}
+          <div className="grid md:grid-cols-2 gap-6 mb-12 mt-8">
+            {/* Rate Alliance Insurance */}
+            <div className="card hover:shadow-lg transition-all">
+              <div className="card-body">
+                <div className="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center mb-4">
+                  <Building2 className="w-6 h-6 text-green-600" />
+                </div>
+                <h2 className="text-xl font-semibold text-neutral-900 mb-2">
+                  Rate Alliance Insurance
+                </h2>
+                <p className="text-neutral-600 text-sm mb-6">
+                  Share your overall feedback about Alliance Insurance as a company
+                </p>
+                <Link href="/rate/alliance" className="btn bg-green-600 hover:bg-green-700 text-white w-full">
+                  Rate Company
+                </Link>
+              </div>
+            </div>
+          </div>
+
         </div>
       </div>
     </div>

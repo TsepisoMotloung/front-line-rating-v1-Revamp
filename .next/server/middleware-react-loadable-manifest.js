@@ -1,1 +1,1 @@
-self.__REACT_LOADABLE_MANIFEST='{"app/rate/scan/page.tsx -> ./Html5QrcodePlugin":{"id":91580,"files":["static/chunks/7cb1fa1f.ea36de2d276ff347.js","static/chunks/791.b2d5eab7fbe6290b.js","static/chunks/580.0ddbfac11fadad9d.js"]}}';
+self.__REACT_LOADABLE_MANIFEST="{}"
