@@ -1,5 +1,64 @@
+# Dependencies
 node_modules
-example.env
+/.pnp
+.pnp.js
+package-lock.json
+yarn.lock
+pnpm-lock.yaml
+bun.lockb
+
+# Testing
+/coverage
+
+# Next.js
+/.next/
+/out/
+*.rsc
+
+# Production
+/build
+
+# Misc
+.DS_Store
+*.pem
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
+lerna-debug.log*
+
+# Environment files
 .env
 .env.local
 .env.*.local
+.env.production.local
+example.env
+process.env
+
+# IDE / Editor
+.vscode
+.vscode/
+.idea
+.idea/
+*.swp
+*.swo
+*~
+.project
+.classpath
+.c9/
+*.launch
+.settings/
+*.sublime-workspace
+
+# OS
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Prisma
+prisma/*.db
