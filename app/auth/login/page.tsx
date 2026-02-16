@@ -161,7 +161,7 @@ function LoginForm() {
               Forgot your password?
             </Link>
             <div className="text-neutral-600">
-              Don't have an account?{' '}
+              Don&apos;t have an account?{' '}
               <Link href="/auth/register" className="text-primary-600 hover:text-primary-700 font-medium">
                 Register here
               </Link>
