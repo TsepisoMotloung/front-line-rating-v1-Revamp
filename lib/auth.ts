@@ -6,12 +6,10 @@ import prisma from './prisma';
 // Validate required environment variables
 if (!process.env.NEXTAUTH_SECRET) {
   console.error('❌ NEXTAUTH_SECRET is not set in environment variables');
-  throw new Error('Missing NEXTAUTH_SECRET environment variable');
 }
 
 if (!process.env.NEXTAUTH_URL && process.env.NODE_ENV === 'production') {
-  console.error('❌ NEXTAUTH_URL is not set in production environment');
-  console.error('   Set it to your deployment URL: https://your-app.vercel.app');
+  console.warn('⚠️ NEXTAUTH_URL is not set - using VERCEL_URL as fallback');
 }
 
 async function verifyHcaptchaToken(token: string): Promise<boolean> {
@@ -135,5 +133,17 @@ export const authOptions: NextAuthOptions = {
     strategy: 'jwt',
     maxAge: 30 * 24 * 60 * 60, // 30 days
   },
+  cookies: {
+    sessionToken: {
+      name: `${process.env.NODE_ENV === 'production' ? '__Secure-' : ''}next-auth.session-token`,
+      options: {
+        httpOnly: true,
+        sameSite: 'lax',
+        path: '/',
+        secure: process.env.NODE_ENV === 'production',
+      },
+    },
+  },
   secret: process.env.NEXTAUTH_SECRET,
+  debug: process.env.NODE_ENV === 'development',
 };
