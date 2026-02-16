@@ -15,7 +15,7 @@ export async function GET(request: NextRequest) {
     const thirtyDaysAgo = new Date();
     thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
 
-    // RUN ALL QUERIES IN PARALLEL - This is the key optimization!
+    // RUN ALL QUERIES IN PARALLEL for optimal performance
     const [
       totalUsers,
       pendingApprovals,
