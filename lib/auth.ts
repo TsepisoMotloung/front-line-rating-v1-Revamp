@@ -3,6 +3,17 @@ import CredentialsProvider from 'next-auth/providers/credentials';
 import bcrypt from 'bcrypt';
 import prisma from './prisma';
 
+// Validate required environment variables
+if (!process.env.NEXTAUTH_SECRET) {
+  console.error('❌ NEXTAUTH_SECRET is not set in environment variables');
+  throw new Error('Missing NEXTAUTH_SECRET environment variable');
+}
+
+if (!process.env.NEXTAUTH_URL && process.env.NODE_ENV === 'production') {
+  console.error('❌ NEXTAUTH_URL is not set in production environment');
+  console.error('   Set it to your deployment URL: https://your-app.vercel.app');
+}
+
 async function verifyHcaptchaToken(token: string): Promise<boolean> {
   try {
     const response = await fetch('https://hcaptcha.com/siteverify', {
