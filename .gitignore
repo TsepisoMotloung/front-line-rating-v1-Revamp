@@ -1,5 +1,5 @@
 # Dependencies
-node_modules
+node_modules/
 /.pnp
 .pnp.js
 package-lock.json
@@ -9,14 +9,18 @@ bun.lockb
 
 # Testing
 /coverage
+*.coverage
+.nyc_output
 
 # Next.js
 /.next/
 /out/
 *.rsc
+.vercel
 
 # Production
 /build
+/dist
 
 # Misc
 .DS_Store
@@ -28,18 +32,16 @@ yarn-error.log*
 .pnpm-debug.log*
 lerna-debug.log*
 
-# Environment files
+# Environment files (CRITICAL - Never commit these!)
 .env
-.env.local
-.env.*.local
-.env.production.local
-example.env
+.env.*
+!.env.example
 process.env
 
 # IDE / Editor
-.vscode
 .vscode/
-.idea
+!.vscode/extensions.json
+!.vscode/settings.json
 .idea/
 *.swp
 *.swo
@@ -50,6 +52,7 @@ process.env
 *.launch
 .settings/
 *.sublime-workspace
+*.sublime-project
 
 # OS
 .DS_Store
@@ -62,3 +65,16 @@ Thumbs.db
 
 # Prisma
 prisma/*.db
+prisma/*.db-journal
+
+# TypeScript
+*.tsbuildinfo
+next-env.d.ts
+
+# Temporary documentation (remove after deployment)
+AUTH_FLOW.md
+QUICK_FIX.md
+VERCEL_SETUP.md
+
+# Debug
+debug.log

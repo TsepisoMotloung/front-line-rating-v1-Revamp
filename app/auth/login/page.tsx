@@ -29,7 +29,6 @@ function LoginForm() {
     }
     
     setIsLoading(true);
-    console.log('🔐 Starting login...');
 
     try {
       // Let NextAuth handle everything including redirect
