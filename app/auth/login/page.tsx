@@ -2,14 +2,13 @@
 
 import { useState, useRef, Suspense } from 'react';
 import { signIn } from 'next-auth/react';
-import { useRouter, useSearchParams } from 'next/navigation';
+import { useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { Mail, Lock, AlertCircle } from 'lucide-react';
 import toast from 'react-hot-toast';
 import HCaptcha from '@hcaptcha/react-hcaptcha';
 
 function LoginForm() {
-  const router = useRouter();
   const searchParams = useSearchParams();
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
@@ -20,60 +19,44 @@ function LoginForm() {
     password: '',
   });
 
-  const handleHcaptchaVerify = (token: string) => {
-    setHcaptchaToken(token);
-  };
-
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
     
-    console.log('🔐 [LOGIN] Starting login process...');
-    const loginStartTime = Date.now();
-    
     if (!hcaptchaToken) {
-      setError('Please complete the hCaptcha verification');
-      toast.error('Please complete the hCaptcha verification');
+      setError('Please complete the captcha verification');
       return;
     }
     
     setIsLoading(true);
+    console.log('🔐 Starting login...');
 
     try {
-      console.log('📊 [LOGIN] Calling signIn...');
-      const signInStart = Date.now();
+      // Let NextAuth handle everything including redirect
+      const callbackUrl = searchParams.get('callbackUrl') || '/dashboard';
+      
       const result = await signIn('credentials', {
         email: formData.email,
         password: formData.password,
         hcaptchaToken,
-        redirect: false,
+        callbackUrl,
+        redirect: true, // Let NextAuth handle the redirect
       });
-      console.log('✅ [LOGIN] signIn completed in', Date.now() - signInStart, 'ms - Result:', result?.ok ? 'SUCCESS' : 'ERROR');
 
+      // This code will only run if redirect: false or if there's an error
       if (result?.error) {
+        console.error('❌ Login error:', result.error);
         setError(result.error);
         toast.error(result.error);
         hcaptchaRef.current?.resetCaptcha();
         setHcaptchaToken(null);
         setIsLoading(false);
-      } else if (result?.ok) {
-        toast.success('Login successful!');
-        console.log('📊 [LOGIN] Login successful, preparing navigation...');
-        
-        // Redirect to callback URL or dashboard
-        const callbackUrl = searchParams.get('callbackUrl') || '/dashboard';
-        console.log('📊 [LOGIN] Navigating to:', callbackUrl);
-        console.log('🏁 [LOGIN] TOTAL LOGIN TIME:', Date.now() - loginStartTime, 'ms');
-        
-        // Use window.location for immediate navigation with page reload to ensure fresh session
-        console.log('🚀 [LOGIN] Starting navigation now...');
-        window.location.href = callbackUrl;
       }
     } catch (error: any) {
+      console.error('❌ Login exception:', error);
       setIsLoading(false);
-      const errorMessage = error?.message || 'Login failed. Please try again.';
-      setError(errorMessage);
-      toast.error(errorMessage);
+      setError(error?.message || 'Login failed');
+      toast.error('Login failed. Please try again.');
       hcaptchaRef.current?.resetCaptcha();
       setHcaptchaToken(null);
     }
@@ -84,125 +67,113 @@ function LoginForm() {
       <div className="w-full max-w-md">
         {/* Logo and Title */}
         <div className="text-center mb-6 sm:mb-8 animate-fade-in">
-          <Link href="/" className="inline-flex items-center justify-center space-x-2 mb-3 sm:mb-4 hover:opacity-80 transition-opacity">
-            <img src="/logo.png" alt="Frontline Rating" className="h-10 w-[3.33rem] sm:h-12 sm:w-16" />
-            <span className="text-xl sm:text-2xl font-bold text-neutral-900 hidden sm:inline">Service Feedback Platform</span>
-          </Link>
-          <h1 className="text-2xl sm:text-3xl font-bold text-neutral-900 mt-3 sm:mt-4">Welcome Back</h1>
-          <p className="text-sm sm:text-base text-neutral-600 mt-2">Sign in to your account to continue</p>
+          <div className="flex justify-center mb-4">
+            <img src="/logo.png" alt="Frontline Rating" className="h-16 w-12" />
+          </div>
+          <h1 className="text-3xl sm:text-4xl font-bold text-neutral-900 mb-2">
+            Welcome Back
+          </h1>
+          <p className="text-neutral-600">Sign in to access your dashboard</p>
         </div>
 
-        {/* Login Form */}
-        <div className="card shadow-xl hover:shadow-2xl transition-shadow duration-300">
-          <div className="card-body p-6 sm:p-8">
-            {error && (
-              <div className="alert alert-error mb-6 flex items-start space-x-2 animate-shake">
-                <AlertCircle className="w-5 h-5 flex-shrink-0 mt-0.5" />
-                <span className="text-sm sm:text-base">{error}</span>
-              </div>
-            )}
+        {/* Login Card */}
+        <div className="glass p-6 sm:p-8 rounded-2xl shadow-lg animate-slide-up">
+          {error && (
+            <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-xl flex items-start gap-3 animate-shake">
+              <AlertCircle className="w-5 h-5 text-red-600 flex-shrink-0 mt-0.5" />
+              <p className="text-sm text-red-800">{error}</p>
+            </div>
+          )}
 
-            <form onSubmit={handleSubmit} className="space-y-5 sm:space-y-6">
-              <div>
-                <label htmlFor="email" className="label text-sm sm:text-base">
-                  Email Address
-                </label>
-                <div className="relative">
-                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                    <Mail className="h-4 w-4 sm:h-5 sm:w-5 text-neutral-400" />
-                  </div>
-                  <input
-                    id="email"
-                    type="email"
-                    required
-                    value={formData.email}
-                    onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                    className="input pl-9 sm:pl-10 text-sm sm:text-base focus:ring-2 focus:ring-primary-500 transition-all"
-                    placeholder="user@example.com"
-                  />
-                </div>
-              </div>
-
-              <div>
-                <label htmlFor="password" className="label text-sm sm:text-base">
-                  Password
-                </label>
-                <div className="relative">
-                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                    <Lock className="h-4 w-4 sm:h-5 sm:w-5 text-neutral-400" />
-                  </div>
-                  <input
-                    id="password"
-                    type="password"
-                    required
-                    value={formData.password}
-                    onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-                    className="input pl-9 sm:pl-10 text-sm sm:text-base focus:ring-2 focus:ring-primary-500 transition-all"
-                    placeholder="••••••••"
-                  />
-                </div>
-              </div>
-
-              <div className="flex items-center justify-between text-xs sm:text-sm">
-                <div className="flex items-center">
-                  <input
-                    id="remember"
-                    type="checkbox"
-                    className="h-4 w-4 text-primary-600 focus:ring-primary-500 border-neutral-300 rounded cursor-pointer"
-                  />
-                  <label htmlFor="remember" className="ml-2 block text-neutral-700 cursor-pointer select-none">
-                    Remember me
-                  </label>
-                </div>
-                <Link
-                  href="/auth/forgot-password"
-                  className="text-primary-600 hover:text-primary-700 font-medium transition-colors"
-                >
-                  Forgot password?
-                </Link>
-              </div>
-
-              <div className="my-5 sm:my-6 flex justify-center">
-                <HCaptcha
-                  ref={hcaptchaRef}
-                  sitekey={process.env.NEXT_PUBLIC_HCAPTCHA_SITE_KEY || ''}
-                  onVerify={handleHcaptchaVerify}
+          <form onSubmit={handleSubmit} className="space-y-5">
+            {/* Email Input */}
+            <div>
+              <label htmlFor="email" className="block text-sm font-medium text-neutral-700 mb-2">
+                Email Address
+              </label>
+              <div className="relative">
+                <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 text-neutral-400 w-5 h-5" />
+                <input
+                  id="email"
+                  type="email"
+                  value={formData.email}
+                  onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                  className="w-full pl-11 pr-4 py-3 border border-neutral-300 rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all"
+                  placeholder="you@example.com"
+                  required
+                  disabled={isLoading}
                 />
               </div>
+            </div>
 
-              <button
-                type="submit"
-                disabled={isLoading || !hcaptchaToken}
-                className="btn btn-primary w-full shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-0.5 disabled:transform-none text-sm sm:text-base"
-              >
-                {isLoading ? (
-                  <span className="flex items-center justify-center space-x-2">
-                    <span className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></span>
-                    <span>Signing in...</span>
-                  </span>
-                ) : (
-                  'Sign In'
-                )}
-              </button>
-            </form>
+            {/* Password Input */}
+            <div>
+              <label htmlFor="password" className="block text-sm font-medium text-neutral-700 mb-2">
+                Password
+              </label>
+              <div className="relative">
+                <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-neutral-400 w-5 h-5" />
+                <input
+                  id="password"
+                  type="password"
+                  value={formData.password}
+                  onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+                  className="w-full pl-11 pr-4 py-3 border border-neutral-300 rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all"
+                  placeholder="Enter your password"
+                  required
+                  disabled={isLoading}
+                />
+              </div>
+            </div>
+
+            {/* hCaptcha */}
+            <div className="flex justify-center">
+              <HCaptcha
+                ref={hcaptchaRef}
+                sitekey={process.env.NEXT_PUBLIC_HCAPTCHA_SITE_KEY || ''}
+                onVerify={setHcaptchaToken}
+                onExpire={() => setHcaptchaToken(null)}
+              />
+            </div>
+
+            {/* Submit Button */}
+            <button
+              type="submit"
+              disabled={isLoading || !hcaptchaToken}
+              className="w-full btn btn-primary py-3 text-base font-semibold disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              {isLoading ? (
+                <span className="flex items-center justify-center gap-2">
+                  <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
+                  Signing in...
+                </span>
+              ) : (
+                'Sign In'
+              )}
+            </button>
+          </form>
+
+          {/* Links */}
+          <div className="mt-6 space-y-3 text-center text-sm">
+            <Link
+              href="/auth/forgot-password"
+              className="text-primary-600 hover:text-primary-700 font-medium block"
+            >
+              Forgot your password?
+            </Link>
+            <div className="text-neutral-600">
+              Don't have an account?{' '}
+              <Link href="/auth/register" className="text-primary-600 hover:text-primary-700 font-medium">
+                Register here
+              </Link>
+            </div>
           </div>
         </div>
 
-        {/* Register Link */}
-        <p className="text-center mt-5 sm:mt-6 text-sm sm:text-base text-neutral-600">
-          Don&apos;t have an account?{' '}
-          <Link href="/auth/register" className="text-primary-600 hover:text-primary-700 font-medium transition-colors">
-            Register here
-          </Link>
+        {/* Footer */}
+        <p className="text-center text-sm text-neutral-500 mt-6">
+          Secure service feedback platform
         </p>
-
-        {/* Back to Home */}
-        <div className="text-center mt-3 sm:mt-4">
-          <Link href="/" className="text-xs sm:text-sm text-neutral-600 hover:text-neutral-900 transition-colors inline-flex items-center space-x-1 group">
-            <span className="group-hover:-translate-x-1 transition-transform">←</span>
-            <span>Back to Home</span>
-          </Link>
-        </div>
       </div>
     </div>
   );
@@ -210,11 +181,7 @@ function LoginForm() {
 
 export default function LoginPage() {
   return (
-    <Suspense fallback={
-      <div className="min-h-screen bg-gradient-to-br from-neutral-50 to-neutral-100 flex items-center justify-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600"></div>
-      </div>
-    }>
+    <Suspense fallback={<div className="min-h-screen flex items-center justify-center">Loading...</div>}>
       <LoginForm />
     </Suspense>
   );
