@@ -41,7 +41,7 @@ function LoginForm() {
         email: formData.email,
         password: formData.password,
         hcaptchaToken,
-        redirect: false, // Handle redirect manually
+        redirect: false,
       });
 
       if (result?.error) {
@@ -52,8 +52,15 @@ function LoginForm() {
         setIsLoading(false);
       } else if (result?.ok) {
         toast.success('Login successful!');
-        // Force a full page reload to /dashboard - this ensures session is properly loaded
-        window.location.replace('/dashboard');
+        
+        // Wait a moment for session to be fully established
+        await new Promise(resolve => setTimeout(resolve, 500));
+        
+        // Refresh the router cache to get new session
+        router.refresh();
+        
+        // Navigate using Next.js router
+        router.push('/dashboard');
       }
     } catch (error: any) {
       setIsLoading(false);

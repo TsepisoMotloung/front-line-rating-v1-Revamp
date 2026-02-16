@@ -93,7 +93,7 @@ export const authOptions: NextAuthOptions = {
     }),
   ],
   callbacks: {
-    async jwt({ token, user }) {
+    async jwt({ token, user, trigger }) {
       if (user) {
         token.id = user.id;
         token.role = user.role;
@@ -101,6 +101,12 @@ export const authOptions: NextAuthOptions = {
         token.departmentName = user.departmentName;
         token.status = user.status;
       }
+      
+      // Log token creation in development
+      if (process.env.NODE_ENV === 'development' && trigger === 'signIn') {
+        console.log('JWT callback - Creating token for:', token.email);
+      }
+      
       return token;
     },
     async session({ session, token }) {
@@ -111,6 +117,12 @@ export const authOptions: NextAuthOptions = {
         session.user.departmentName = token.departmentName as string;
         session.user.status = token.status as string;
       }
+      
+      // Log session creation in development
+      if (process.env.NODE_ENV === 'development') {
+        console.log('Session callback - User:', session.user?.email, 'Role:', session.user?.role);
+      }
+      
       return session;
     },
     async redirect({ url, baseUrl }) {
