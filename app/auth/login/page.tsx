@@ -37,25 +37,29 @@ function LoginForm() {
     setIsLoading(true);
 
     try {
-      // Get the callbackUrl from URL params, default to /dashboard
-      const callbackUrl = searchParams.get('callbackUrl') || '/dashboard';
-      
-      // Let NextAuth handle the redirect - this ensures proper session handling
-      await signIn('credentials', {
+      const result = await signIn('credentials', {
         email: formData.email,
         password: formData.password,
         hcaptchaToken,
-        callbackUrl,
-        redirect: true, // Let NextAuth handle redirect
+        redirect: false, // Handle redirect manually
       });
-      
-      // This code only runs if there's an error (redirect prevents execution)
+
+      if (result?.error) {
+        setError(result.error);
+        toast.error(result.error);
+        hcaptchaRef.current?.resetCaptcha();
+        setHcaptchaToken(null);
+        setIsLoading(false);
+      } else if (result?.ok) {
+        toast.success('Login successful!');
+        // Force a full page reload to /dashboard - this ensures session is properly loaded
+        window.location.replace('/dashboard');
+      }
     } catch (error: any) {
       setIsLoading(false);
       const errorMessage = error?.message || 'Login failed. Please try again.';
       setError(errorMessage);
       toast.error(errorMessage);
-      // Reset captcha on error
       hcaptchaRef.current?.resetCaptcha();
       setHcaptchaToken(null);
     }
