@@ -70,7 +70,7 @@ export default function HODDashboard() {
         <div>
           <h1 className="text-3xl font-bold text-neutral-900">Department Overview</h1>
           <p className="text-neutral-600 mt-2">
-            Monitor your team's performance and customer satisfaction
+            Monitor your team&apos;s performance and customer satisfaction
           </p>
         </div>
         <div className="flex gap-3">

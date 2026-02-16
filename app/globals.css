@@ -56,15 +56,29 @@
   
   /* Enhanced Input Styles */
   .input {
-    @apply w-full px-4 py-3 border-2 border-neutral-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-all duration-200 placeholder:text-neutral-400;
+    @apply w-full px-4 py-3 border-2 border-neutral-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-all duration-200 placeholder:text-neutral-400 bg-white;
   }
   
   .input-error {
-    @apply border-red-500 focus:ring-red-500 focus:border-red-500;
+    @apply border-red-500 focus:ring-red-500 focus:border-red-500 bg-red-50;
   }
   
   .label {
     @apply block text-sm font-semibold text-neutral-700 mb-2;
+  }
+  
+  /* Select Dropdown Enhanced */
+  .select {
+    @apply w-full px-4 py-3 border-2 border-neutral-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-all duration-200 bg-white appearance-none cursor-pointer;
+  }
+  
+  /* Checkbox and Radio Enhanced */
+  .checkbox, .radio {
+    @apply w-4 h-4 text-primary-600 border-2 border-neutral-300 rounded focus:ring-2 focus:ring-primary-500 transition-all duration-200 cursor-pointer;
+  }
+  
+  .radio {
+    @apply rounded-full;
   }
   
   /* Enhanced Card Styles */
@@ -286,6 +300,23 @@
     to {
       opacity: 1;
       transform: scale(1);
+    }
+  }
+  
+  /* Shake Animation for Errors */
+  .animate-shake {
+    animation: shake 0.5s ease-in-out;
+  }
+  
+  @keyframes shake {
+    0%, 100% {
+      transform: translateX(0);
+    }
+    10%, 30%, 50%, 70%, 90% {
+      transform: translateX(-5px);
+    }
+    20%, 40%, 60%, 80% {
+      transform: translateX(5px);
     }
   }
   

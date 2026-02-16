@@ -35,10 +35,12 @@ export default function ComplaintsPage() {
 
   useEffect(() => {
     fetchComplaints();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   useEffect(() => {
     filterComplaints();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [statusFilter, complaints]);
 
   const fetchComplaints = async () => {

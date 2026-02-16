@@ -27,6 +27,7 @@ export default function ProfilePage() {
         generateQRCode();
       }
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [session]);
 
   const generateQRCode = async () => {

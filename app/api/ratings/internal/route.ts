@@ -15,11 +15,33 @@ export async function GET(req: NextRequest) {
     const raterId = searchParams.get('raterId');
     const ratedId = searchParams.get('ratedId');
     const category = searchParams.get('category');
+    const getStats = searchParams.get('stats'); // For admin stats/reports
+
+    // Only admins can view all internal ratings stats
+    if (getStats && session.user.role !== 'ADMIN') {
+      return NextResponse.json({ error: 'Unauthorized - Admin only' }, { status: 403 });
+    }
 
     let whereClause: any = {};
 
-    if (raterId) whereClause.raterId = raterId;
-    if (ratedId) whereClause.ratedId = ratedId;
+    // Non-admins can only see their own ratings (given or received)
+    if (session.user.role !== 'ADMIN' && !getStats) {
+      if (raterId) whereClause.raterId = raterId;
+      if (ratedId) whereClause.ratedId = ratedId;
+      
+      // Ensure user can only see ratings they gave or received
+      if (!raterId && !ratedId) {
+        whereClause.OR = [
+          { raterId: session.user.id },
+          { ratedId: session.user.id },
+        ];
+      }
+    } else {
+      // Admins can filter by any user
+      if (raterId) whereClause.raterId = raterId;
+      if (ratedId) whereClause.ratedId = ratedId;
+    }
+
     if (category) whereClause.category = category;
 
     const ratings = await prisma.internalRating.findMany({

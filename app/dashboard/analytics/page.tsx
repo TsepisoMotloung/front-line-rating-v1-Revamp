@@ -65,6 +65,11 @@ export default function RatingsAnalyticsPage() {
     redirect('/auth/login');
   }
 
+  // Only admins can access analytics
+  if (session.user.role !== 'ADMIN') {
+    redirect('/dashboard');
+  }
+
   const [ratings, setRatings] = useState<Rating[]>([]);
   const [analytics, setAnalytics] = useState<Analytics | null>(null);
   const [departments, setDepartments] = useState<Department[]>([]);
@@ -87,6 +92,7 @@ export default function RatingsAnalyticsPage() {
 
   useEffect(() => {
     fetchRatings();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [filters]);
 
   const fetchData = async () => {

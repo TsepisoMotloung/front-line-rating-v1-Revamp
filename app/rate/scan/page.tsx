@@ -82,7 +82,7 @@ export default function ScanQRCodePage() {
           </Link>
           <h1 className="text-2xl font-bold text-neutral-900 mt-4">Scan QR Code</h1>
           <p className="text-neutral-600 mt-2">
-            Point your camera at an agent's QR code to rate their service
+            Point your camera at an agent&apos;s QR code to rate their service
           </p>
         </div>
 

@@ -27,9 +27,9 @@ export default function RegistrationSuccessPage() {
               Thank you for registering. Your account has been created and is pending approval from an administrator.
             </p>
 
-            {/* What's Next Section */}
+            {/* What&apos;s Next Section */}
             <div className="bg-primary-50 border border-primary-200 rounded-lg p-4 mb-6 text-left">
-              <h3 className="font-semibold text-primary-900 mb-2">What's Next?</h3>
+              <h3 className="font-semibold text-primary-900 mb-2">What&apos;s Next?</h3>
               <ul className="space-y-2 text-sm text-primary-800">
                 <li className="flex items-start">
                   <span className="mr-2">•</span>
@@ -37,7 +37,7 @@ export default function RegistrationSuccessPage() {
                 </li>
                 <li className="flex items-start">
                   <span className="mr-2">•</span>
-                  <span>You'll receive an email notification once your account is approved</span>
+                  <span>You&apos;ll receive an email notification once your account is approved</span>
                 </li>
                 <li className="flex items-start">
                   <span className="mr-2">•</span>

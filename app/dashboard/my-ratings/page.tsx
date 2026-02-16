@@ -109,7 +109,7 @@ export default function MyRatingsPage() {
                     </div>
                     {rating.feedbackText && (
                       <p className="text-neutral-600 text-sm mt-2 bg-neutral-50 p-3 rounded-md">
-                        "{rating.feedbackText}"
+                        &quot;{rating.feedbackText}&quot;
                       </p>
                     )}
                     <div className="mt-4 pt-4 border-t border-neutral-100">

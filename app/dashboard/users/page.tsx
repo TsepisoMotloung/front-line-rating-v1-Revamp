@@ -31,6 +31,7 @@ export default function UsersPage() {
 
   useEffect(() => {
     filterUsers();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [searchQuery, statusFilter, users]);
 
   const fetchUsers = async () => {

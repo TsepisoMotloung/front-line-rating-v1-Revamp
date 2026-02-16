@@ -31,19 +31,16 @@ export async function GET(request: NextRequest) {
         {
           name: {
             contains: search,
-            mode: 'insensitive',
           },
         },
         {
           email: {
             contains: search,
-            mode: 'insensitive',
           },
         },
         {
           employeeId: {
             contains: search,
-            mode: 'insensitive',
           },
         },
       ],

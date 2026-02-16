@@ -56,7 +56,7 @@ export async function sendVerificationEmail(email: string, token: string) {
           </div>
           <div class="content">
             <p>Hello,</p>
-            <p>Thank you for registering with Service Feedback Platform. Please verify your email address by clicking the button below:</p>
+            <p>Thank you for registering with Alliance Insurance - Service Feedback Platform. Please verify your email address by clicking the button below:</p>
             <div style="text-align: center;">
               <a href="${verificationUrl}" class="button">Verify Email Address</a>
             </div>
@@ -155,7 +155,7 @@ export async function sendApprovalNotificationEmail(email: string, name: string,
             <p>Hello ${name},</p>
             <p>Your account registration has been <strong>${statusText}</strong>.</p>
             ${approved ? `
-              <p>You can now log in to the Service Feedback Platform using your credentials.</p>
+              <p>You can now log in to the Alliance Insurance - Service Feedback Platform using your credentials.</p>
               <div style="text-align: center;">
                 <a href="${process.env.APP_URL}/auth/login" class="button">Login Now</a>
               </div>

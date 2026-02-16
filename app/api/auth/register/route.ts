@@ -11,7 +11,7 @@ async function verifyHcaptchaToken(token: string): Promise<boolean> {
       headers: {
         'Content-Type': 'application/x-www-form-urlencoded',
       },
-      body: `secret=${encodeURIComponent(process.env.HCAPTCHA_SECRET || '')}&response=${encodeURIComponent(token)}`,
+      body: `secret=${encodeURIComponent(process.env.HCAPTCHA_SECRET_KEY || '')}&response=${encodeURIComponent(token)}`,
     });
 
     const data = await response.json();

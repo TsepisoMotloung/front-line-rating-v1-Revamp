@@ -1,12 +1,25 @@
 'use client';
 import DashboardLayout from '@/components/DashboardLayout';
 import { useEffect, useState } from 'react';
+import { useSession } from 'next-auth/react';
+import { redirect } from 'next/navigation';
 import toast from 'react-hot-toast';
 
 interface Department { id: string; name: string }
 interface UserOption { id: string; name: string }
 
 export default function ReportsPage() {
+  const { data: session } = useSession();
+
+  // Check if user is authenticated and is admin
+  if (!session) {
+    redirect('/auth/login');
+  }
+
+  if (session.user.role !== 'ADMIN') {
+    redirect('/dashboard');
+  }
+
   const [departments, setDepartments] = useState<Department[]>([]);
   const [users, setUsers] = useState<UserOption[]>([]);
   const [departmentId, setDepartmentId] = useState('');

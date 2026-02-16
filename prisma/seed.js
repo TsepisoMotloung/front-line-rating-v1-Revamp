@@ -70,7 +70,7 @@ async function main() {
   const salesHod = await prisma.user.create({
     data: {
       email: 'hod.sales@frontlinerating.com',
-      name: 'Sarah Johnson',
+      name: 'Mamello Molefe',
       password: hashedHodPassword,
       role: 'HOD',
       status: 'APPROVED',
@@ -84,7 +84,7 @@ async function main() {
   const csHod = await prisma.user.create({
     data: {
       email: 'hod.cs@frontlinerating.com',
-      name: 'Michael Chen',
+      name: 'Thabo Mokoena',
       password: hashedHodPassword,
       role: 'HOD',
       status: 'APPROVED',
@@ -98,7 +98,7 @@ async function main() {
   const claimsHod = await prisma.user.create({
     data: {
       email: 'hod.claims@frontlinerating.com',
-      name: 'Patricia Williams',
+      name: 'Lineo Sekhonyana',
       password: hashedHodPassword,
       role: 'HOD',
       status: 'APPROVED',
@@ -119,7 +119,7 @@ async function main() {
     prisma.user.create({
       data: {
         email: 'agent1.sales@frontlinerating.com',
-        name: 'John Smith',
+        name: 'Thabiso Makhetha',
         password: hashedAgentPassword,
         role: 'AGENT',
         status: 'APPROVED',
@@ -132,7 +132,7 @@ async function main() {
     prisma.user.create({
       data: {
         email: 'agent2.sales@frontlinerating.com',
-        name: 'Emily Davis',
+        name: 'Puleng Mofolo',
         password: hashedAgentPassword,
         role: 'AGENT',
         status: 'APPROVED',
@@ -145,7 +145,7 @@ async function main() {
     prisma.user.create({
       data: {
         email: 'agent1.cs@frontlinerating.com',
-        name: 'Robert Brown',
+        name: 'Lebohang Nkoane',
         password: hashedAgentPassword,
         role: 'AGENT',
         status: 'APPROVED',
@@ -158,7 +158,7 @@ async function main() {
     prisma.user.create({
       data: {
         email: 'agent2.cs@frontlinerating.com',
-        name: 'Jennifer Martinez',
+        name: 'Nthabiseng Tshabalala',
         password: hashedAgentPassword,
         role: 'AGENT',
         status: 'APPROVED',
@@ -171,7 +171,7 @@ async function main() {
     prisma.user.create({
       data: {
         email: 'agent1.claims@frontlinerating.com',
-        name: 'David Wilson',
+        name: 'Motloheloa Mokone',
         password: hashedAgentPassword,
         role: 'AGENT',
         status: 'APPROVED',
@@ -329,7 +329,7 @@ async function main() {
     data: {
       agentId: agents[0].id,
       departmentId: salesDept.id,
-      customerName: 'Customer One',
+      customerName: 'Palesa Mohapi',
       customerContact: '+266 5800 0001',
       policyNumber: 'POL001234',
       feedbackText: 'Excellent service! Very knowledgeable and helpful.',
@@ -348,7 +348,7 @@ async function main() {
     data: {
       agentId: agents[2].id,
       departmentId: customerServiceDept.id,
-      customerName: 'Customer Two',
+      customerName: 'Mpho Letsoela',
       customerContact: '+266 5800 0002',
       policyNumber: 'POL001235',
       feedbackText: 'Quick response and resolved my issue efficiently.',
@@ -367,7 +367,7 @@ async function main() {
     data: {
       agentId: agents[1].id,
       departmentId: salesDept.id,
-      customerName: 'Customer Three',
+      customerName: 'Tshepo Ramokoena',
       customerContact: '+266 5800 0003',
       feedbackText: 'Agent was not very helpful and seemed rushed.',
       isComplaint: true,

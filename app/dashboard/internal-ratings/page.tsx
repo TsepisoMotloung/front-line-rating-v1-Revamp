@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { Users, Star, ArrowLeft, AlertCircle, Search, User } from 'lucide-react';
+import { Users, Star, ArrowLeft, AlertCircle, Search, User, QrCode, Download, X } from 'lucide-react';
 import toast from 'react-hot-toast';
 import DashboardLayout from '@/components/DashboardLayout';
 
@@ -48,6 +48,9 @@ export default function InternalRatingPage() {
   const [feedback, setFeedback] = useState('');
   const [isAnonymous, setIsAnonymous] = useState(false);
   const [employeeRatings, setEmployeeRatings] = useState<InternalRating[]>([]);
+  const [showQRModal, setShowQRModal] = useState(false);
+  const [qrCodeEmployee, setQRCodeEmployee] = useState<Employee | null>(null);
+  const [qrCodeUrl, setQRCodeUrl] = useState('');
 
   useEffect(() => {
     if (status === 'unauthenticated') {
@@ -57,6 +60,7 @@ export default function InternalRatingPage() {
 
   useEffect(() => {
     searchEmployees();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [searchQuery]);
 
   const searchEmployees = async () => {
@@ -97,6 +101,46 @@ export default function InternalRatingPage() {
       }
     } catch (err) {
       console.error('Error fetching ratings:', err);
+    }
+  };
+
+  const handleShowQRCode = async (employee: Employee) => {
+    setQRCodeEmployee(employee);
+    setShowQRModal(true);
+    setQRCodeUrl('');
+
+    try {
+      const response = await fetch(`/api/profile/qrcode?agentId=${employee.id}`);
+      if (response.ok) {
+        const blob = await response.blob();
+        const url = URL.createObjectURL(blob);
+        setQRCodeUrl(url);
+      } else {
+        toast.error('Failed to generate QR code');
+      }
+    } catch (err) {
+      console.error('Error generating QR code:', err);
+      toast.error('Failed to generate QR code');
+    }
+  };
+
+  const downloadQRCode = () => {
+    if (!qrCodeUrl || !qrCodeEmployee) return;
+    const link = document.createElement('a');
+    link.href = qrCodeUrl;
+    link.download = `${qrCodeEmployee.name.replace(/\s+/g, '-')}-qrcode.png`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    toast.success('QR code downloaded!');
+  };
+
+  const closeQRModal = () => {
+    setShowQRModal(false);
+    setQRCodeEmployee(null);
+    if (qrCodeUrl) {
+      URL.revokeObjectURL(qrCodeUrl);
+      setQRCodeUrl('');
     }
   };
 
@@ -239,12 +283,14 @@ export default function InternalRatingPage() {
               ) : employees.length > 0 ? (
                 <div className="space-y-3">
                   {employees.map((employee) => (
-                    <button
+                    <div
                       key={employee.id}
-                      onClick={() => selectEmployee(employee)}
-                      className="w-full text-left p-4 border border-neutral-200 rounded-lg hover:border-primary-400 hover:bg-primary-50 transition-all flex items-center justify-between"
+                      className="p-4 border border-neutral-200 rounded-lg hover:border-primary-400 transition-all flex items-center justify-between"
                     >
-                      <div className="flex items-center space-x-4">
+                      <button
+                        onClick={() => selectEmployee(employee)}
+                        className="flex-1 text-left flex items-center space-x-4"
+                      >
                         <div className="w-10 h-10 bg-primary-100 rounded-full flex items-center justify-center">
                           <User className="w-5 h-5 text-primary-600" />
                         </div>
@@ -252,11 +298,23 @@ export default function InternalRatingPage() {
                           <p className="font-medium text-neutral-900">{employee.name}</p>
                           <p className="text-sm text-neutral-600">{employee.email}</p>
                         </div>
+                      </button>
+                      <div className="flex items-center space-x-2">
+                        <span className="text-xs font-medium px-2 py-1 bg-neutral-100 text-neutral-700 rounded">
+                          {employee.role}
+                        </span>
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleShowQRCode(employee);
+                          }}
+                          className="p-2 text-primary-600 hover:bg-primary-50 rounded-lg transition-colors"
+                          title="Show QR Code"
+                        >
+                          <QrCode className="w-5 h-5" />
+                        </button>
                       </div>
-                      <span className="text-xs font-medium px-2 py-1 bg-neutral-100 text-neutral-700 rounded">
-                        {employee.role}
-                      </span>
-                    </button>
+                    </div>
                   ))}
                 </div>
               ) : searchQuery ? (
@@ -415,6 +473,63 @@ export default function InternalRatingPage() {
                 </div>
               </div>
             )}
+          </div>
+        )}
+
+        {/* QR Code Modal */}
+        {showQRModal && qrCodeEmployee && (
+          <div
+            className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4"
+            onClick={closeQRModal}
+          >
+            <div
+              className="bg-white rounded-lg shadow-xl max-w-md w-full p-6"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <div className="flex items-center justify-between mb-6">
+                <h3 className="text-xl font-semibold text-neutral-900">
+                  QR Code for {qrCodeEmployee.name}
+                </h3>
+                <button
+                  onClick={closeQRModal}
+                  className="text-neutral-400 hover:text-neutral-600 transition-colors"
+                >
+                  <X className="w-6 h-6" />
+                </button>
+              </div>
+
+              <div className="text-center">
+                {qrCodeUrl ? (
+                  <div className="space-y-6">
+                    <div className="bg-white p-4 rounded-lg border border-neutral-200 inline-block">
+                      <img
+                        src={qrCodeUrl}
+                        alt={`QR Code for ${qrCodeEmployee.name}`}
+                        className="w-64 h-64"
+                      />
+                    </div>
+
+                    <div className="space-y-2">
+                      <p className="text-sm text-neutral-600">
+                        Scan this QR code to rate {qrCodeEmployee.name}
+                      </p>
+                      <button
+                        onClick={downloadQRCode}
+                        className="btn btn-primary w-full"
+                      >
+                        <Download className="w-4 h-4 mr-2" />
+                        Download QR Code
+                      </button>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="py-12">
+                    <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600 mx-auto"></div>
+                    <p className="text-neutral-600 mt-4">Generating QR code...</p>
+                  </div>
+                )}
+              </div>
+            </div>
           </div>
         )}
       </div>

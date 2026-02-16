@@ -42,6 +42,7 @@ export default function RatingFormPage({ params }: { params: { agentId: string }
 
   useEffect(() => {
     fetchAgentAndQuestions();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [params.agentId]);
 
   const fetchAgentAndQuestions = async () => {
