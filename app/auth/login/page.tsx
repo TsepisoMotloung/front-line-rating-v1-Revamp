@@ -58,17 +58,16 @@ function LoginForm() {
         setIsLoading(false);
       } else if (result?.ok) {
         toast.success('Login successful!');
-        console.log('📊 [LOGIN] Login successful, waiting for session...');
+        console.log('📊 [LOGIN] Login successful, preparing navigation...');
         
-        // Wait a moment for session to be fully established
-        await new Promise(resolve => setTimeout(resolve, 500));
-        console.log('📊 [LOGIN] Refreshing router...');
+        // Redirect to callback URL or dashboard
+        const callbackUrl = searchParams.get('callbackUrl') || '/dashboard';
+        console.log('📊 [LOGIN] Navigating to:', callbackUrl);
+        console.log('🏁 [LOGIN] TOTAL LOGIN TIME:', Date.now() - loginStartTime, 'ms');
         
-        // Refresh the router cache to get new session
-        router.refresh();
-        
-        // Navigate using Next.js router
-        router.push('/dashboard');
+        // Use window.location for immediate navigation with page reload to ensure fresh session
+        console.log('🚀 [LOGIN] Starting navigation now...');
+        window.location.href = callbackUrl;
       }
     } catch (error: any) {
       setIsLoading(false);
