@@ -564,4 +564,175 @@
   .focus-ring {
     @apply focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2;
   }
+  
+  /* Additional Responsive Utilities */
+  .grid-responsive-2 {
+    display: grid;
+    grid-template-columns: repeat(1, 1fr);
+    gap: 1rem;
+  }
+  @media (min-width: 768px) {
+    .grid-responsive-2 {
+      grid-template-columns: repeat(2, 1fr);
+      gap: 1.5rem;
+    }
+  }
+  
+  .grid-responsive-3 {
+    display: grid;
+    grid-template-columns: repeat(1, 1fr);
+    gap: 1rem;
+  }
+  @media (min-width: 640px) {
+    .grid-responsive-3 {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+  @media (min-width: 1024px) {
+    .grid-responsive-3 {
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1.5rem;
+    }
+  }
+  
+  .grid-responsive-4 {
+    display: grid;
+    grid-template-columns: repeat(1, 1fr);
+    gap: 1rem;
+  }
+  @media (min-width: 640px) {
+    .grid-responsive-4 {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+  @media (min-width: 1024px) {
+    .grid-responsive-4 {
+      grid-template-columns: repeat(4, 1fr);
+      gap: 1.5rem;
+    }
+  }
+  
+  /* Smooth Page Transitions */
+  .page-transition {
+    animation: pageTransition 0.4s ease-out;
+  }
+  
+  @keyframes pageTransition {
+    from {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+  
+  /* Loading Spinner */
+  .spinner {
+    border: 3px solid rgba(0, 0, 0, 0.1);
+    border-radius: 50%;
+    border-top-color: currentColor;
+    animation: spin 1s ease-in-out infinite;
+  }
+  
+  @keyframes spin {
+    to {
+      transform: rotate(360deg);
+    }
+  }
+  
+  /* Smooth Hover Transitions */
+  .hover-lift {
+    @apply transition-all duration-300 ease-out;
+  }
+  
+  .hover-lift:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 12px 24px rgba(0, 0, 0, 0.15);
+  }
+  
+  /* Enhanced Button States */
+  .btn-transition {
+    @apply transition-all duration-200 ease-in-out;
+  }
+  
+  .btn-transition:active {
+    transform: scale(0.98);
+  }
+  
+  /* Skeleton Loading */
+  .skeleton {
+    @apply bg-neutral-200 animate-pulse rounded;
+  }
+  
+  /* Badge Pulse Animation */
+  .badge-pulse {
+    animation: badgePulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+  }
+  
+  @keyframes badgePulse {
+    0%, 100% {
+      opacity: 1;
+    }
+    50% {
+      opacity: 0.6;
+    }
+  }
+  
+  /* Smooth Scroll */
+  .smooth-scroll {
+    scroll-behavior: smooth;
+  }
+  
+  /* Container with Max Width */
+  .container-custom {
+    width: 100%;
+    max-width: 1400px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+  
+  /* Mobile-First Typography */
+  h1, .h1 {
+    @apply text-2xl sm:text-3xl lg:text-4xl font-bold;
+  }
+  
+  h2, .h2 {
+    @apply text-xl sm:text-2xl lg:text-3xl font-bold;
+  }
+  
+  h3, .h3 {
+    @apply text-lg sm:text-xl lg:text-2xl font-semibold;
+  }
+  
+  h4, .h4 {
+    @apply text-base sm:text-lg lg:text-xl font-semibold;
+  }
+  
+  /* Enhanced Stat Card */
+  .stat-card {
+    @apply bg-white rounded-xl p-6 border border-neutral-200 hover-lift cursor-pointer;
+  }
+  
+  /* Status Indicators */
+  .status-dot {
+    @apply w-2 h-2 rounded-full inline-block mr-2;
+  }
+  
+  .status-dot-success {
+    @apply bg-emerald-500;
+  }
+  
+  .status-dot-warning {
+    @apply bg-amber-500;
+  }
+  
+  .status-dot-danger {
+    @apply bg-red-500;
+  }
+  
+  .status-dot-info {
+    @apply bg-blue-500;
+  }
 }

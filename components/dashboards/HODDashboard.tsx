@@ -64,47 +64,47 @@ export default function HODDashboard() {
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 sm:space-y-8">
       {/* Header */}
-      <div className="flex justify-between items-start">
-        <div>
-          <h1 className="text-3xl font-bold text-neutral-900">Department Overview</h1>
-          <p className="text-neutral-600 mt-2">
+      <div className="flex flex-col lg:flex-row lg:justify-between lg:items-start gap-4">
+        <div className="animate-fade-in">
+          <h1 className="text-2xl sm:text-3xl font-bold text-neutral-900">Department Overview</h1>
+          <p className="text-sm sm:text-base text-neutral-600 mt-1 sm:mt-2">
             Monitor your team&apos;s performance and customer satisfaction
           </p>
         </div>
-        <div className="flex gap-3">
-          <Link href="/dashboard/questions" className="btn btn-outline">
-            Manage Questions
+        <div className="flex flex-wrap gap-2 sm:gap-3">
+          <Link href="/dashboard/questions" className="btn btn-outline text-xs sm:text-sm">
+            Questions
           </Link>
-          <Link href="/dashboard/reports" className="btn btn-primary">
+          <Link href="/dashboard/reports" className="btn btn-primary text-xs sm:text-sm">
             Generate Report
           </Link>
         </div>
       </div>
 
       {/* Stats Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+      <div className="grid-responsive-4 animate-slide-in-left">
         <div className="stat-card">
           <div className="flex items-center justify-between mb-4">
-            <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
-              <Users className="w-6 h-6 text-blue-600" />
+            <div className="w-10 h-10 sm:w-12 sm:h-12 bg-blue-100 rounded-lg flex items-center justify-center">
+              <Users className="w-5 h-5 sm:w-6 sm:h-6 text-blue-600" />
             </div>
-            <span className="text-sm font-medium text-blue-600">Active</span>
+            <span className="text-xs sm:text-sm font-medium text-blue-600">Active</span>
           </div>
-          <h3 className="text-sm font-medium text-neutral-600 mb-1">Team Members</h3>
-          <p className="text-3xl font-bold text-neutral-900">{stats?.totalAgents || 0}</p>
+          <h3 className="text-xs sm:text-sm font-medium text-neutral-600 mb-1">Team Members</h3>
+          <p className="text-2xl sm:text-3xl font-bold text-neutral-900">{stats?.totalAgents || 0}</p>
           <p className="text-xs text-neutral-500 mt-2">Agents in department</p>
         </div>
 
         <div className="stat-card">
           <div className="flex items-center justify-between mb-4">
-            <div className="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center">
-              <Star className="w-6 h-6 text-purple-600" />
+            <div className="w-10 h-10 sm:w-12 sm:h-12 bg-purple-100 rounded-lg flex items-center justify-center">
+              <Star className="w-5 h-5 sm:w-6 sm:h-6 text-purple-600" />
             </div>
           </div>
-          <h3 className="text-sm font-medium text-neutral-600 mb-1">Total Ratings</h3>
-          <p className="text-3xl font-bold text-neutral-900">{stats?.totalRatings || 0}</p>
+          <h3 className="text-xs sm:text-sm font-medium text-neutral-600 mb-1">Total Ratings</h3>
+          <p className="text-2xl sm:text-3xl font-bold text-neutral-900">{stats?.totalRatings || 0}</p>
           <p className="text-xs text-neutral-500 mt-2">
             Avg: <span className={`font-semibold ${getRatingColor(stats?.averageRating || 0)}`}>
               {stats?.averageRating?.toFixed(1) || '0.0'} / 5.0
@@ -114,14 +114,14 @@ export default function HODDashboard() {
 
         <div className="stat-card">
           <div className="flex items-center justify-between mb-4">
-            <div className="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center">
-              <TrendingUp className="w-6 h-6 text-green-600" />
+            <div className="w-10 h-10 sm:w-12 sm:h-12 bg-green-100 rounded-lg flex items-center justify-center">
+              <TrendingUp className="w-5 h-5 sm:w-6 sm:h-6 text-green-600" />
             </div>
-            <span className="text-sm font-medium text-green-600">
+            <span className="text-xs sm:text-sm font-medium text-green-600">
               {stats?.satisfactionPercentage || 0}%
             </span>
           </div>
-          <h3 className="text-sm font-medium text-neutral-600 mb-1">Satisfaction Rate</h3>
+          <h3 className="text-xs sm:text-sm font-medium text-neutral-600 mb-1">Satisfaction Rate</h3>
           <div className="w-full bg-neutral-200 rounded-full h-2 mt-3">
             <div
               className="bg-green-600 h-2 rounded-full transition-all duration-500"
@@ -132,15 +132,15 @@ export default function HODDashboard() {
 
         <div className="stat-card">
           <div className="flex items-center justify-between mb-4">
-            <div className="w-12 h-12 bg-primary-100 rounded-lg flex items-center justify-center">
-              <MessageSquare className="w-6 h-6 text-primary-600" />
+            <div className="w-10 h-10 sm:w-12 sm:h-12 bg-primary-100 rounded-lg flex items-center justify-center">
+              <MessageSquare className="w-5 h-5 sm:w-6 sm:h-6 text-primary-600" />
             </div>
-            <span className="text-sm font-medium text-primary-600">
-              {stats?.openComplaints || 0} Open
+            <span className="text-xs sm:text-sm font-medium text-primary-600 badge-pulse">
+              {stats?.openComplaints || 0}
             </span>
           </div>
-          <h3 className="text-sm font-medium text-neutral-600 mb-1">Complaints</h3>
-          <p className="text-3xl font-bold text-neutral-900">{stats?.totalComplaints || 0}</p>
+          <h3 className="text-xs sm:text-sm font-medium text-neutral-600 mb-1">Complaints</h3>
+          <p className="text-2xl sm:text-3xl font-bold text-neutral-900">{stats?.totalComplaints || 0}</p>
           <p className="text-xs text-neutral-500 mt-2">
             {stats?.resolvedComplaints || 0} resolved
           </p>

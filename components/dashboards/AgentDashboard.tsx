@@ -52,66 +52,66 @@ export default function AgentDashboard() {
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 sm:space-y-8">
       {/* Header */}
-      <div>
-        <h1 className="text-3xl font-bold text-neutral-900">My Performance</h1>
-        <p className="text-neutral-600 mt-2">
+      <div className="animate-fade-in">
+        <h1 className="text-2xl sm:text-3xl font-bold text-neutral-900">My Performance</h1>
+        <p className="text-sm sm:text-base text-neutral-600 mt-1 sm:mt-2">
           Track your ratings and customer feedback
         </p>
       </div>
 
       {/* Stats Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+      <div className="grid-responsive-4 animate-slide-in-left">
         <div className="stat-card">
           <div className="flex items-center justify-between mb-4">
-            <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
-              <Star className="w-6 h-6 text-blue-600" />
+            <div className="w-10 h-10 sm:w-12 sm:h-12 bg-blue-100 rounded-lg flex items-center justify-center">
+              <Star className="w-5 h-5 sm:w-6 sm:h-6 text-blue-600" />
             </div>
           </div>
-          <h3 className="text-sm font-medium text-neutral-600 mb-1">Total Ratings</h3>
-          <p className="text-3xl font-bold text-neutral-900">{stats?.totalRatings || 0}</p>
+          <h3 className="text-xs sm:text-sm font-medium text-neutral-600 mb-1">Total Ratings</h3>
+          <p className="text-2xl sm:text-3xl font-bold text-neutral-900">{stats?.totalRatings || 0}</p>
         </div>
 
         <div className="stat-card">
           <div className="flex items-center justify-between mb-4">
-            <div className="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center">
-              <Award className="w-6 h-6 text-green-600" />
+            <div className="w-10 h-10 sm:w-12 sm:h-12 bg-green-100 rounded-lg flex items-center justify-center">
+              <Award className="w-5 h-5 sm:w-6 sm:h-6 text-green-600" />
             </div>
           </div>
-          <h3 className="text-sm font-medium text-neutral-600 mb-1">Average Rating</h3>
-          <p className={`text-3xl font-bold ${getRatingColor(stats?.averageRating || 0)}`}>
+          <h3 className="text-xs sm:text-sm font-medium text-neutral-600 mb-1">Average Rating</h3>
+          <p className={`text-2xl sm:text-3xl font-bold ${getRatingColor(stats?.averageRating || 0)}`}>
             {stats?.averageRating?.toFixed(1) || '0.0'} / 5.0
           </p>
         </div>
 
         <div className="stat-card">
           <div className="flex items-center justify-between mb-4">
-            <div className="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center">
-              <TrendingUp className="w-6 h-6 text-purple-600" />
+            <div className="w-10 h-10 sm:w-12 sm:h-12 bg-purple-100 rounded-lg flex items-center justify-center">
+              <TrendingUp className="w-5 h-5 sm:w-6 sm:h-6 text-purple-600" />
             </div>
           </div>
-          <h3 className="text-sm font-medium text-neutral-600 mb-1">Satisfaction</h3>
-          <p className="text-3xl font-bold text-neutral-900">
+          <h3 className="text-xs sm:text-sm font-medium text-neutral-600 mb-1">Satisfaction</h3>
+          <p className="text-2xl sm:text-3xl font-bold text-neutral-900">
             {stats?.satisfactionPercentage || 0}%
           </p>
         </div>
 
         <div className="stat-card">
           <div className="flex items-center justify-between mb-4">
-            <div className="w-12 h-12 bg-primary-100 rounded-lg flex items-center justify-center">
-              <MessageSquare className="w-6 h-6 text-primary-600" />
+            <div className="w-10 h-10 sm:w-12 sm:h-12 bg-primary-100 rounded-lg flex items-center justify-center">
+              <MessageSquare className="w-5 h-5 sm:w-6 sm:h-6 text-primary-600" />
             </div>
           </div>
-          <h3 className="text-sm font-medium text-neutral-600 mb-1">Complaints</h3>
-          <p className="text-3xl font-bold text-neutral-900">{stats?.totalComplaints || 0}</p>
+          <h3 className="text-xs sm:text-sm font-medium text-neutral-600 mb-1">Complaints</h3>
+          <p className="text-2xl sm:text-3xl font-bold text-neutral-900">{stats?.totalComplaints || 0}</p>
         </div>
       </div>
 
       {/* Performance Trend Chart */}
-      <div className="card">
+      <div className="card animate-fade-in">
         <div className="card-header">
-          <h2 className="text-lg font-semibold text-neutral-900">Performance Trend</h2>
+          <h2 className="text-base sm:text-lg font-semibold text-neutral-900">Performance Trend</h2>
         </div>
         <div className="card-body">
           {stats?.trendData && stats.trendData.length > 0 ? (
