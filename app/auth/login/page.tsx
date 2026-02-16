@@ -1,15 +1,16 @@
 'use client';
 
-import { useState, useRef } from 'react';
+import { useState, useRef, Suspense } from 'react';
 import { signIn } from 'next-auth/react';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { Mail, Lock, AlertCircle } from 'lucide-react';
 import toast from 'react-hot-toast';
 import HCaptcha from '@hcaptcha/react-hcaptcha';
 
-export default function LoginPage() {
+function LoginForm() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
   const [hcaptchaToken, setHcaptchaToken] = useState<string | null>(null);
@@ -36,10 +37,14 @@ export default function LoginPage() {
     setIsLoading(true);
 
     try {
+      // Get the callbackUrl from URL params, default to /dashboard
+      const callbackUrl = searchParams.get('callbackUrl') || '/dashboard';
+      
       const result = await signIn('credentials', {
         email: formData.email,
         password: formData.password,
         hcaptchaToken,
+        callbackUrl,
         redirect: false,
       });
 
@@ -49,10 +54,10 @@ export default function LoginPage() {
         // Reset captcha on error
         hcaptchaRef.current?.resetCaptcha();
         setHcaptchaToken(null);
-      } else {
+      } else if (result?.ok) {
         toast.success('Login successful!');
-        router.push('/dashboard');
-        router.refresh();
+        // Use the callbackUrl for redirect
+        window.location.href = callbackUrl;
       }
     } catch (error) {
       setError('An unexpected error occurred');
@@ -188,5 +193,17 @@ export default function LoginPage() {
         </div>
       </div>
     </div>
+  );
+}
+
+export default function LoginPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen bg-gradient-to-br from-neutral-50 to-neutral-100 flex items-center justify-center">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600"></div>
+      </div>
+    }>
+      <LoginForm />
+    </Suspense>
   );
 }
