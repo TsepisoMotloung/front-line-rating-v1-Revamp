@@ -14,14 +14,20 @@ if (!process.env.NEXTAUTH_URL && process.env.NODE_ENV === 'production') {
 
 async function verifyHcaptchaToken(token: string): Promise<boolean> {
   try {
+    // Add 5 second timeout to prevent hanging
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 5000);
+    
     const response = await fetch('https://hcaptcha.com/siteverify', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/x-www-form-urlencoded',
       },
       body: `secret=${encodeURIComponent(process.env.HCAPTCHA_SECRET_KEY || '')}&response=${encodeURIComponent(token)}`,
+      signal: controller.signal,
     });
 
+    clearTimeout(timeoutId);
     const data = await response.json();
     return data.success === true;
   } catch (error) {
@@ -40,6 +46,8 @@ export const authOptions: NextAuthOptions = {
         hcaptchaToken: { label: 'hCaptcha Token', type: 'text' },
       },
       async authorize(credentials, req) {
+        console.log('🔐 Authorize starting for:', credentials?.email);
+        
         if (!credentials?.email || !credentials?.password) {
           throw new Error('Please enter your email and password');
         }
@@ -49,15 +57,20 @@ export const authOptions: NextAuthOptions = {
         }
 
         // Verify hCaptcha token server-side
+        console.log('🤖 Verifying hCaptcha...');
         const hcaptchaValid = await verifyHcaptchaToken(credentials.hcaptchaToken);
+        console.log('🤖 hCaptcha result:', hcaptchaValid);
+        
         if (!hcaptchaValid) {
           throw new Error('hCaptcha verification failed');
         }
 
+        console.log('🔍 Querying database for user...');
         const user = await prisma.user.findUnique({
           where: { email: credentials.email },
           include: { department: true },
         });
+        console.log('🔍 User found:', user ? user.email : 'null');
 
         if (!user) {
           throw new Error('No user found with this email');
@@ -71,15 +84,18 @@ export const authOptions: NextAuthOptions = {
           throw new Error('Your account has been rejected');
         }
 
+        console.log('🔑 Verifying password...');
         const isPasswordValid = await bcrypt.compare(
           credentials.password,
           user.password
         );
+        console.log('🔑 Password valid:', isPasswordValid);
 
         if (!isPasswordValid) {
           throw new Error('Invalid password');
         }
 
+        console.log('✅ Authorization successful for:', user.email);
         return {
           id: user.id,
           email: user.email,

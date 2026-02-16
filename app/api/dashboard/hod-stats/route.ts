@@ -5,7 +5,11 @@ import prisma from '@/lib/prisma';
 
 export async function GET(request: NextRequest) {
   try {
+    const startTime = Date.now();
+    console.log('🚀 [HOD-STATS] Starting request at', new Date().toISOString());
+    
     const session = await getServerSession(authOptions);
+    console.log('⏱️ [HOD-STATS] Session retrieved in', Date.now() - startTime, 'ms');
 
     if (!session || session.user.role !== 'HOD') {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
@@ -18,6 +22,8 @@ export async function GET(request: NextRequest) {
     }
 
     // Get total agents in department
+    const step1 = Date.now();
+    console.log('📊 [HOD-STATS] Fetching total agents...');
     const totalAgents = await prisma.user.count({
       where: {
         departmentId,
@@ -25,8 +31,11 @@ export async function GET(request: NextRequest) {
         status: 'APPROVED',
       },
     });
+    console.log('✅ [HOD-STATS] Total agents fetched in', Date.now() - step1, 'ms');
 
     // Get all ratings for department
+    const step2 = Date.now();
+    console.log('📊 [HOD-STATS] Fetching department ratings...');
     const ratings = await prisma.rating.findMany({
       where: { departmentId },
       include: {

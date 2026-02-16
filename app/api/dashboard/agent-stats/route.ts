@@ -5,7 +5,11 @@ import prisma from '@/lib/prisma';
 
 export async function GET(request: NextRequest) {
   try {
+    const startTime = Date.now();
+    console.log('🚀 [AGENT-STATS] Starting request at', new Date().toISOString());
+    
     const session = await getServerSession(authOptions);
+    console.log('⏱️ [AGENT-STATS] Session retrieved in', Date.now() - startTime, 'ms');
 
     if (!session || (session.user.role !== 'AGENT' && session.user.role !== 'EMPLOYEE')) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
@@ -14,6 +18,8 @@ export async function GET(request: NextRequest) {
     const agentId = session.user.id;
 
     // Get all ratings for this agent
+    const step1 = Date.now();
+    console.log('📊 [AGENT-STATS] Fetching ratings for agent...');
     const ratings = await prisma.rating.findMany({
       where: { agentId },
       include: {
@@ -21,6 +27,7 @@ export async function GET(request: NextRequest) {
       },
       orderBy: { createdAt: 'desc' },
     });
+    console.log('✅ [AGENT-STATS] Ratings fetched in', Date.now() - step1, 'ms - Count:', ratings.length);
 
     const totalRatings = ratings.length;
 
@@ -39,6 +46,8 @@ export async function GET(request: NextRequest) {
     const satisfactionPercentage = Math.round((averageRating / 5) * 100);
 
     // Get complaints
+    const step2 = Date.now();
+    console.log('📊 [AGENT-STATS] Fetching complaints...');
     const totalComplaints = await prisma.rating.count({
       where: {
         agentId,

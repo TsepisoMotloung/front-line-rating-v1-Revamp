@@ -5,39 +5,55 @@ import prisma from '@/lib/prisma';
 
 export async function GET(request: NextRequest) {
   try {
+    const startTime = Date.now();
+    console.log('🚀 [ADMIN-STATS] Starting request at', new Date().toISOString());
+    
     const session = await getServerSession(authOptions);
+    console.log('⏱️ [ADMIN-STATS] Session retrieved in', Date.now() - startTime, 'ms');
 
     if (!session || session.user.role !== 'ADMIN') {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
     // Get total users
+    const step1 = Date.now();
+    console.log('📊 [ADMIN-STATS] Fetching total users...');
     const totalUsers = await prisma.user.count({
       where: {
         status: 'APPROVED',
       },
     });
+    console.log('✅ [ADMIN-STATS] Total users fetched in', Date.now() - step1, 'ms');
 
     // Get pending approvals
+    const step2 = Date.now();
+    console.log('📊 [ADMIN-STATS] Fetching pending approvals...');
     const pendingApprovals = await prisma.user.count({
       where: {
         status: 'PENDING',
       },
     });
+    console.log('✅ [ADMIN-STATS] Pending approvals fetched in', Date.now() - step2, 'ms');
 
     // Get total departments
+    const step3 = Date.now();
+    console.log('📊 [ADMIN-STATS] Fetching total departments...');
     const totalDepartments = await prisma.department.count({
       where: {
         isActive: true,
       },
     });
+    console.log('✅ [ADMIN-STATS] Total departments fetched in', Date.now() - step3, 'ms');
 
     // Get all ratings
+    const step4 = Date.now();
+    console.log('📊 [ADMIN-STATS] Fetching all ratings with responses...');
     const ratings = await prisma.rating.findMany({
       include: {
         responses: true,
       },
     });
+    console.log('✅ [ADMIN-STATS] All ratings fetched in', Date.now() - step4, 'ms - Count:', ratings.length);
 
     const totalRatings = ratings.length;
 
@@ -71,6 +87,8 @@ export async function GET(request: NextRequest) {
     const ratings1 = ratingsWithAverages.filter((r) => r.averageScore < 2).length;
 
     // Get complaints
+    const step5 = Date.now();
+    console.log('📊 [ADMIN-STATS] Fetching complaints...');
     const totalComplaints = await prisma.rating.count({
       where: {
         isComplaint: true,
@@ -83,8 +101,11 @@ export async function GET(request: NextRequest) {
         complaintStatus: 'OPEN',
       },
     });
+    console.log('✅ [ADMIN-STATS] Complaints fetched in', Date.now() - step5, 'ms');
 
     // Get trend data (last 30 days)
+    const step6 = Date.now();
+    console.log('📊 [ADMIN-STATS] Fetching trend data...');
     const thirtyDaysAgo = new Date();
     thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
 
@@ -101,6 +122,7 @@ export async function GET(request: NextRequest) {
         createdAt: 'asc',
       },
     });
+    console.log('✅ [ADMIN-STATS] Trend data fetched in', Date.now() - step6, 'ms');
 
     // Group by date
     const trendMap = new Map();
@@ -124,6 +146,8 @@ export async function GET(request: NextRequest) {
     }));
 
     // Get department performance
+    const step7 = Date.now();
+    console.log('📊 [ADMIN-STATS] Fetching department performance...');
     const departments = await prisma.department.findMany({
       where: {
         isActive: true,
@@ -136,6 +160,7 @@ export async function GET(request: NextRequest) {
         },
       },
     });
+    console.log('✅ [ADMIN-STATS] Departments fetched in', Date.now() - step7, 'ms');
 
     const departmentPerformance = departments.map((dept) => {
       let deptTotalScore = 0;
@@ -156,6 +181,8 @@ export async function GET(request: NextRequest) {
     });
 
     // Get top performers (top 6 agents)
+    const step8 = Date.now();
+    console.log('📊 [ADMIN-STATS] Fetching agent performance (THIS IS LIKELY SLOW)...');
     const agents = await prisma.user.findMany({
       where: {
         role: 'AGENT',
@@ -179,6 +206,7 @@ export async function GET(request: NextRequest) {
         },
       },
     });
+    console.log('✅ [ADMIN-STATS] Agents fetched in', Date.now() - step8, 'ms - Count:', agents.length);
 
     const agentPerformance = agents
       .map((agent) => {
@@ -207,6 +235,8 @@ export async function GET(request: NextRequest) {
       .slice(0, 6);
 
     // Get pending users
+    const step9 = Date.now();
+    console.log('📊 [ADMIN-STATS] Fetching pending users...');
     const pendingUsers = await prisma.user.findMany({
       where: {
         status: 'PENDING',
@@ -222,6 +252,7 @@ export async function GET(request: NextRequest) {
         createdAt: 'desc',
       },
     });
+    console.log('✅ [ADMIN-STATS] Pending users fetched in', Date.now() - step9, 'ms');
 
     const pendingUsersData = pendingUsers.map((user) => ({
       id: user.id,
@@ -233,6 +264,8 @@ export async function GET(request: NextRequest) {
     }));
 
     // Get recent activity
+    const step10 = Date.now();
+    console.log('📊 [ADMIN-STATS] Fetching recent activity...');
     const recentActivity = await prisma.rating.findMany({
       take: 10,
       orderBy: {
@@ -251,6 +284,8 @@ export async function GET(request: NextRequest) {
         },
       },
     });
+    console.log('✅ [ADMIN-STATS] Recent activity fetched in', Date.now() - step10, 'ms');
+    console.log('🏁 [ADMIN-STATS] TOTAL REQUEST TIME:', Date.now() - startTime, 'ms');
 
     return NextResponse.json({
       totalUsers,

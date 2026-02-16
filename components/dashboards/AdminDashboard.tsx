@@ -31,14 +31,21 @@ export default function AdminDashboard() {
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
+    console.log('🚀 [DASHBOARD] AdminDashboard mounted, fetching stats...');
     fetchStats();
   }, []);
 
   const fetchStats = async () => {
     try {
+      const fetchStart = Date.now();
+      console.log('📊 [DASHBOARD] Calling /api/dashboard/admin-stats...');
       const response = await fetch('/api/dashboard/admin-stats');
+      console.log('⏱️ [DASHBOARD] Response received in', Date.now() - fetchStart, 'ms - Status:', response.status);
       if (response.ok) {
+        const parseStart = Date.now();
         const data = await response.json();
+        console.log('✅ [DASHBOARD] Data parsed in', Date.now() - parseStart, 'ms');
+        console.log('🏁 [DASHBOARD] TOTAL FETCH TIME:', Date.now() - fetchStart, 'ms');
         setStats(data);
       }
     } catch (error) {

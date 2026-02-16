@@ -28,6 +28,9 @@ function LoginForm() {
     e.preventDefault();
     setError('');
     
+    console.log('🔐 [LOGIN] Starting login process...');
+    const loginStartTime = Date.now();
+    
     if (!hcaptchaToken) {
       setError('Please complete the hCaptcha verification');
       toast.error('Please complete the hCaptcha verification');
@@ -37,12 +40,15 @@ function LoginForm() {
     setIsLoading(true);
 
     try {
+      console.log('📊 [LOGIN] Calling signIn...');
+      const signInStart = Date.now();
       const result = await signIn('credentials', {
         email: formData.email,
         password: formData.password,
         hcaptchaToken,
         redirect: false,
       });
+      console.log('✅ [LOGIN] signIn completed in', Date.now() - signInStart, 'ms - Result:', result?.ok ? 'SUCCESS' : 'ERROR');
 
       if (result?.error) {
         setError(result.error);
@@ -52,9 +58,11 @@ function LoginForm() {
         setIsLoading(false);
       } else if (result?.ok) {
         toast.success('Login successful!');
+        console.log('📊 [LOGIN] Login successful, waiting for session...');
         
         // Wait a moment for session to be fully established
         await new Promise(resolve => setTimeout(resolve, 500));
+        console.log('📊 [LOGIN] Refreshing router...');
         
         // Refresh the router cache to get new session
         router.refresh();
