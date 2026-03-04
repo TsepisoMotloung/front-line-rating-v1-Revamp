@@ -38,7 +38,8 @@ export async function POST(request: NextRequest) {
       const ipAddress = request.headers.get('x-forwarded-for') || request.headers.get('x-real-ip') || 'unknown';
       const userAgent = request.headers.get('user-agent') || 'unknown';
 
-      // Store responses as JSON since they reference AllianceInsuranceQuestion, not Question
+      // For alliance ratings, we don't store individual responses in the Response table
+      // Instead we just store the customer info and feedback
       const rating = await prisma.rating.create({
         data: {
           ratingType: 'ALLIANCE',
@@ -51,7 +52,6 @@ export async function POST(request: NextRequest) {
           complaintStatus: isComplaint ? 'OPEN' : undefined,
           ipAddress,
           userAgent,
-          allianceResponses: responses, // Store as JSON
         },
       });
 
@@ -70,7 +70,7 @@ export async function POST(request: NextRequest) {
       const ipAddress = request.headers.get('x-forwarded-for') || request.headers.get('x-real-ip') || 'unknown';
       const userAgent = request.headers.get('user-agent') || 'unknown';
 
-      // Store responses as JSON since they reference AllianceInsuranceQuestion, not Question
+      // For company ratings, we don't store individual responses in the Response table
       const rating = await prisma.rating.create({
         data: {
           ratingType: 'ALLIANCE', // Company ratings use ALLIANCE type
@@ -83,7 +83,6 @@ export async function POST(request: NextRequest) {
           complaintStatus: isComplaint ? 'OPEN' : undefined,
           ipAddress,
           userAgent,
-          allianceResponses: responses, // Store as JSON
         },
       });
 
