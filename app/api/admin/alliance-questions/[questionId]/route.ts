@@ -22,6 +22,41 @@ export async function PUT(
     const body = await request.json();
     const { questionText, order, isActive } = body;
 
+    // Get the current question to check if order is changing
+    const currentQuestion = await prisma.allianceInsuranceQuestion.findUnique({
+      where: { id: questionId },
+    });
+
+    if (!currentQuestion) {
+      return NextResponse.json(
+        { error: 'Question not found' },
+        { status: 404 }
+      );
+    }
+
+    // If order is being changed and is different from current order
+    if (order !== undefined && order !== currentQuestion.order) {
+      // Find all questions with order >= new order (excluding current question)
+      const conflictingQuestions = await prisma.allianceInsuranceQuestion.findMany({
+        where: {
+          order: {
+            gte: order,
+          },
+          id: {
+            not: questionId,
+          },
+        },
+      });
+
+      // Increment the order of all conflicting questions by 1
+      for (const q of conflictingQuestions) {
+        await prisma.allianceInsuranceQuestion.update({
+          where: { id: q.id },
+          data: { order: q.order + 1 },
+        });
+      }
+    }
+
     const question = await prisma.allianceInsuranceQuestion.update({
       where: { id: questionId },
       data: {

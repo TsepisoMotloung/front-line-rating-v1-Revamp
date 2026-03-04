@@ -49,7 +49,11 @@ export async function POST(request: NextRequest) {
         isComplaint: r.isComplaint,
         feedbackText: r.feedbackText,
         createdAt: r.createdAt.toISOString(),
-        responses: JSON.stringify(r.responses.map((resp) => ({ question: resp.question.questionText, score: resp.score }))),
+        ...r.responses.reduce((acc, resp, idx) => ({
+          ...acc,
+          [`Q${idx + 1}_Question`]: resp.question.questionText,
+          [`Q${idx + 1}_Score`]: resp.score,
+        }), {}),
       }));
 
       const ratingsSheet = XLSX.utils.json_to_sheet(ratingRows);
@@ -78,7 +82,11 @@ export async function POST(request: NextRequest) {
         feedbackText: r.feedbackText,
         complaintStatus: r.complaintStatus,
         createdAt: r.createdAt.toISOString(),
-        responses: JSON.stringify(r.responses.map((resp) => ({ question: resp.question.questionText, score: resp.score }))),
+        ...r.responses.reduce((acc, resp, idx) => ({
+          ...acc,
+          [`Q${idx + 1}_Question`]: resp.question.questionText,
+          [`Q${idx + 1}_Score`]: resp.score,
+        }), {}),
       }));
 
       const complaintsSheet = XLSX.utils.json_to_sheet(complaintRows);

@@ -195,7 +195,7 @@ export default function RateCompanyPage() {
 
                     <div>
                       <label htmlFor="customerContact" className="label">
-                        Contact Number (Optional)
+                        Contact Number *
                       </label>
                       <input
                         id="customerContact"
@@ -221,7 +221,7 @@ export default function RateCompanyPage() {
                       />
                     </div>
 
-                    <div className="flex items-center space-x-2">
+                    {/* <div className="flex items-center space-x-2">
                       <input
                         id="isAnonymous"
                         type="checkbox"
@@ -232,7 +232,7 @@ export default function RateCompanyPage() {
                       <label htmlFor="isAnonymous" className="text-sm text-neutral-700">
                         Submit this rating anonymously
                       </label>
-                    </div>
+                    </div> */}
                   </div>
                 </div>
 

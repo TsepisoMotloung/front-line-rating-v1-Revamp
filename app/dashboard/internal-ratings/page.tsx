@@ -23,6 +23,7 @@ interface InternalRating {
   feedbackText?: string;
   isAnonymous: boolean;
   rater: { name: string; role: string };
+  rated: { name: string; role: string };
   createdAt: string;
 }
 
@@ -51,6 +52,10 @@ export default function InternalRatingPage() {
   const [showQRModal, setShowQRModal] = useState(false);
   const [qrCodeEmployee, setQRCodeEmployee] = useState<Employee | null>(null);
   const [qrCodeUrl, setQRCodeUrl] = useState('');
+  const [viewMode, setViewMode] = useState<'submit' | 'view'>('submit'); // For HOD/Admin
+  const [departmentRatings, setDepartmentRatings] = useState<InternalRating[]>([]);
+  const [selectedRating, setSelectedRating] = useState<InternalRating | null>(null);
+  const [isLoadingRatings, setIsLoadingRatings] = useState(false);
 
   useEffect(() => {
     if (status === 'unauthenticated') {
@@ -63,25 +68,81 @@ export default function InternalRatingPage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [searchQuery]);
 
+  useEffect(() => {
+    // For HOD/Admin: Fetch department ratings on load
+    if ((session?.user?.role === 'HOD' || session?.user?.role === 'ADMIN') && viewMode === 'view') {
+      fetchDepartmentRatings();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [session?.user?.role, viewMode]);
+
   const searchEmployees = async () => {
     if (!searchQuery.trim()) {
+      setEmployees([]);
+      setError('');
+      return;
+    }
+
+    if (searchQuery.trim().length < 2) {
+      setError('Please enter at least 2 characters to search');
       setEmployees([]);
       return;
     }
 
     try {
       setIsLoading(true);
+      setError('');
       const response = await fetch(`/api/users/search?search=${encodeURIComponent(searchQuery)}`);
+      
       if (!response.ok) {
-        throw new Error('Failed to search employees');
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Failed to search employees');
       }
+      
       const data = await response.json();
+      
+      if (data.length === 0) {
+        setError('No employees found matching your search');
+      }
+      
       setEmployees(data);
     } catch (err: any) {
-      setError(err.message);
-      toast.error('Failed to search employees');
+      const errorMessage = err.message || 'Failed to search employees';
+      setError(errorMessage);
+      setEmployees([]);
+      
+      // Only show toast for actual errors, not for "no results" messages
+      if (!errorMessage.includes('not found') && !errorMessage.includes('No employees')) {
+        toast.error(errorMessage);
+      }
     } finally {
       setIsLoading(false);
+    }
+  };
+
+  const fetchDepartmentRatings = async () => {
+    try {
+      setIsLoadingRatings(true);
+      
+      let url = '/api/ratings/internal';
+      if (session?.user?.role === 'HOD' && session.user.departmentId) {
+        // HOD can see ratings about employees in their department
+        url += '?stats=true';
+      } else if (session?.user?.role === 'ADMIN') {
+        // Admin can see all internal ratings
+        url += '?stats=true';
+      }
+      
+      const response = await fetch(url);
+      if (response.ok) {
+        const data = await response.json();
+        setDepartmentRatings(Array.isArray(data) ? data : []);
+      }
+    } catch (err) {
+      console.error('Error fetching department ratings:', err);
+      toast.error('Failed to load ratings');
+    } finally {
+      setIsLoadingRatings(false);
     }
   };
 
@@ -245,6 +306,32 @@ export default function InternalRatingPage() {
           </div>
         </div>
 
+        {/* View Mode Toggle for HOD/Admin */}
+        {(session?.user?.role === 'HOD' || session?.user?.role === 'ADMIN') && (
+          <div className="mb-6 flex space-x-2">
+            <button
+              onClick={() => setViewMode('submit')}
+              className={`px-4 py-2 rounded-lg font-medium transition-colors ${
+                viewMode === 'submit'
+                  ? 'bg-primary-600 text-white'
+                  : 'bg-neutral-200 text-neutral-700 hover:bg-neutral-300'
+              }`}
+            >
+              Submit Rating
+            </button>
+            <button
+              onClick={() => setViewMode('view')}
+              className={`px-4 py-2 rounded-lg font-medium transition-colors ${
+                viewMode === 'view'
+                  ? 'bg-primary-600 text-white'
+                  : 'bg-neutral-200 text-neutral-700 hover:bg-neutral-300'
+              }`}
+            >
+              View Ratings
+            </button>
+          </div>
+        )}
+
         {error && (
           <div className="alert alert-error mb-6 flex items-start space-x-2">
             <AlertCircle className="w-5 h-5 flex-shrink-0 mt-0.5" />
@@ -252,8 +339,65 @@ export default function InternalRatingPage() {
           </div>
         )}
 
-        {/* Step 1: Search and Select Employee */}
-        {currentStep === 1 && (
+        {/* View Ratings Section for HOD/Admin */}
+        {viewMode === 'view' && (session?.user?.role === 'HOD' || session?.user?.role === 'ADMIN') && (
+          <div className="mb-8">
+            <h2 className="text-2xl font-bold text-neutral-900 mb-4">
+              {session?.user?.role === 'HOD' ? 'Department Ratings' : 'All Internal Ratings'}
+            </h2>
+            
+            {isLoadingRatings ? (
+              <div className="text-center py-12">
+                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600 mx-auto"></div>
+              </div>
+            ) : departmentRatings.length > 0 ? (
+              <div className="space-y-4">
+                {departmentRatings.map((rating) => (
+                  <div
+                    key={rating.id}
+                    className="card cursor-pointer hover:shadow-md transition-shadow"
+                    onClick={() => setSelectedRating(rating)}
+                  >
+                    <div className="card-body">
+                      <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+                        <div className="flex-1">
+                          <div className="flex items-center gap-3 mb-2">
+                            <div className="w-10 h-10 bg-primary-100 rounded-full flex items-center justify-center">
+                              <User className="w-5 h-5 text-primary-600" />
+                            </div>
+                            <div>
+                              <p className="font-semibold text-neutral-900">
+                                {rating.rated?.name} <span className="text-sm text-neutral-600">rated by {rating.isAnonymous ? 'Anonymous' : rating.rater?.name}</span>
+                              </p>
+                              <p className="text-sm text-neutral-600">{rating.category}</p>
+                            </div>
+                          </div>
+                          <p className="text-sm text-neutral-600 ml-13">
+                            {new Date(rating.createdAt).toLocaleDateString()}
+                          </p>
+                        </div>
+                        <div className="flex items-center gap-3">
+                          <div className="text-center">
+                            <p className="text-2xl font-bold text-primary-600">{rating.score}</p>
+                            <p className="text-xs text-neutral-600">/5</p>
+                          </div>
+                          <Star className="w-5 h-5 text-yellow-500 fill-yellow-500" />
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <div className="text-center py-12 bg-neutral-50 rounded-lg">
+                <p className="text-neutral-600">No internal ratings available yet</p>
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* Step 1: Search and Select Employee - Only show when viewMode is 'submit' */}
+        {viewMode === 'submit' && currentStep === 1 && (
           <div className="card">
             <div className="card-body space-y-6">
               <div>
@@ -303,7 +447,7 @@ export default function InternalRatingPage() {
                         <span className="text-xs font-medium px-2 py-1 bg-neutral-100 text-neutral-700 rounded">
                           {employee.role}
                         </span>
-                        <button
+                        {/* <button
                           onClick={(e) => {
                             e.stopPropagation();
                             handleShowQRCode(employee);
@@ -312,7 +456,7 @@ export default function InternalRatingPage() {
                           title="Show QR Code"
                         >
                           <QrCode className="w-5 h-5" />
-                        </button>
+                        </button> */}
                       </div>
                     </div>
                   ))}
@@ -406,7 +550,7 @@ export default function InternalRatingPage() {
                   />
                 </div>
 
-                {/* Anonymous Option */}
+                {/* Anonymous Option
                 <div className="flex items-center space-x-2 mt-6">
                   <input
                     id="isAnonymous"
@@ -418,7 +562,7 @@ export default function InternalRatingPage() {
                   <label htmlFor="isAnonymous" className="text-sm text-neutral-700">
                     Submit this rating anonymously
                   </label>
-                </div>
+                </div> */}
 
                 <div className="flex space-x-4 mt-8">
                   <button
@@ -528,6 +672,91 @@ export default function InternalRatingPage() {
                     <p className="text-neutral-600 mt-4">Generating QR code...</p>
                   </div>
                 )}
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Rating Details Modal for HOD/Admin */}
+        {selectedRating && viewMode === 'view' && (
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+            <div className="bg-white rounded-lg max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+              <div className="p-6 border-b border-neutral-200 sticky top-0 bg-white">
+                <div className="flex justify-between items-start">
+                  <div>
+                    <h2 className="text-2xl font-bold text-neutral-900">{selectedRating.rated?.name}</h2>
+                    <p className="text-neutral-600 text-sm mt-1">
+                      {selectedRating.category} - {selectedRating.score}/5
+                    </p>
+                  </div>
+                  <button
+                    onClick={() => setSelectedRating(null)}
+                    className="text-neutral-400 hover:text-neutral-600 text-2xl"
+                  >
+                    ×
+                  </button>
+                </div>
+              </div>
+
+              <div className="p-6 space-y-6">
+                <div className="grid grid-cols-3 gap-4">
+                  <div>
+                    <p className="text-xs text-neutral-600 mb-1">Rated Person</p>
+                    <p className="font-semibold text-sm">{selectedRating.rated?.name}</p>
+                    <p className="text-xs text-neutral-500">{selectedRating.rated?.role}</p>
+                  </div>
+                  <div>
+                    <p className="text-xs text-neutral-600 mb-1">Rater</p>
+                    <p className="font-semibold text-sm">
+                      {selectedRating.isAnonymous ? 'Anonymous' : selectedRating.rater?.name}
+                    </p>
+                    {!selectedRating.isAnonymous && (
+                      <p className="text-xs text-neutral-500">{selectedRating.rater?.role}</p>
+                    )}
+                  </div>
+                  <div>
+                    <p className="text-xs text-neutral-600 mb-1">Date</p>
+                    <p className="font-semibold text-sm">
+                      {new Date(selectedRating.createdAt).toLocaleDateString()}
+                    </p>
+                  </div>
+                </div>
+
+                <div>
+                  <h3 className="font-semibold text-neutral-900 mb-3">Rating</h3>
+                  <div className="flex items-center gap-3 p-4 bg-primary-50 rounded-lg">
+                    <span className="text-3xl font-bold text-primary-600">{selectedRating.score}</span>
+                    <div className="flex gap-1">
+                      {[1, 2, 3, 4, 5].map((star) => (
+                        <Star
+                          key={star}
+                          className={`w-5 h-5 ${
+                            star <= selectedRating.score ? 'text-yellow-500 fill-yellow-500' : 'text-neutral-300'
+                          }`}
+                        />
+                      ))}
+                    </div>
+                    <span className="text-sm text-neutral-600 ml-2">/5</span>
+                  </div>
+                </div>
+
+                {selectedRating.feedbackText && (
+                  <div>
+                    <h3 className="font-semibold text-neutral-900 mb-2">Feedback</h3>
+                    <p className="text-neutral-700 text-sm bg-neutral-50 p-4 rounded-lg">
+                      {selectedRating.feedbackText}
+                    </p>
+                  </div>
+                )}
+
+                <div className="flex gap-3 pt-4 border-t border-neutral-200">
+                  <button
+                    onClick={() => setSelectedRating(null)}
+                    className="flex-1 btn btn-secondary"
+                  >
+                    Close
+                  </button>
+                </div>
               </div>
             </div>
           </div>

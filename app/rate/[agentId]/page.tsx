@@ -279,7 +279,7 @@ export default function RatingFormPage({ params }: { params: { agentId: string }
 
                       <div>
                         <label htmlFor="customerContact" className="label">
-                          Phone Number
+                          Phone Number *
                         </label>
                         <div className="relative">
                           <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">

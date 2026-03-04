@@ -264,71 +264,28 @@ export default function AdminDashboard() {
         </div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* System Performance Trend */}
-        <div className="card">
-          <div className="card-header">
-            <h2 className="text-lg font-semibold text-neutral-900">System Performance Trend</h2>
-            <p className="text-sm text-neutral-600 mt-1">Ratings and satisfaction over time</p>
-          </div>
-          <div className="card-body">
-            {stats?.trendData && stats.trendData.length > 0 ? (
-              <ResponsiveContainer width="100%" height={300}>
-                <LineChart data={stats.trendData}>
-                  <CartesianGrid strokeDasharray="3 3" />
-                  <XAxis dataKey="date" />
-                  <YAxis yAxisId="left" domain={[0, 5]} />
-                  <YAxis yAxisId="right" orientation="right" />
-                  <Tooltip />
-                  <Line
-                    yAxisId="left"
-                    type="monotone"
-                    dataKey="avgRating"
-                    stroke="#dc2626"
-                    strokeWidth={2}
-                    name="Avg Rating"
-                  />
-                  <Line
-                    yAxisId="right"
-                    type="monotone"
-                    dataKey="count"
-                    stroke="#3b82f6"
-                    strokeWidth={2}
-                    name="Count"
-                  />
-                </LineChart>
-              </ResponsiveContainer>
-            ) : (
-              <div className="text-center py-12 text-neutral-500">
-                No trend data available yet
-              </div>
-            )}
-          </div>
+      {/* Department Performance - Full Width */}
+      <div className="card">
+        <div className="card-header">
+          <h2 className="text-lg font-semibold text-neutral-900">Department Performance</h2>
+          <p className="text-sm text-neutral-600 mt-1">Compare departments</p>
         </div>
-
-        {/* Department Performance */}
-        <div className="card">
-          <div className="card-header">
-            <h2 className="text-lg font-semibold text-neutral-900">Department Performance</h2>
-            <p className="text-sm text-neutral-600 mt-1">Compare departments</p>
-          </div>
-          <div className="card-body">
-            {stats?.departmentPerformance && stats.departmentPerformance.length > 0 ? (
-              <ResponsiveContainer width="100%" height={300}>
-                <BarChart data={stats.departmentPerformance}>
-                  <CartesianGrid strokeDasharray="3 3" />
-                  <XAxis dataKey="name" />
-                  <YAxis domain={[0, 5]} />
-                  <Tooltip />
-                  <Bar dataKey="avgRating" fill="#dc2626" />
-                </BarChart>
-              </ResponsiveContainer>
-            ) : (
-              <div className="text-center py-12 text-neutral-500">
-                No performance data available yet
-              </div>
-            )}
-          </div>
+        <div className="card-body">
+          {stats?.departmentPerformance && stats.departmentPerformance.length > 0 ? (
+            <ResponsiveContainer width="100%" height={300}>
+              <BarChart data={stats.departmentPerformance}>
+                <CartesianGrid strokeDasharray="3 3" />
+                <XAxis dataKey="name" />
+                <YAxis domain={[0, 5]} />
+                <Tooltip />
+                <Bar dataKey="avgRating" fill="#dc2626" />
+              </BarChart>
+            </ResponsiveContainer>
+          ) : (
+            <div className="text-center py-12 text-neutral-500">
+              No performance data available yet
+            </div>
+          )}
         </div>
       </div>
 

@@ -3,13 +3,32 @@
 import { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { Star, Mail, Lock, User, Phone, Building2, Hash, AlertCircle, CheckCircle } from 'lucide-react';
+import { Star, Mail, Lock, User, Phone, Building2, Hash, AlertCircle, CheckCircle, Eye, EyeOff } from 'lucide-react';
 import toast from 'react-hot-toast';
 import HCaptcha from '@hcaptcha/react-hcaptcha';
+import {
+  validateEmail,
+  validatePhoneNumber,
+  validatePassword,
+  validatePasswordConfirmation,
+  validateName,
+  validateEmployeeId,
+  validateDepartmentSelection,
+} from '@/lib/validations';
 
 interface Department {
   id: string;
   name: string;
+}
+
+interface FormErrors {
+  name?: string;
+  email?: string;
+  phone?: string;
+  employeeId?: string;
+  password?: string;
+  confirmPassword?: string;
+  departmentId?: string;
 }
 
 export default function RegisterPage() {
@@ -17,8 +36,11 @@ export default function RegisterPage() {
   const [isLoading, setIsLoading] = useState(false);
   const [departments, setDepartments] = useState<Department[]>([]);
   const [error, setError] = useState('');
+  const [fieldErrors, setFieldErrors] = useState<FormErrors>({});
   const [hcaptchaToken, setHcaptchaToken] = useState<string | null>(null);
   const hcaptchaRef = useRef<any>(null);
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -50,23 +72,76 @@ export default function RegisterPage() {
     setHcaptchaToken(token);
   };
 
-  const validateForm = () => {
-    if (formData.password !== formData.confirmPassword) {
-      setError('Passwords do not match');
-      return false;
+  const validateForm = (): boolean => {
+    const errors: FormErrors = {};
+    let isValid = true;
+
+    // Validate name
+    const nameValidation = validateName(formData.name, 'Full Name');
+    if (!nameValidation.isValid) {
+      errors.name = nameValidation.error;
+      isValid = false;
     }
 
-    if (formData.password.length < 8) {
-      setError('Password must be at least 8 characters long');
-      return false;
+    // Validate email
+    const emailValidation = validateEmail(formData.email);
+    if (!emailValidation.isValid) {
+      errors.email = emailValidation.error;
+      isValid = false;
     }
 
+    // Validate phone
+    const phoneValidation = validatePhoneNumber(formData.phone, 'ZA');
+    if (!phoneValidation.isValid) {
+      errors.phone = phoneValidation.error;
+      isValid = false;
+    }
+
+    // Validate employee ID if provided
+    if (formData.employeeId) {
+      const empIdValidation = validateEmployeeId(formData.employeeId);
+      if (!empIdValidation.isValid) {
+        errors.employeeId = empIdValidation.error;
+        isValid = false;
+      }
+    }
+
+    // Validate password
+    const passwordValidation = validatePassword(formData.password);
+    if (!passwordValidation.isValid) {
+      errors.password = passwordValidation.error;
+      isValid = false;
+    }
+
+    // Validate password confirmation
+    const confirmValidation = validatePasswordConfirmation(
+      formData.password,
+      formData.confirmPassword
+    );
+    if (!confirmValidation.isValid) {
+      errors.confirmPassword = confirmValidation.error;
+      isValid = false;
+    }
+
+    // Validate department selection
     if (formData.role !== 'ADMIN' && !formData.departmentId) {
-      setError('Please select a department');
-      return false;
+      const deptValidation = validateDepartmentSelection(formData.departmentId);
+      if (!deptValidation.isValid) {
+        errors.departmentId = deptValidation.error;
+        isValid = false;
+      }
     }
 
-    return true;
+    setFieldErrors(errors);
+    return isValid;
+  };
+
+  const handleFieldChange = (field: string, value: string) => {
+    setFormData({ ...formData, [field]: value });
+    // Clear field error when user starts typing
+    if (fieldErrors[field as keyof FormErrors]) {
+      setFieldErrors({ ...fieldErrors, [field]: undefined });
+    }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -155,11 +230,17 @@ export default function RegisterPage() {
                       type="text"
                       required
                       value={formData.name}
-                      onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                      className="input pl-10"
+                      onChange={(e) => handleFieldChange('name', e.target.value)}
+                      className={`input pl-10 ${fieldErrors.name ? 'border-red-500' : ''}`}
                       placeholder="Tsepiso Motloung"
                     />
                   </div>
+                  {fieldErrors.name && (
+                    <p className="text-xs text-red-600 mt-1 flex items-center gap-1">
+                      <AlertCircle className="w-3 h-3" />
+                      {fieldErrors.name}
+                    </p>
+                  )}
                 </div>
 
                 {/* Email */}
@@ -176,17 +257,23 @@ export default function RegisterPage() {
                       type="email"
                       required
                       value={formData.email}
-                      onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                      className="input pl-10"
+                      onChange={(e) => handleFieldChange('email', e.target.value)}
+                      className={`input pl-10 ${fieldErrors.email ? 'border-red-500' : ''}`}
                       placeholder="user@example.com"
                     />
                   </div>
+                  {fieldErrors.email && (
+                    <p className="text-xs text-red-600 mt-1 flex items-center gap-1">
+                      <AlertCircle className="w-3 h-3" />
+                      {fieldErrors.email}
+                    </p>
+                  )}
                 </div>
 
                 {/* Phone */}
                 <div>
                   <label htmlFor="phone" className="label">
-                    Phone Number
+                    Phone Number * (South African format)
                   </label>
                   <div className="relative">
                     <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
@@ -196,11 +283,18 @@ export default function RegisterPage() {
                       id="phone"
                       type="tel"
                       value={formData.phone}
-                      onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-                      className="input pl-10"
-                      placeholder="+266 5000 0000"
+                      onChange={(e) => handleFieldChange('phone', e.target.value)}
+                      className={`input pl-10 ${fieldErrors.phone ? 'border-red-500' : ''}`}
+                      placeholder="+27 60 000 0000 or 060 000 0000"
                     />
                   </div>
+                  {fieldErrors.phone && (
+                    <p className="text-xs text-red-600 mt-1 flex items-center gap-1">
+                      <AlertCircle className="w-3 h-3" />
+                      {fieldErrors.phone}
+                    </p>
+                  )}
+                  <p className="text-xs text-neutral-500 mt-1">10 digits, starting with 0 or +27</p>
                 </div>
 
                 {/* Employee ID */}
@@ -216,11 +310,17 @@ export default function RegisterPage() {
                       id="employeeId"
                       type="text"
                       value={formData.employeeId}
-                      onChange={(e) => setFormData({ ...formData, employeeId: e.target.value })}
-                      className="input pl-10"
+                      onChange={(e) => handleFieldChange('employeeId', e.target.value)}
+                      className={`input pl-10 ${fieldErrors.employeeId ? 'border-red-500' : ''}`}
                       placeholder="EMP001"
                     />
                   </div>
+                  {fieldErrors.employeeId && (
+                    <p className="text-xs text-red-600 mt-1 flex items-center gap-1">
+                      <AlertCircle className="w-3 h-3" />
+                      {fieldErrors.employeeId}
+                    </p>
+                  )}
                 </div>
 
                 {/* Role */}
@@ -232,7 +332,7 @@ export default function RegisterPage() {
                     id="role"
                     required
                     value={formData.role}
-                    onChange={(e) => setFormData({ ...formData, role: e.target.value })}
+                    onChange={(e) => handleFieldChange('role', e.target.value)}
                     className="input"
                   >
                     <option value="AGENT">Agent</option>
@@ -255,8 +355,8 @@ export default function RegisterPage() {
                         id="department"
                         required
                         value={formData.departmentId}
-                        onChange={(e) => setFormData({ ...formData, departmentId: e.target.value })}
-                        className="input pl-10"
+                        onChange={(e) => handleFieldChange('departmentId', e.target.value)}
+                        className={`input pl-10 ${fieldErrors.departmentId ? 'border-red-500' : ''}`}
                       >
                         <option value="">Select Department</option>
                         {departments.map((dept) => (
@@ -266,6 +366,12 @@ export default function RegisterPage() {
                         ))}
                       </select>
                     </div>
+                    {fieldErrors.departmentId && (
+                      <p className="text-xs text-red-600 mt-1 flex items-center gap-1">
+                        <AlertCircle className="w-3 h-3" />
+                        {fieldErrors.departmentId}
+                      </p>
+                    )}
                   </div>
                 )}
 
@@ -280,18 +386,37 @@ export default function RegisterPage() {
                     </div>
                     <input
                       id="password"
-                      type="password"
+                      type={showPassword ? 'text' : 'password'}
                       required
                       value={formData.password}
-                      onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-                      className="input pl-10"
+                      onChange={(e) => handleFieldChange('password', e.target.value)}
+                      className={`input pl-10 pr-12 ${fieldErrors.password ? 'border-red-500' : ''}`}
                       placeholder="••••••••"
-                      minLength={8}
                     />
+                    <button
+                      type="button"
+                      onClick={() => setShowPassword(!showPassword)}
+                      className="absolute right-3 top-1/2 transform -translate-y-1/2 text-neutral-400 hover:text-neutral-600 transition-colors"
+                      tabIndex={-1}
+                    >
+                      {showPassword ? (
+                        <EyeOff className="w-5 h-5" />
+                      ) : (
+                        <Eye className="w-5 h-5" />
+                      )}
+                    </button>
                   </div>
-                  <p className="text-xs text-neutral-500 mt-1">
-                    Must be at least 8 characters
-                  </p>
+                  {fieldErrors.password && (
+                    <p className="text-xs text-red-600 mt-1 flex items-center gap-1">
+                      <AlertCircle className="w-3 h-3" />
+                      {fieldErrors.password}
+                    </p>
+                  )}
+                  {!fieldErrors.password && (
+                    <p className="text-xs text-neutral-500 mt-1">
+                      At least 8 chars, 1 uppercase, 1 lowercase, 1 number
+                    </p>
+                  )}
                 </div>
 
                 {/* Confirm Password */}
@@ -305,14 +430,32 @@ export default function RegisterPage() {
                     </div>
                     <input
                       id="confirmPassword"
-                      type="password"
+                      type={showConfirmPassword ? 'text' : 'password'}
                       required
                       value={formData.confirmPassword}
-                      onChange={(e) => setFormData({ ...formData, confirmPassword: e.target.value })}
-                      className="input pl-10"
+                      onChange={(e) => handleFieldChange('confirmPassword', e.target.value)}
+                      className={`input pl-10 pr-12 ${fieldErrors.confirmPassword ? 'border-red-500' : ''}`}
                       placeholder="••••••••"
                     />
+                    <button
+                      type="button"
+                      onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                      className="absolute right-3 top-1/2 transform -translate-y-1/2 text-neutral-400 hover:text-neutral-600 transition-colors"
+                      tabIndex={-1}
+                    >
+                      {showConfirmPassword ? (
+                        <EyeOff className="w-5 h-5" />
+                      ) : (
+                        <Eye className="w-5 h-5" />
+                      )}
+                    </button>
                   </div>
+                  {fieldErrors.confirmPassword && (
+                    <p className="text-xs text-red-600 mt-1 flex items-center gap-1">
+                      <AlertCircle className="w-3 h-3" />
+                      {fieldErrors.confirmPassword}
+                    </p>
+                  )}
                 </div>
               </div>
 

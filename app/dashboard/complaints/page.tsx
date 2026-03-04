@@ -83,13 +83,23 @@ export default function ComplaintsPage() {
       const response = await fetch(`/api/complaints/${complaintId}/resolve`, {
         method: 'PUT',
       });
-      if (!response.ok) throw new Error('Failed to resolve complaint');
+      
+      const data = await response.json();
+      
+      if (!response.ok) {
+        const errorMessage = data.error || 'Failed to resolve complaint';
+        toast.error(errorMessage);
+        console.error('Resolution error:', errorMessage);
+        return;
+      }
+      
       toast.success('Complaint resolved successfully');
       setSelectedComplaint(null);
       fetchComplaints();
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error resolving complaint:', error);
-      toast.error('Failed to resolve complaint');
+      const errorMessage = error?.message || 'Failed to resolve complaint. Please try again.';
+      toast.error(errorMessage);
     }
   };
 

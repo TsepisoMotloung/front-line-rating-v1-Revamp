@@ -65,7 +65,7 @@ export default function ScanQRCodePage() {
       setError('No camera found. Please ensure your device has a working camera.');
     } else if (!errorMessage.includes('permission')) {
       // Don't show permission-related messages as errors
-      setError('Scanner error: ' + errorMessage);
+      setError(errorMessage);
     }
   };
 
@@ -118,7 +118,6 @@ export default function ScanQRCodePage() {
 
           {error && (
             <div className="text-sm bg-primary-50 text-primary-700 rounded-lg p-4 mb-4">
-              <div className="font-medium">Scanner Error</div>
               <div className="mt-1">{error}</div>
             </div>
           )}

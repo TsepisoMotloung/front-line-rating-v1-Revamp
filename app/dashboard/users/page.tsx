@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import DashboardLayout from '@/components/DashboardLayout';
-import { UserCheck, UserX, Search } from 'lucide-react';
+import { UserCheck, UserX, Search, Edit2 } from 'lucide-react';
 import toast from 'react-hot-toast';
 
 interface User {
@@ -24,6 +24,9 @@ export default function UsersPage() {
   const [statusFilter, setStatusFilter] = useState('ALL');
   const [selectedUsers, setSelectedUsers] = useState<Set<string>>(new Set());
   const [bulkAction, setBulkAction] = useState<string>('');
+  const [promoteModalOpen, setPromoteModalOpen] = useState(false);
+  const [promoteUser, setPromoteUser] = useState<User | null>(null);
+  const [newRole, setNewRole] = useState('EMPLOYEE');
 
   useEffect(() => {
     fetchUsers();
@@ -149,6 +152,34 @@ export default function UsersPage() {
     } catch (error) {
       console.error('Error deleting user:', error);
       toast.error('Failed to delete user');
+    }
+  };
+
+  const handlePromoteClick = (user: User) => {
+    setPromoteUser(user);
+    setNewRole(user.role);
+    setPromoteModalOpen(true);
+  };
+
+  const handlePromote = async () => {
+    if (!promoteUser) return;
+
+    try {
+      const response = await fetch(`/api/users/${promoteUser.id}/promote`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ role: newRole }),
+      });
+
+      if (!response.ok) throw new Error('Failed to promote user');
+
+      toast.success(`User promoted to ${newRole}`);
+      setPromoteModalOpen(false);
+      setPromoteUser(null);
+      fetchUsers();
+    } catch (error) {
+      console.error('Error promoting user:', error);
+      toast.error('Failed to promote user');
     }
   };
 
@@ -389,6 +420,13 @@ export default function UsersPage() {
                           {user.status === 'APPROVED' && (
                             <div className="flex gap-2">
                               <button
+                                onClick={() => handlePromoteClick(user)}
+                                className="btn btn-sm btn-info"
+                                title="Change Role"
+                              >
+                                <Edit2 className="w-4 h-4" />
+                              </button>
+                              <button
                                 onClick={() => handleDeactivate(user.id)}
                                 className="btn btn-sm btn-warning"
                                 title="Deactivate"
@@ -437,6 +475,59 @@ export default function UsersPage() {
           </div>
         </div>
       </div>
+
+      {/* Promote Modal */}
+      {promoteModalOpen && promoteUser && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-lg shadow-xl max-w-md w-full">
+            <div className="p-6">
+              <h2 className="text-2xl font-bold text-neutral-900 mb-2">Change User Role</h2>
+              <p className="text-neutral-600 mb-6">
+                Changing role for <span className="font-semibold">{promoteUser.name}</span>
+              </p>
+
+              <div className="space-y-4">
+                <div>
+                  <label className="block text-sm font-medium text-neutral-700 mb-2">
+                    New Role
+                  </label>
+                  <select
+                    value={newRole}
+                    onChange={(e) => setNewRole(e.target.value)}
+                    className="w-full border border-neutral-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                  >
+                    <option value="EMPLOYEE">Employee</option>
+                    <option value="AGENT">Agent</option>
+                    <option value="HOD">HOD (Head of Department)</option>
+                    <option value="ADMIN">Admin</option>
+                  </select>
+                  <p className="text-sm text-neutral-500 mt-2">
+                    Current role: <span className="font-medium">{promoteUser.role}</span>
+                  </p>
+                </div>
+              </div>
+
+              <div className="flex gap-3 mt-8">
+                <button
+                  onClick={() => {
+                    setPromoteModalOpen(false);
+                    setPromoteUser(null);
+                  }}
+                  className="flex-1 btn btn-secondary"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={handlePromote}
+                  className="flex-1 btn btn-primary"
+                >
+                  Update Role
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </DashboardLayout>
   );
 }
