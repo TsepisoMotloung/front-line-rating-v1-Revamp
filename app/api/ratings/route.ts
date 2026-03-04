@@ -38,6 +38,7 @@ export async function POST(request: NextRequest) {
       const ipAddress = request.headers.get('x-forwarded-for') || request.headers.get('x-real-ip') || 'unknown';
       const userAgent = request.headers.get('user-agent') || 'unknown';
 
+      // Store responses as JSON since they reference AllianceInsuranceQuestion, not Question
       const rating = await prisma.rating.create({
         data: {
           ratingType: 'ALLIANCE',
@@ -50,15 +51,7 @@ export async function POST(request: NextRequest) {
           complaintStatus: isComplaint ? 'OPEN' : undefined,
           ipAddress,
           userAgent,
-          responses: {
-            create: responses.map((r: any) => ({
-              questionId: r.questionId,
-              score: r.score,
-            })),
-          },
-        },
-        include: {
-          responses: true,
+          allianceResponses: responses, // Store as JSON
         },
       });
 
@@ -71,15 +64,16 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Legacy COMPANY rating (for backward compatibility)
+    // Legacy COMPANY rating (maps to ALLIANCE ratingType)
     if (ratingType === 'COMPANY') {
       // Company rating - no agent or department required
       const ipAddress = request.headers.get('x-forwarded-for') || request.headers.get('x-real-ip') || 'unknown';
       const userAgent = request.headers.get('user-agent') || 'unknown';
 
+      // Store responses as JSON since they reference AllianceInsuranceQuestion, not Question
       const rating = await prisma.rating.create({
         data: {
-          ratingType: 'ALLIANCE',
+          ratingType: 'ALLIANCE', // Company ratings use ALLIANCE type
           customerName,
           customerContact,
           policyNumber,
@@ -89,21 +83,13 @@ export async function POST(request: NextRequest) {
           complaintStatus: isComplaint ? 'OPEN' : undefined,
           ipAddress,
           userAgent,
-          responses: {
-            create: responses.map((r: any) => ({
-              questionId: r.questionId,
-              score: r.score,
-            })),
-          },
-        },
-        include: {
-          responses: true,
+          allianceResponses: responses, // Store as JSON
         },
       });
 
       return NextResponse.json(
         {
-          message: 'Alliance Insurance rating submitted successfully',
+          message: 'Rating submitted successfully',
           rating: { id: rating.id },
         },
         { status: 201 }

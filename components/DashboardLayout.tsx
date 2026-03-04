@@ -53,7 +53,6 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
         { href: '/dashboard/questions', icon: FileText, label: 'Questions' },
         { href: '/dashboard/ratings', icon: Star, label: 'Ratings' },
         { href: '/dashboard/complaints', icon: MessageSquare, label: 'Complaints' },
-        { href: '/dashboard/reports', icon: FileText, label: 'Reports' },
       ];
     }
 

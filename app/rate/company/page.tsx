@@ -34,8 +34,8 @@ export default function RateCompanyPage() {
   const fetchQuestions = async () => {
     try {
       setIsLoading(true);
-      // Fetch company rating questions - these are generic questions for the company
-      const response = await fetch('/api/questions?type=company');
+      // Fetch company rating questions - these use the same questions as Alliance Insurance
+      const response = await fetch('/api/admin/alliance-questions');
       if (!response.ok) {
         throw new Error('Failed to fetch questions');
       }
