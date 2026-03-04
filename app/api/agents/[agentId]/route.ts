@@ -9,13 +9,13 @@ export async function GET(
     const agent = await prisma.user.findUnique({
       where: {
         id: params.agentId,
-        role: 'AGENT',
-        status: 'APPROVED',
       },
       select: {
         id: true,
         name: true,
         employeeId: true,
+        role: true,
+        status: true,
         department: {
           select: {
             id: true,
@@ -32,7 +32,21 @@ export async function GET(
       );
     }
 
-    return NextResponse.json(agent);
+    // Check if agent is approved and has AGENT role
+    if (agent.role !== 'AGENT' || agent.status !== 'APPROVED') {
+      return NextResponse.json(
+        { error: 'Agent not available' },
+        { status: 404 }
+      );
+    }
+
+    // Return agent without role/status fields
+    return NextResponse.json({
+      id: agent.id,
+      name: agent.name,
+      employeeId: agent.employeeId,
+      department: agent.department,
+    });
   } catch (error) {
     console.error('Error fetching agent:', error);
     return NextResponse.json(

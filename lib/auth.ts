@@ -77,10 +77,11 @@ export const authOptions: NextAuthOptions = {
             email: user.email,
             name: user.name,
             role: user.role,
+            employeeId: user.employeeId || undefined,
             departmentId: user.departmentId ?? undefined,
             departmentName: user.department?.name,
             status: user.status,
-          };
+          } as any;
         } catch (error: any) {
           console.error('🔐 Auth error:', error.message);
           throw error;
@@ -94,7 +95,10 @@ export const authOptions: NextAuthOptions = {
       // Add user data to token on sign in
       if (user) {
         token.id = user.id;
+        token.email = user.email;
+        token.name = user.name;
         token.role = user.role;
+        token.employeeId = user.employeeId;
         token.departmentId = user.departmentId;
         token.departmentName = user.departmentName;
         token.status = user.status;
@@ -105,11 +109,14 @@ export const authOptions: NextAuthOptions = {
     async session({ session, token }) {
       // Add token data to session
       if (session.user) {
-        session.user.id = token.id as string;
-        session.user.role = token.role as string;
-        session.user.departmentId = token.departmentId as string;
-        session.user.departmentName = token.departmentName as string;
-        session.user.status = token.status as string;
+        (session.user as any).id = token.id as string;
+        (session.user as any).email = token.email as string;
+        (session.user as any).name = token.name as string;
+        (session.user as any).role = token.role as string;
+        (session.user as any).employeeId = token.employeeId as string;
+        (session.user as any).departmentId = token.departmentId as string;
+        (session.user as any).departmentName = token.departmentName as string;
+        (session.user as any).status = token.status as string;
       }
       return session;
     },

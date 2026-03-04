@@ -23,8 +23,16 @@ export async function GET(request: NextRequest) {
         }
       }
     });
+
+    // Count unread notifications
+    const unreadCount = await prisma.notification.count({
+      where: {
+        userId: session.user.id,
+        isRead: false,
+      },
+    });
     
-    return NextResponse.json(notifications);
+    return NextResponse.json({ notifications, unreadCount });
   } catch (error) {
     console.error('Error fetching notifications:', error);
     return NextResponse.json(

@@ -12,7 +12,7 @@ export async function PUT(request: NextRequest) {
     }
 
     const body = await request.json();
-    const { name, email } = body;
+    const { name, email, phone } = body;
 
     // Validate
     if (!name || !email) {
@@ -20,6 +20,33 @@ export async function PUT(request: NextRequest) {
         { error: 'Name and email are required' },
         { status: 400 }
       );
+    }
+
+    // Get current user data to check if anything changed
+    const currentUser = await prisma.user.findUnique({
+      where: { id: session.user.id },
+    });
+
+    if (!currentUser) {
+      return NextResponse.json(
+        { error: 'User not found' },
+        { status: 404 }
+      );
+    }
+
+    // Check if data actually changed
+    const hasChanges = currentUser.name !== name || currentUser.email !== email || (phone && currentUser.phone !== phone);
+
+    if (!hasChanges) {
+      return NextResponse.json({
+        message: 'No changes made',
+        user: {
+          id: currentUser.id,
+          name: currentUser.name,
+          email: currentUser.email,
+          phone: currentUser.phone,
+        },
+      });
     }
 
     // Check if email is already taken by another user
@@ -39,10 +66,13 @@ export async function PUT(request: NextRequest) {
       );
     }
 
-    // Update user
+    // Update user with only changed fields
+    const updateData: any = { name, email };
+    if (phone) updateData.phone = phone;
+
     const updatedUser = await prisma.user.update({
       where: { id: session.user.id },
-      data: { name, email },
+      data: updateData,
     });
 
     return NextResponse.json({
@@ -51,6 +81,7 @@ export async function PUT(request: NextRequest) {
         id: updatedUser.id,
         name: updatedUser.name,
         email: updatedUser.email,
+        phone: updatedUser.phone,
       },
     });
   } catch (error) {

@@ -59,11 +59,11 @@ export const validateEmail = (email: string): ValidationResult => {
 };
 
 /**
- * Validate phone number based on country code
+ * Validate phone number - auto-detect country format
  */
 export const validatePhoneNumber = (
   phoneNumber: string,
-  countryCode: string = 'default'
+  countryCode?: string
 ): ValidationResult => {
   if (!phoneNumber) {
     return { isValid: false, error: 'Phone number is required' };
@@ -72,23 +72,43 @@ export const validatePhoneNumber = (
   // Remove common separators for validation
   const cleanedPhone = phoneNumber.replace(/[\s\-\(\)]/g, '');
 
-  const pattern = PHONE_PATTERNS[countryCode] || PHONE_PATTERNS.default;
-
-  if (!pattern.regex.test(phoneNumber)) {
-    return {
-      isValid: false,
-      error: `Invalid phone format. ${pattern.description}`,
-    };
+  // If country code is provided, use it
+  if (countryCode && PHONE_PATTERNS[countryCode]) {
+    const pattern = PHONE_PATTERNS[countryCode];
+    if (!pattern.regex.test(phoneNumber)) {
+      return {
+        isValid: false,
+        error: `Invalid phone format. Expected: ${pattern.description}`,
+      };
+    }
+    if (cleanedPhone.replace(/\D/g, '').length < pattern.length) {
+      return {
+        isValid: false,
+        error: `Phone number must have at least ${pattern.length} digits`,
+      };
+    }
+    return { isValid: true };
   }
 
-  if (cleanedPhone.replace(/\D/g, '').length < pattern.length) {
-    return {
-      isValid: false,
-      error: `Phone number must have at least ${pattern.length} digits`,
-    };
+  // Auto-detect: Try each pattern, prioritizing specific countries over default
+  const countriesToTry = ['ZA', 'LS', 'US', 'UK', 'AU', 'default'];
+  
+  for (const country of countriesToTry) {
+    const pattern = PHONE_PATTERNS[country];
+    if (pattern.regex.test(phoneNumber)) {
+      // Additional check for minimum digits
+      const digitCount = cleanedPhone.replace(/\D/g, '').length;
+      if (digitCount >= pattern.length) {
+        return { isValid: true };
+      }
+    }
   }
 
-  return { isValid: true };
+  // If no pattern matched, use default error message
+  return {
+    isValid: false,
+    error: 'Phone number format not recognized. Try international format like +1234567890 or local format.',
+  };
 };
 
 /**

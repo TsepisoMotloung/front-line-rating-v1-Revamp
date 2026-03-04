@@ -25,16 +25,10 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    if (!responses || !Array.isArray(responses) || responses.length === 0) {
-      return NextResponse.json(
-        { error: 'At least one response is required' },
-        { status: 400 }
-      );
-    }
-
     // Handle different rating types
     if (ratingType === 'ALLIANCE') {
       // Alliance Insurance rating - no agent or department required
+      // Don't require responses for alliance ratings
       const ipAddress = request.headers.get('x-forwarded-for') || request.headers.get('x-real-ip') || 'unknown';
       const userAgent = request.headers.get('user-agent') || 'unknown';
 
@@ -92,6 +86,14 @@ export async function POST(request: NextRequest) {
           rating: { id: rating.id },
         },
         { status: 201 }
+      );
+    }
+
+    // For AGENT ratings, responses are required
+    if (!responses || !Array.isArray(responses) || responses.length === 0) {
+      return NextResponse.json(
+        { error: 'At least one response is required for agent ratings' },
+        { status: 400 }
       );
     }
 
@@ -225,6 +227,7 @@ export async function GET(request: NextRequest) {
     const startDate = searchParams.get('startDate');
     const endDate = searchParams.get('endDate');
     const searchQuery = searchParams.get('search');
+    const isComplaint = searchParams.get('isComplaint');
     const limit = parseInt(searchParams.get('limit') || '100');
 
     // Build where clause
@@ -233,6 +236,8 @@ export async function GET(request: NextRequest) {
     if (ratingType) where.ratingType = ratingType;
     if (agentId && ratingType !== 'ALLIANCE') where.agentId = agentId;
     if (departmentId && ratingType !== 'ALLIANCE') where.departmentId = departmentId;
+    if (isComplaint === 'true') where.isComplaint = true;
+    if (isComplaint === 'false') where.isComplaint = false;
 
     // Date range filtering
     if (startDate || endDate) {

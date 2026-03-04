@@ -95,7 +95,7 @@ export default function RateCompanyPage() {
         throw new Error('Failed to submit rating');
       }
 
-      toast.success('Thank you for rating Alliance Insurance!');
+      toast.success('Thank you for your feedback!');
       // Redirect to success page
       window.location.href = '/rate/success?type=company';
     } catch (err: any) {

@@ -116,7 +116,11 @@ export default function RatingFormPage({ params }: { params: { agentId: string }
         throw new Error(data.error || 'Failed to submit rating');
       }
 
-      toast.success('Rating submitted successfully!');
+      if (formData.isComplaint) {
+        toast.success('Complaint submitted successfully!');
+      } else {
+        toast.success('Thank you for your feedback!');
+      }
       router.push('/rate/success');
     } catch (error: any) {
       console.error('Error submitting rating:', error);

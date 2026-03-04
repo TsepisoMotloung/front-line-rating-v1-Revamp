@@ -90,8 +90,8 @@ export default function RegisterPage() {
       isValid = false;
     }
 
-    // Validate phone
-    const phoneValidation = validatePhoneNumber(formData.phone, 'ZA');
+    // Validate phone - auto-detect country format
+    const phoneValidation = validatePhoneNumber(formData.phone);
     if (!phoneValidation.isValid) {
       errors.phone = phoneValidation.error;
       isValid = false;
@@ -273,7 +273,7 @@ export default function RegisterPage() {
                 {/* Phone */}
                 <div>
                   <label htmlFor="phone" className="label">
-                    Phone Number * (South African format)
+                    Phone Number *
                   </label>
                   <div className="relative">
                     <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
@@ -285,7 +285,7 @@ export default function RegisterPage() {
                       value={formData.phone}
                       onChange={(e) => handleFieldChange('phone', e.target.value)}
                       className={`input pl-10 ${fieldErrors.phone ? 'border-red-500' : ''}`}
-                      placeholder="+27 60 000 0000 or 060 000 0000"
+                      placeholder="+266 5757 5858"
                     />
                   </div>
                   {fieldErrors.phone && (
@@ -294,7 +294,7 @@ export default function RegisterPage() {
                       {fieldErrors.phone}
                     </p>
                   )}
-                  <p className="text-xs text-neutral-500 mt-1">10 digits, starting with 0 or +27</p>
+                  
                 </div>
 
                 {/* Employee ID */}

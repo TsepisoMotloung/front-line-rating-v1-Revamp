@@ -17,7 +17,7 @@ import {
   Menu,
   X,
 } from 'lucide-react';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 
 interface DashboardLayoutProps {
   children: React.ReactNode;
@@ -27,6 +27,28 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
   const { data: session } = useSession();
   const pathname = usePathname();
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const [unreadCount, setUnreadCount] = useState(0);
+
+  useEffect(() => {
+    const fetchUnreadCount = async () => {
+      try {
+        const response = await fetch('/api/notifications');
+        if (response.ok) {
+          const data = await response.json();
+          setUnreadCount(data.unreadCount || 0);
+        }
+      } catch (err) {
+        console.error('Error fetching unread count:', err);
+      }
+    };
+
+    // Fetch on mount
+    fetchUnreadCount();
+
+    // Optionally set up polling to update count periodically
+    const interval = setInterval(fetchUnreadCount, 30000); // Update every 30 seconds
+    return () => clearInterval(interval);
+  }, []);
 
   const getNavItems = () => {
     const role = session?.user?.role;
@@ -117,7 +139,9 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
                 aria-label="Notifications"
               >
                 <Bell className="w-5 h-5 sm:w-6 sm:h-6 text-neutral-600" />
-                <span className="absolute top-1 right-1 w-2 h-2 bg-primary-600 rounded-full"></span>
+                {unreadCount > 0 && (
+                  <span className="absolute top-1 right-1 w-2 h-2 bg-primary-600 rounded-full"></span>
+                )}
               </Link>
 
               {/* Profile Dropdown */}

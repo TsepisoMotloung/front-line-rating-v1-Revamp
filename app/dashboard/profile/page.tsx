@@ -13,15 +13,16 @@ export default function ProfilePage() {
   const [formData, setFormData] = useState({
     name: '',
     email: '',
-    employeeId: '',
+    phone: '',
   });
+  const [responseMessage, setResponseMessage] = useState('');
 
   useEffect(() => {
     if (session?.user) {
       setFormData({
         name: session.user.name || '',
         email: session.user.email || '',
-        employeeId: session.user.id || '',
+        phone: (session.user as any)?.phone || '',
       });
       if (session.user.role === 'AGENT') {
         generateQRCode();
@@ -58,11 +59,21 @@ export default function ProfilePage() {
 
       if (!response.ok) throw new Error('Failed to update profile');
 
-      toast.success('Profile updated successfully!');
+      const data = await response.json();
+      
+      if (data.message === 'No changes made') {
+        setResponseMessage('No changes were made to your profile');
+        toast.success('No changes made');
+      } else {
+        toast.success('Profile updated successfully!');
+        setResponseMessage('');
+      }
+      
       setIsEditing(false);
     } catch (error) {
       console.error('Error updating profile:', error);
       toast.error('Failed to update profile');
+      setResponseMessage('');
     }
   };
 
@@ -70,7 +81,7 @@ export default function ProfilePage() {
     if (!qrCodeUrl) return;
     const link = document.createElement('a');
     link.href = qrCodeUrl;
-    link.download = `${formData.employeeId || 'agent'}-qrcode.png`;
+    link.download = `${(session?.user as any)?.employeeId || 'agent'}-qrcode.png`;
     link.click();
   };
 
@@ -148,7 +159,27 @@ export default function ProfilePage() {
                     </div>
                   </div>
 
-                  {session?.user.role === 'AGENT' && (
+                  <div>
+                    <label htmlFor="phone" className="label">
+                      Phone Number
+                    </label>
+                    <div className="relative">
+                      <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                        <User className="h-5 w-5 text-neutral-400" />
+                      </div>
+                      <input
+                        id="phone"
+                        type="tel"
+                        disabled={!isEditing}
+                        value={formData.phone}
+                        onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+                        className="input pl-10 disabled:bg-neutral-50 disabled:cursor-not-allowed"
+                        placeholder="Enter phone number"
+                      />
+                    </div>
+                  </div>
+
+                  {session && (session?.user as any)?.employeeId && (
                     <div>
                       <label htmlFor="employeeId" className="label">
                         Employee ID
@@ -157,7 +188,7 @@ export default function ProfilePage() {
                         id="employeeId"
                         type="text"
                         disabled
-                        value={formData.employeeId}
+                        value={(session.user as any)?.employeeId || ''}
                         className="input disabled:bg-neutral-50 disabled:cursor-not-allowed"
                       />
                       <p className="text-xs text-neutral-500 mt-2">

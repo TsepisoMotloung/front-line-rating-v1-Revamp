@@ -27,6 +27,15 @@ interface InternalRating {
   createdAt: string;
 }
 
+interface AggregatedRating {
+  ratedId: string;
+  ratedName: string;
+  ratedRole: string;
+  averageScore: number;
+  totalRatings: number;
+  ratings: InternalRating[];
+}
+
 const RATING_CATEGORIES = [
   { id: 'professionalism', label: 'Professionalism', description: 'Professional conduct and attitude' },
   { id: 'teamwork', label: 'Teamwork', description: 'Collaboration and support for team' },
@@ -54,7 +63,7 @@ export default function InternalRatingPage() {
   const [qrCodeUrl, setQRCodeUrl] = useState('');
   const [viewMode, setViewMode] = useState<'submit' | 'view'>('submit'); // For HOD/Admin
   const [departmentRatings, setDepartmentRatings] = useState<InternalRating[]>([]);
-  const [selectedRating, setSelectedRating] = useState<InternalRating | null>(null);
+  const [selectedAggregatedRating, setSelectedAggregatedRating] = useState<AggregatedRating | null>(null);
   const [isLoadingRatings, setIsLoadingRatings] = useState(false);
 
   useEffect(() => {
@@ -125,13 +134,6 @@ export default function InternalRatingPage() {
       setIsLoadingRatings(true);
       
       let url = '/api/ratings/internal';
-      if (session?.user?.role === 'HOD' && session.user.departmentId) {
-        // HOD can see ratings about employees in their department
-        url += '?stats=true';
-      } else if (session?.user?.role === 'ADMIN') {
-        // Admin can see all internal ratings
-        url += '?stats=true';
-      }
       
       const response = await fetch(url);
       if (response.ok) {
@@ -144,6 +146,31 @@ export default function InternalRatingPage() {
     } finally {
       setIsLoadingRatings(false);
     }
+  };
+
+  // Group ratings by rated person and calculate aggregated data
+  const getAggregatedRatings = () => {
+    const grouped: { [key: string]: InternalRating[] } = {};
+    departmentRatings.forEach((rating) => {
+      const key = rating.rated?.name || 'Unknown';
+      if (!grouped[key]) {
+        grouped[key] = [];
+      }
+      grouped[key].push(rating);
+    });
+
+    return Object.entries(grouped).map(([ratedName, ratings]) => {
+      const averageScore = ratings.reduce((sum, r) => sum + r.score, 0) / ratings.length;
+      const latestRating = ratings[0];
+      return {
+        ratedId: ratedName,
+        ratedName: ratedName,
+        ratedRole: latestRating.rated?.role || 'Unknown',
+        averageScore: parseFloat(averageScore.toFixed(1)),
+        totalRatings: ratings.length,
+        ratings, // Keep original ratings for modal
+      };
+    });
   };
 
   const selectEmployee = async (employee: Employee) => {
@@ -352,11 +379,11 @@ export default function InternalRatingPage() {
               </div>
             ) : departmentRatings.length > 0 ? (
               <div className="space-y-4">
-                {departmentRatings.map((rating) => (
+                {getAggregatedRatings().map((aggregated) => (
                   <div
-                    key={rating.id}
+                    key={aggregated.ratedId}
                     className="card cursor-pointer hover:shadow-md transition-shadow"
-                    onClick={() => setSelectedRating(rating)}
+                    onClick={() => setSelectedAggregatedRating(aggregated)}
                   >
                     <div className="card-body">
                       <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
@@ -367,18 +394,15 @@ export default function InternalRatingPage() {
                             </div>
                             <div>
                               <p className="font-semibold text-neutral-900">
-                                {rating.rated?.name} <span className="text-sm text-neutral-600">rated by {rating.isAnonymous ? 'Anonymous' : rating.rater?.name}</span>
+                                {aggregated.ratedName}
                               </p>
-                              <p className="text-sm text-neutral-600">{rating.category}</p>
+                              <p className="text-sm text-neutral-600">{aggregated.ratedRole} • {aggregated.totalRatings} rating{aggregated.totalRatings !== 1 ? 's' : ''}</p>
                             </div>
                           </div>
-                          <p className="text-sm text-neutral-600 ml-13">
-                            {new Date(rating.createdAt).toLocaleDateString()}
-                          </p>
                         </div>
                         <div className="flex items-center gap-3">
                           <div className="text-center">
-                            <p className="text-2xl font-bold text-primary-600">{rating.score}</p>
+                            <p className="text-2xl font-bold text-primary-600">{aggregated.averageScore}</p>
                             <p className="text-xs text-neutral-600">/5</p>
                           </div>
                           <Star className="w-5 h-5 text-yellow-500 fill-yellow-500" />
@@ -678,19 +702,19 @@ export default function InternalRatingPage() {
         )}
 
         {/* Rating Details Modal for HOD/Admin */}
-        {selectedRating && viewMode === 'view' && (
+        {selectedAggregatedRating && viewMode === 'view' && (
           <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
             <div className="bg-white rounded-lg max-w-2xl w-full max-h-[90vh] overflow-y-auto">
               <div className="p-6 border-b border-neutral-200 sticky top-0 bg-white">
                 <div className="flex justify-between items-start">
                   <div>
-                    <h2 className="text-2xl font-bold text-neutral-900">{selectedRating.rated?.name}</h2>
+                    <h2 className="text-2xl font-bold text-neutral-900">{selectedAggregatedRating.ratedName}</h2>
                     <p className="text-neutral-600 text-sm mt-1">
-                      {selectedRating.category} - {selectedRating.score}/5
+                      Average Rating: {selectedAggregatedRating.averageScore}/5
                     </p>
                   </div>
                   <button
-                    onClick={() => setSelectedRating(null)}
+                    onClick={() => setSelectedAggregatedRating(null)}
                     className="text-neutral-400 hover:text-neutral-600 text-2xl"
                   >
                     ×
@@ -699,59 +723,51 @@ export default function InternalRatingPage() {
               </div>
 
               <div className="p-6 space-y-6">
-                <div className="grid grid-cols-3 gap-4">
+                <div className="grid grid-cols-1 gap-4">
                   <div>
-                    <p className="text-xs text-neutral-600 mb-1">Rated Person</p>
-                    <p className="font-semibold text-sm">{selectedRating.rated?.name}</p>
-                    <p className="text-xs text-neutral-500">{selectedRating.rated?.role}</p>
+                    <p className="text-xs text-neutral-600 mb-1">Role</p>
+                    <p className="font-semibold text-sm">{selectedAggregatedRating.ratedRole}</p>
                   </div>
                   <div>
-                    <p className="text-xs text-neutral-600 mb-1">Rater</p>
-                    <p className="font-semibold text-sm">
-                      {selectedRating.isAnonymous ? 'Anonymous' : selectedRating.rater?.name}
-                    </p>
-                    {!selectedRating.isAnonymous && (
-                      <p className="text-xs text-neutral-500">{selectedRating.rater?.role}</p>
-                    )}
-                  </div>
-                  <div>
-                    <p className="text-xs text-neutral-600 mb-1">Date</p>
-                    <p className="font-semibold text-sm">
-                      {new Date(selectedRating.createdAt).toLocaleDateString()}
-                    </p>
+                    <p className="text-xs text-neutral-600 mb-1">Total Ratings</p>
+                    <p className="font-semibold text-sm">{selectedAggregatedRating.totalRatings}</p>
                   </div>
                 </div>
 
                 <div>
-                  <h3 className="font-semibold text-neutral-900 mb-3">Rating</h3>
-                  <div className="flex items-center gap-3 p-4 bg-primary-50 rounded-lg">
-                    <span className="text-3xl font-bold text-primary-600">{selectedRating.score}</span>
-                    <div className="flex gap-1">
-                      {[1, 2, 3, 4, 5].map((star) => (
-                        <Star
-                          key={star}
-                          className={`w-5 h-5 ${
-                            star <= selectedRating.score ? 'text-yellow-500 fill-yellow-500' : 'text-neutral-300'
-                          }`}
-                        />
-                      ))}
-                    </div>
-                    <span className="text-sm text-neutral-600 ml-2">/5</span>
+                  <h3 className="font-semibold text-neutral-900 mb-3">All Ratings</h3>
+                  <div className="space-y-4 max-h-96 overflow-y-auto">
+                    {selectedAggregatedRating.ratings.map((rating) => (
+                      <div key={rating.id} className="border border-neutral-200 rounded-lg p-4">
+                        <div className="flex justify-between items-start mb-2">
+                          <div>
+                            <p className="font-medium text-neutral-900">
+                              {rating.isAnonymous ? 'Anonymous' : rating.rater.name}
+                            </p>
+                            <p className="text-sm text-neutral-600">{rating.rater.role}</p>
+                          </div>
+                          <div className="text-center">
+                            <p className="text-xl font-bold text-primary-600">{rating.score}</p>
+                            <p className="text-xs text-neutral-600">/5</p>
+                          </div>
+                        </div>
+                        <p className="text-sm text-neutral-600 mb-2">{rating.category}</p>
+                        {rating.feedbackText && (
+                          <p className="text-sm text-neutral-700 bg-neutral-50 p-2 rounded">
+                            {rating.feedbackText}
+                          </p>
+                        )}
+                        <p className="text-xs text-neutral-400 mt-2">
+                          {new Date(rating.createdAt).toLocaleDateString()}
+                        </p>
+                      </div>
+                    ))}
                   </div>
                 </div>
 
-                {selectedRating.feedbackText && (
-                  <div>
-                    <h3 className="font-semibold text-neutral-900 mb-2">Feedback</h3>
-                    <p className="text-neutral-700 text-sm bg-neutral-50 p-4 rounded-lg">
-                      {selectedRating.feedbackText}
-                    </p>
-                  </div>
-                )}
-
                 <div className="flex gap-3 pt-4 border-t border-neutral-200">
                   <button
-                    onClick={() => setSelectedRating(null)}
+                    onClick={() => setSelectedAggregatedRating(null)}
                     className="flex-1 btn btn-secondary"
                   >
                     Close

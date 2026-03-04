@@ -46,10 +46,15 @@ export default function ComplaintsPage() {
   const fetchComplaints = async () => {
     try {
       const params = new URLSearchParams({ isComplaint: 'true' });
+      // For agents, use userId; for HOD, use departmentId 
       if (session?.user.role === 'AGENT') {
+        // Agents see complaints against them
         params.append('userId', session.user.id);
       } else if (session?.user.role === 'HOD' && session.user.departmentId) {
+        // HOD sees complaints in their department
         params.append('departmentId', session.user.departmentId);
+      } else if (session?.user.role === 'ADMIN') {
+        // Admin sees all complaints
       }
       const response = await fetch(`/api/ratings?${params}`);
       if (response.ok) {
