@@ -141,10 +141,10 @@ export default function RateAgentPage() {
           {/* Search Section */}
           <div id="search" className="scroll-mt-8">
             <h2 className="text-xl sm:text-2xl font-bold text-neutral-900 mb-4 sm:mb-6">
-              Find An Employee or Agent
+              Find An Agent
             </h2>
             <p className="text-sm sm:text-base text-neutral-600 mb-6 sm:mb-8">
-              Search for the employee or agent who served you to share your feedback
+              Search for an agent or Client Services employee to rate their service
             </p>
 
             {/* QR Code Scanner Option */}
@@ -171,7 +171,7 @@ export default function RateAgentPage() {
                 <form onSubmit={(e) => e.preventDefault()} className="space-y-5 sm:space-y-6">
                   <div>
                     <label htmlFor="search" className="label text-sm sm:text-base">
-                      Agent or Employee Name
+                      Agent or Client Services Employee Name
                     </label>
                     <div className="relative">
                       <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
@@ -183,7 +183,7 @@ export default function RateAgentPage() {
                         value={searchQuery}
                         onChange={(e) => setSearchQuery(e.target.value)}
                         className="input pl-9 sm:pl-10 text-sm sm:text-base focus:ring-2 focus:ring-primary-500 transition-all"
-                        placeholder="Start typing an agent/employee name..."
+                        placeholder="Search for an agent or Client Services employee..."
                       />
                     </div>
                   </div>
