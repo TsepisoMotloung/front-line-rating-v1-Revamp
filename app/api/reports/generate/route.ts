@@ -33,7 +33,12 @@ export async function POST(request: NextRequest) {
         include: {
           agent: { select: { id: true, name: true, employeeId: true } },
           department: { select: { id: true, name: true } },
-          responses: { include: { question: { select: { questionText: true } } } },
+          responses: {
+            include: {
+              question: { select: { questionText: true } },
+              allianceQuestion: { select: { questionText: true } },
+            },
+          },
         },
         orderBy: { createdAt: 'desc' },
       });
@@ -51,7 +56,7 @@ export async function POST(request: NextRequest) {
         createdAt: r.createdAt.toISOString(),
         ...r.responses.reduce((acc, resp, idx) => ({
           ...acc,
-          [`Q${idx + 1}_Question`]: resp.question.questionText,
+          [`Q${idx + 1}_Question`]: resp.question?.questionText || resp.allianceQuestion?.questionText,
           [`Q${idx + 1}_Score`]: resp.score,
         }), {}),
       }));
@@ -67,7 +72,12 @@ export async function POST(request: NextRequest) {
         include: {
           agent: { select: { id: true, name: true, employeeId: true } },
           department: { select: { id: true, name: true } },
-          responses: { include: { question: { select: { questionText: true } } } },
+          responses: {
+            include: {
+              question: { select: { questionText: true } },
+              allianceQuestion: { select: { questionText: true } },
+            },
+          },
         },
         orderBy: { createdAt: 'desc' },
       });
@@ -84,7 +94,7 @@ export async function POST(request: NextRequest) {
         createdAt: r.createdAt.toISOString(),
         ...r.responses.reduce((acc, resp, idx) => ({
           ...acc,
-          [`Q${idx + 1}_Question`]: resp.question.questionText,
+          [`Q${idx + 1}_Question`]: resp.question?.questionText || resp.allianceQuestion?.questionText,
           [`Q${idx + 1}_Score`]: resp.score,
         }), {}),
       }));

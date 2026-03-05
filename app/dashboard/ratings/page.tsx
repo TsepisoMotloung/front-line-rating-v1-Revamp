@@ -29,7 +29,10 @@ interface Rating {
   createdAt: string;
   responses: Array<{
     score: number;
-    question: {
+    question?: {
+      questionText: string;
+    };
+    allianceQuestion?: {
       questionText: string;
     };
   }>;
@@ -121,7 +124,7 @@ export default function RatingsPage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [searchQuery, ratingTypeFilter, complaintFilter, ratings]);
 
-  const getAverageScore = (responses: Array<{ score: number; question: { questionText: string } }>) => {
+  const getAverageScore = (responses: Array<{ score: number; question?: { questionText: string }; allianceQuestion?: { questionText: string } }>) => {
     if (responses.length === 0) return '0';
     const sum = responses.reduce((acc, r) => acc + r.score, 0);
     return (sum / responses.length).toFixed(1);
@@ -335,7 +338,7 @@ export default function RatingsPage() {
                     <div key={idx} className="border border-neutral-200 rounded-lg p-3">
                       <div className="flex justify-between items-start mb-2">
                         <p className="text-sm font-medium text-neutral-900">
-                          {response.question.questionText}
+                          {response.question?.questionText || response.allianceQuestion?.questionText}
                         </p>
                         <div className="flex items-center gap-1">
                           <span className="font-bold text-primary-600">{response.score}</span>

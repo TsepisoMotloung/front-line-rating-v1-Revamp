@@ -28,12 +28,11 @@ export async function POST(request: NextRequest) {
     // Handle different rating types
     if (ratingType === 'ALLIANCE') {
       // Alliance Insurance rating - no agent or department required
-      // Don't require responses for alliance ratings
+      // Store responses for alliance questions
       const ipAddress = request.headers.get('x-forwarded-for') || request.headers.get('x-real-ip') || 'unknown';
       const userAgent = request.headers.get('user-agent') || 'unknown';
 
-      // For alliance ratings, we don't store individual responses in the Response table
-      // Instead we just store the customer info and feedback
+      // For alliance ratings, store responses with alliance questions
       const rating = await prisma.rating.create({
         data: {
           ratingType: 'ALLIANCE',
@@ -46,6 +45,15 @@ export async function POST(request: NextRequest) {
           complaintStatus: isComplaint ? 'OPEN' : undefined,
           ipAddress,
           userAgent,
+          responses: responses && Array.isArray(responses) && responses.length > 0 ? {
+            create: responses.map((r: any) => ({
+              allianceQuestionId: r.questionId,
+              score: r.score,
+            })),
+          } : undefined,
+        },
+        include: {
+          responses: true,
         },
       });
 
@@ -60,11 +68,11 @@ export async function POST(request: NextRequest) {
 
     // Legacy COMPANY rating (maps to ALLIANCE ratingType)
     if (ratingType === 'COMPANY') {
-      // Company rating - no agent or department required
+      // Company rating - maps to ALLIANCE type with responses support
       const ipAddress = request.headers.get('x-forwarded-for') || request.headers.get('x-real-ip') || 'unknown';
       const userAgent = request.headers.get('user-agent') || 'unknown';
 
-      // For company ratings, we don't store individual responses in the Response table
+      // For company ratings, store responses with alliance questions
       const rating = await prisma.rating.create({
         data: {
           ratingType: 'ALLIANCE', // Company ratings use ALLIANCE type
@@ -77,6 +85,15 @@ export async function POST(request: NextRequest) {
           complaintStatus: isComplaint ? 'OPEN' : undefined,
           ipAddress,
           userAgent,
+          responses: responses && Array.isArray(responses) && responses.length > 0 ? {
+            create: responses.map((r: any) => ({
+              allianceQuestionId: r.questionId,
+              score: r.score,
+            })),
+          } : undefined,
+        },
+        include: {
+          responses: true,
         },
       });
 
@@ -274,6 +291,11 @@ export async function GET(request: NextRequest) {
         responses: {
           include: {
             question: {
+              select: {
+                questionText: true,
+              },
+            },
+            allianceQuestion: {
               select: {
                 questionText: true,
               },

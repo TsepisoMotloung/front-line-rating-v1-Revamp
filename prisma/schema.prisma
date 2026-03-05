@@ -105,6 +105,8 @@ model AllianceInsuranceQuestion {
   createdAt    DateTime   @default(now())
   updatedAt    DateTime   @updatedAt
   
+  responses    Response[]
+  
   @@index([isActive])
   @@index([order])
 }
@@ -147,16 +149,19 @@ model Rating {
 }
 
 model Response {
-  id         String   @id @default(cuid())
-  ratingId   String
-  rating     Rating   @relation(fields: [ratingId], references: [id], onDelete: Cascade)
-  questionId String
-  question   Question @relation(fields: [questionId], references: [id], onDelete: Cascade)
-  score      Int      // 1-5 Likert scale
-  createdAt  DateTime @default(now())
+  id                    String                   @id @default(cuid())
+  ratingId              String
+  rating                Rating                   @relation(fields: [ratingId], references: [id], onDelete: Cascade)
+  questionId            String?
+  question              Question?                @relation(fields: [questionId], references: [id], onDelete: Cascade)
+  allianceQuestionId    String?
+  allianceQuestion      AllianceInsuranceQuestion? @relation(fields: [allianceQuestionId], references: [id], onDelete: Cascade)
+  score                 Int                      // 1-5 Likert scale
+  createdAt             DateTime                 @default(now())
   
   @@index([ratingId])
   @@index([questionId])
+  @@index([allianceQuestionId])
 }
 
 model Notification {
