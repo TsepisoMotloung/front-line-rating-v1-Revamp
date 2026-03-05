@@ -275,25 +275,30 @@ export default function InternalRatingPage() {
 
     try {
       setIsSubmitting(true);
+      setError('');
       
-      const ratingData = {
-        ratedId: selectedEmployee.id,
-        ratings: Object.entries(ratings).map(([category, score]) => ({
+      // Submit each category rating individually
+      const ratingEntries = Object.entries(ratings);
+      
+      for (const [category, score] of ratingEntries) {
+        const ratingData = {
+          ratedId: selectedEmployee.id,
           category,
           score: parseInt(score as any),
-        })),
-        feedbackText: feedback.trim() || null,
-        isAnonymous,
-      };
+          feedbackText: feedback.trim() || null,
+          isAnonymous,
+        };
 
-      const response = await fetch('/api/ratings/internal', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(ratingData),
-      });
+        const response = await fetch('/api/ratings/internal', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(ratingData),
+        });
 
-      if (!response.ok) {
-        throw new Error('Failed to submit rating');
+        if (!response.ok) {
+          const errorData = await response.json();
+          throw new Error(errorData.error || 'Failed to submit rating');
+        }
       }
 
       toast.success('Rating submitted successfully!');
@@ -302,8 +307,10 @@ export default function InternalRatingPage() {
       setFeedback('');
       setIsAnonymous(false);
       setSearchQuery('');
-    } catch (err) {
-      toast.error('Failed to submit rating');
+    } catch (err: any) {
+      const errorMessage = err?.message || 'Failed to submit rating';
+      setError(errorMessage);
+      toast.error(errorMessage);
     } finally {
       setIsSubmitting(false);
     }
