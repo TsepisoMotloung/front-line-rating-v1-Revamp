@@ -2,13 +2,14 @@
 
 import { useState, useRef, Suspense } from 'react';
 import { signIn } from 'next-auth/react';
-import { useSearchParams } from 'next/navigation';
+import { useSearchParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { Mail, Lock, AlertCircle, Eye, EyeOff } from 'lucide-react';
 import toast from 'react-hot-toast';
 import HCaptcha from '@hcaptcha/react-hcaptcha';
 
 function LoginForm() {
+  const router = useRouter();
   const searchParams = useSearchParams();
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
@@ -50,44 +51,56 @@ function LoginForm() {
     
     if (!hcaptchaToken) {
       setError('Please complete the captcha verification');
+      toast.error('Please complete the captcha verification');
       return;
     }
     
     setIsLoading(true);
 
     try {
-      // Let NextAuth handle everything including redirect
+      // Let NextAuth handle authentication
       const callbackUrl = searchParams.get('callbackUrl') || '/dashboard';
       
       const result = await signIn('credentials', {
         email: formData.email,
         password: formData.password,
         hcaptchaToken,
-        callbackUrl,
-        redirect: true, // Let NextAuth handle the redirect
+        redirect: false, // Don't redirect automatically - we'll handle it
       });
 
-      // This code will only run if redirect: false or if there's an error
+      // Check for errors
       if (result?.error) {
         console.error('❌ Login error:', result.error);
         // Map NextAuth errors to user-friendly messages
         let friendlyError = result.error;
-        if (result.error.includes('Invalid email') || result.error.includes('Invalid credentials')) {
-          friendlyError = 'Invalid email or password. Please try again.';
+        
+        if (result.error.includes('Invalid email or password')) {
+          friendlyError = 'Incorrect email or password. Please try again.';
         } else if (result.error.includes('pending approval')) {
           friendlyError = 'Your account is pending admin approval. Please check back later.';
+        } else if (result.error.includes('rejected')) {
+          friendlyError = 'Your account has been rejected. Please contact support.';
+        } else if (result.error.includes('Captcha')) {
+          friendlyError = 'Captcha verification failed. Please try again.';
         }
+        
+        // Show error but don't navigate
         setError(friendlyError);
         toast.error(friendlyError);
         hcaptchaRef.current?.resetCaptcha();
         setHcaptchaToken(null);
         setIsLoading(false);
+      } else if (result?.ok) {
+        // Login successful - now navigate
+        toast.success('Login successful! Redirecting...');
+        router.push(callbackUrl);
       }
     } catch (error: any) {
       console.error('❌ Login exception:', error);
       setIsLoading(false);
-      setError(error?.message || 'Login failed');
-      toast.error('Login failed. Please try again.');
+      const errorMsg = error?.message || 'Login failed. Please try again.';
+      setError(errorMsg);
+      toast.error(errorMsg);
       hcaptchaRef.current?.resetCaptcha();
       setHcaptchaToken(null);
     }
