@@ -329,7 +329,7 @@ export async function GET(request: NextRequest) {
       ];
     }
 
-    // Fetch ratings - keep include simple to avoid schema mismatch issues
+    // Fetch ratings - simple queries until migration is applied
     const ratings = await prisma.rating.findMany({
       where,
       include: {
@@ -347,7 +347,10 @@ export async function GET(request: NextRequest) {
           },
         },
         responses: {
-          include: {
+          select: {
+            id: true,
+            score: true,
+            questionId: true,
             question: {
               select: {
                 questionText: true,

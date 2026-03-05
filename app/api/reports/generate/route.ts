@@ -34,7 +34,9 @@ export async function POST(request: NextRequest) {
           agent: { select: { id: true, name: true, employeeId: true } },
           department: { select: { id: true, name: true } },
           responses: {
-            include: {
+            select: {
+              id: true,
+              score: true,
               question: { select: { questionText: true } },
             },
           },
@@ -72,9 +74,10 @@ export async function POST(request: NextRequest) {
           agent: { select: { id: true, name: true, employeeId: true } },
           department: { select: { id: true, name: true } },
           responses: {
-            include: {
+            select: {
+              id: true,
+              score: true,
               question: { select: { questionText: true } },
-              allianceQuestion: { select: { questionText: true } },
             },
           },
         },
