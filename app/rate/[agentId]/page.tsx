@@ -129,6 +129,8 @@ export default function RatingFormPage({ params }: { params: { agentId: string }
         })),
       };
 
+      console.log('Submitting rating payload:', payload);
+
       const response = await fetch('/api/ratings', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -136,6 +138,7 @@ export default function RatingFormPage({ params }: { params: { agentId: string }
       });
 
       const data = await response.json();
+      console.log('Rating API response:', { status: response.status, data });
 
       if (!response.ok) {
         throw new Error(data.error || 'Failed to submit rating');
@@ -149,7 +152,8 @@ export default function RatingFormPage({ params }: { params: { agentId: string }
       router.push('/rate/success?type=agent');
     } catch (error: any) {
       console.error('Error submitting rating:', error);
-      toast.error(error.message || 'Failed to submit rating');
+      const errorMessage = error?.message || 'Failed to submit rating';
+      toast.error(errorMessage);
     } finally {
       setIsSubmitting(false);
     }
@@ -271,7 +275,7 @@ export default function RatingFormPage({ params }: { params: { agentId: string }
                 <div className="border-t pt-6">
                   <h4 className="font-semibold text-neutral-900 mb-4">Your Information</h4>
                   
-                  {/* <div className="flex items-center mb-4">
+                  <div className="flex items-center mb-4 p-3 bg-neutral-50 rounded-lg">
                     <input
                       type="checkbox"
                       id="anonymous"
@@ -280,9 +284,9 @@ export default function RatingFormPage({ params }: { params: { agentId: string }
                       className="h-4 w-4 text-primary-600 focus:ring-primary-500 border-neutral-300 rounded"
                     />
                     <label htmlFor="anonymous" className="ml-2 text-sm text-neutral-700">
-                      Submit anonymously
+                      Submit anonymously (optional)
                     </label>
-                  </div> */}
+                  </div>
 
                   {!formData.isAnonymous && (
                     <div className="space-y-4">
