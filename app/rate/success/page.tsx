@@ -67,10 +67,10 @@ function SuccessContent() {
                   <Home className="w-5 h-5 mr-2" />
                   Back to Home
                 </Link>
-                {type === 'agent' && (
-                  <Link href="/rate" className="btn btn-secondary flex items-center justify-center">
+                {(type === 'agent' || type === 'alliance') && (
+                  <Link href={type === 'agent' ? '/rate' : '/rate/alliance'} className="btn btn-secondary flex items-center justify-center">
                     <Star className="w-5 h-5 mr-2" />
-                    Rate Another Agent
+                    {type === 'agent' ? 'Rate Another Agent' : 'Rate Again'}
                   </Link>
                 )}
               </div>

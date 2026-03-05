@@ -180,7 +180,6 @@ export default function RatingsPage() {
                   <option value="ALL">All Types</option>
                   <option value="AGENT">Agent Ratings</option>
                   <option value="ALLIANCE">Alliance Ratings</option>
-                  <option value="COMPANY">Company Ratings</option>
                   <option value="EMPLOYEE">Employee Ratings</option>
                 </select>
               </div>

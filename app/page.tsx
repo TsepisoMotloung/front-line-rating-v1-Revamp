@@ -59,7 +59,7 @@ export default function Home() {
             </h1>
             
             <p className="text-base sm:text-xl lg:text-2xl text-neutral-600 mb-8 sm:mb-12 max-w-3xl mx-auto leading-relaxed">
-              Rate our agents, employees, or company-wide service. Your valuable feedback helps us deliver excellence and recognize outstanding performance.
+              Rate our agents, employees, or alliance insurance service. Your valuable feedback helps us deliver excellence and recognize outstanding performance.
             </p>
 
             {/* CTA Buttons */}
@@ -76,7 +76,7 @@ export default function Home() {
                 className="btn btn-outline btn-lg flex items-center justify-center space-x-2 w-full sm:w-auto hover:bg-neutral-50 hover:-translate-y-1 transition-all duration-300 text-center"
               >
                 <Star className="w-4 sm:w-5 h-4 sm:h-5" />
-                <span className="text-sm sm:text-base">Rate Alliance as a Company</span>
+                <span className="text-sm sm:text-base">Rate Alliance Insurance</span>
               </Link>
             </div>
 
@@ -116,7 +116,7 @@ export default function Home() {
               Your Feedback Powers Excellence
             </h2>
             <p className="text-base sm:text-lg lg:text-xl text-neutral-600 max-w-2xl mx-auto">
-              Rate our team members and company service to help us maintain the highest standards and recognize excellence
+              Rate our team members and alliance insurance service to help us maintain the highest standards and recognize excellence
             </p>
           </div>
 
@@ -131,7 +131,7 @@ export default function Home() {
                   Quality Assurance
                 </h3>
                 <p className="text-sm sm:text-base text-neutral-600 leading-relaxed">
-                  Rate agents, employees, and company service to help us maintain the highest standards and improve continuously
+                  Rate agents, employees, and alliance insurance service to help us maintain the highest standards and improve continuously
                 </p>
               </div>
             </div>
@@ -204,7 +204,7 @@ export default function Home() {
                     Choose What to Rate
                   </h3>
                   <p className="text-sm sm:text-lg text-primary-100 leading-relaxed">
-                    Select to rate an Agent, Employee, or Alliance as a company overall
+                    Select to rate an Agent, Employee, or Alliance Insurance
                   </p>
                 </div>
               </div>
@@ -285,7 +285,7 @@ export default function Home() {
                 </li>
                 <li>
                   <Link href="/rate/alliance" className="hover:text-primary-400 transition-colors inline-flex items-center group">
-                    <span className="group-hover:translate-x-1 transition-transform">Rate Alliance Company</span>
+                    <span className="group-hover:translate-x-1 transition-transform">Rate Alliance Insurance</span>
                   </Link>
                 </li>
                 <li>

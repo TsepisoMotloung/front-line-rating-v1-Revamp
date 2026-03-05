@@ -10,6 +10,7 @@ interface DashboardStats {
   pendingApprovals: number;
   totalDepartments: number;
   totalRatings: number;
+  allianceRatings: number;
   averageRating: number;
   satisfactionPercentage: number;
   totalComplaints: number;
@@ -146,6 +147,19 @@ export default function AdminDashboard() {
               {stats?.averageRating?.toFixed(1) || '0.0'} / 5.0
             </span>
           </p>
+        </div>
+
+        <div className="stat-card">
+          <div className="flex items-center justify-between mb-4">
+            <div className="w-10 h-10 sm:w-12 sm:h-12 bg-amber-100 rounded-lg flex items-center justify-center">
+              <Star className="w-5 h-5 sm:w-6 sm:h-6 text-amber-600" />
+            </div>
+          </div>
+          <h3 className="text-xs sm:text-sm font-medium text-neutral-600 mb-1">Alliance Ratings</h3>
+          <p className="text-2xl sm:text-3xl font-bold text-neutral-900">{stats?.allianceRatings || 0}</p>
+          <Link href="/dashboard/analytics?ratingType=ALLIANCE" className="text-xs text-primary-600 hover:text-primary-700 mt-2 inline-block">
+            View analysis →
+          </Link>
         </div>
 
         <div className="stat-card">

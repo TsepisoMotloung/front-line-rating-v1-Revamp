@@ -165,7 +165,7 @@ export default function AdminAllianceQuestionsPage() {
                 <div>
                   <h1 className="text-3xl font-bold text-neutral-900">Alliance Insurance Questions</h1>
                   <p className="text-neutral-600 mt-2">
-                    Manage rating questions for Alliance Insurance company ratings
+                    Manage rating questions for Alliance Insurance
                   </p>
                 </div>
                 <Link href="/dashboard" className="btn btn-outline">
@@ -301,7 +301,7 @@ export default function AdminAllianceQuestionsPage() {
                 <div>
                   <p className="font-medium text-neutral-900">About Alliance Insurance Questions</p>
                   <p className="text-sm text-neutral-700 mt-1">
-                    These questions appear when customers rate Alliance Insurance as a company. You can add, edit, or remove questions to customize the rating experience.
+                    These questions appear when customers rate Alliance Insurance. You can add, edit, or remove questions to customize the rating experience.
                   </p>
                 </div>
               </div>

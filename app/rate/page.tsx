@@ -260,10 +260,10 @@ export default function RateAgentPage() {
                   Rate Alliance Insurance
                 </h2>
                 <p className="text-neutral-600 text-xs sm:text-sm mb-5 sm:mb-6">
-                  Share your overall feedback about Alliance Insurance as a company
+                  Share your overall feedback about Alliance Insurance
                 </p>
                 <Link href="/rate/alliance" className="btn bg-green-600 hover:bg-green-700 text-white w-full shadow-lg hover:shadow-xl transition-all text-sm sm:text-base">
-                  Rate Company
+                  Rate Alliance Insurance
                 </Link>
               </div>
             </div>

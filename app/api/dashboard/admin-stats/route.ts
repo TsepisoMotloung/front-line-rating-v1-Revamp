@@ -198,11 +198,15 @@ export async function GET(request: NextRequest) {
 
     console.log('✅ [ADMIN-STATS] Completed in', Date.now() - startTime, 'ms');
 
+    // Count alliance ratings separately
+    const allianceRatings = ratings.filter(r => r.ratingType === 'ALLIANCE').length;
+
     return NextResponse.json({
       totalUsers,
       pendingApprovals,
       totalDepartments,
       totalRatings,
+      allianceRatings,
       averageRating: Math.round(averageRating * 10) / 10,
       satisfactionPercentage,
       totalComplaints,

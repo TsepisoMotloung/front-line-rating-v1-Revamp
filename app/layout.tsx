@@ -8,7 +8,7 @@ const inter = Inter({ subsets: ['latin'] });
 
 export const metadata: Metadata = {
   title: 'Service Feedback Platform',
-  description: 'Comprehensive service feedback system for Alliance Insurance - rate agents, employees, and company-wide service',
+  description: 'Comprehensive service feedback system for Alliance Insurance - rate agents, employees, and alliance-wide service',
   keywords: ['insurance feedback', 'service rating', 'agent rating', 'customer feedback', 'performance'],
 };
 
