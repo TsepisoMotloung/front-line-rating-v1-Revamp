@@ -6,9 +6,11 @@ import prisma from '@/lib/prisma';
 export async function GET(request: NextRequest) {
   try {
     const startTime = Date.now();
+    console.log('[ADMIN-STATS] Starting admin stats request');
     const session = await getServerSession(authOptions);
 
     if (!session || session.user.role !== 'ADMIN') {
+      console.log('[ADMIN-STATS] Unauthorized access attempt');
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
@@ -224,6 +226,13 @@ export async function GET(request: NextRequest) {
     });
   } catch (error) {
     console.error('❌ [ADMIN-STATS] Error:', error);
-    return NextResponse.json({ error: 'Failed to fetch statistics' }, { status: 500 });
+    console.error('[ADMIN-STATS] Error details:', error instanceof Error ? error.message : String(error));
+    return NextResponse.json(
+      { 
+        error: 'Failed to fetch statistics',
+        details: error instanceof Error ? error.message : 'Unknown error'
+      }, 
+      { status: 500 }
+    );
   }
 }

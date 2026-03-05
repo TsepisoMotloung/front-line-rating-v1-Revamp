@@ -36,7 +36,6 @@ export async function POST(request: NextRequest) {
           responses: {
             include: {
               question: { select: { questionText: true } },
-              allianceQuestion: { select: { questionText: true } },
             },
           },
         },
@@ -56,7 +55,7 @@ export async function POST(request: NextRequest) {
         createdAt: r.createdAt.toISOString(),
         ...r.responses.reduce((acc, resp, idx) => ({
           ...acc,
-          [`Q${idx + 1}_Question`]: resp.question?.questionText || resp.allianceQuestion?.questionText,
+          [`Q${idx + 1}_Question`]: resp.question?.questionText || 'Alliance Question',
           [`Q${idx + 1}_Score`]: resp.score,
         }), {}),
       }));
@@ -94,7 +93,7 @@ export async function POST(request: NextRequest) {
         createdAt: r.createdAt.toISOString(),
         ...r.responses.reduce((acc, resp, idx) => ({
           ...acc,
-          [`Q${idx + 1}_Question`]: resp.question?.questionText || resp.allianceQuestion?.questionText,
+          [`Q${idx + 1}_Question`]: resp.question?.questionText || 'Alliance Question',
           [`Q${idx + 1}_Score`]: resp.score,
         }), {}),
       }));
