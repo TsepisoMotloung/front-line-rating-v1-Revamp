@@ -180,15 +180,15 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Verify agent exists
+    // Verify agent/employee exists and is either AGENT or EMPLOYEE
     const agent = await prisma.user.findUnique({
       where: { id: agentId },
       include: { department: true },
     });
 
-    if (!agent || agent.role !== 'AGENT') {
+    if (!agent || (agent.role !== 'AGENT' && agent.role !== 'EMPLOYEE')) {
       return NextResponse.json(
-        { error: 'Invalid agent' },
+        { error: 'Invalid user for rating' },
         { status: 400 }
       );
     }
