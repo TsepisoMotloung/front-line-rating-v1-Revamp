@@ -58,12 +58,14 @@ export default function RatingFormPage({ params }: { params: { agentId: string }
         setAgent(agentData);
         setQuestions(questionsData);
       } else {
-        toast.error('Agent not found');
+        const errorData = await agentRes.json().catch(() => ({}));
+        toast.error(errorData?.error || 'User not found or not available for rating');
         router.push('/rate');
       }
     } catch (error) {
       console.error('Error fetching data:', error);
       toast.error('Failed to load rating form');
+      router.push('/rate');
     } finally {
       setIsLoading(false);
     }

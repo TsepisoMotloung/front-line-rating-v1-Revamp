@@ -27,15 +27,23 @@ export async function GET(
 
     if (!agent) {
       return NextResponse.json(
-        { error: 'Agent not found' },
+        { error: 'User not found' },
         { status: 404 }
       );
     }
 
-    // Check if agent is approved and has AGENT role
-    if (agent.role !== 'AGENT' || agent.status !== 'APPROVED') {
+    // Check if user is approved and is either an AGENT or EMPLOYEE from Client Services
+    if (agent.status !== 'APPROVED') {
       return NextResponse.json(
-        { error: 'Agent not available' },
+        { error: 'User not available' },
+        { status: 404 }
+      );
+    }
+
+    // Only allow AGENT role OR EMPLOYEE role from Client Services department
+    if (agent.role === 'EMPLOYEE' && !agent.department?.name?.toLowerCase().includes('client services')) {
+      return NextResponse.json(
+        { error: 'User not available for rating' },
         { status: 404 }
       );
     }

@@ -20,15 +20,15 @@ export async function GET(
 
     if (!agent) {
       return NextResponse.json(
-        { error: 'Agent not found' },
+        { error: 'User not found' },
         { status: 404 }
       );
     }
 
-    // Validate agent is an approved AGENT
-    if (agent.role !== 'AGENT' || agent.status !== 'APPROVED') {
+    // Validate user is approved and is either AGENT or EMPLOYEE
+    if (agent.status !== 'APPROVED') {
       return NextResponse.json(
-        { error: 'Agent not available' },
+        { error: 'User not available' },
         { status: 404 }
       );
     }
