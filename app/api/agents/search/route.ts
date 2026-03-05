@@ -16,6 +16,11 @@ export async function GET(request: NextRequest) {
       status: 'APPROVED',
     };
 
+    // Filter by department if provided
+    if (departmentId) {
+      where.departmentId = departmentId;
+    }
+
     if (query && query.trim() !== '') {
       // Only search by agent name (case-insensitive depending on DB collation)
       where.name = { contains: query };
@@ -23,8 +28,6 @@ export async function GET(request: NextRequest) {
       // If no query provided, return empty result to avoid returning all agents
       return NextResponse.json([], { status: 200 });
     }
-
-    // departmentId is ignored for this simplified name-only search
 
     // Search for agents
     const agents = await prisma.user.findMany({

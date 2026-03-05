@@ -26,6 +26,31 @@ export default function RateAgentPage() {
   const [agents, setAgents] = useState<Agent[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [hasSearched, setHasSearched] = useState(false);
+  const [clientServicesDept, setClientServicesDept] = useState<Department | null>(null);
+
+  // Fetch Client Services department on mount
+  useEffect(() => {
+    const fetchClientServicesDept = async () => {
+      try {
+        const res = await fetch('/api/departments');
+        if (res.ok) {
+          const departments = await res.json();
+          const cssServices = departments.find(
+            (dept: Department) => dept.name.toLowerCase() === 'client services'
+          );
+          if (cssServices) {
+            setClientServicesDept(cssServices);
+          } else {
+            console.warn('Client Services department not found');
+            toast.error('Client Services department not found');
+          }
+        }
+      } catch (error) {
+        console.error('Error fetching departments:', error);
+      }
+    };
+    fetchClientServicesDept();
+  }, []);
 
   useEffect(() => {
     // live-search as user types with debounce
@@ -33,6 +58,11 @@ export default function RateAgentPage() {
       setAgents([]);
       setHasSearched(false);
       setIsLoading(false);
+      return;
+    }
+
+    // Only search if Client Services department is loaded
+    if (!clientServicesDept) {
       return;
     }
 
@@ -44,6 +74,7 @@ export default function RateAgentPage() {
       try {
         const params = new URLSearchParams();
         params.append('query', searchQuery.trim());
+        params.append('departmentId', clientServicesDept.id);
 
         const res = await fetch(`/api/agents/search?${params.toString()}`, { signal: controller.signal });
         if (!res.ok) {
@@ -72,7 +103,7 @@ export default function RateAgentPage() {
       controller.abort();
       clearTimeout(id);
     };
-  }, [searchQuery]);
+  }, [searchQuery, clientServicesDept]);
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-white to-neutral-50">
