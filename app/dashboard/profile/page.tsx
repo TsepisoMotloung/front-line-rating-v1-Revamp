@@ -47,8 +47,43 @@ export default function ProfilePage() {
     }
   };
 
+  const validateForm = (): string | null => {
+    if (!formData.name.trim()) {
+      return 'Full name is required';
+    }
+    if (formData.name.trim().length < 3) {
+      return 'Full name must be at least 3 characters';
+    }
+    if (!/^[a-zA-Z\s\-\'\.]+$/.test(formData.name)) {
+      return 'Full name can only contain letters, spaces, hyphens, apostrophes, and periods';
+    }
+
+    if (!formData.email.trim()) {
+      return 'Email address is required';
+    }
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
+      return 'Please enter a valid email address';
+    }
+
+    if (formData.phone.trim()) {
+      const phoneRegex = /^(?:\+[1-9]\d{0,3}|[\d\s\-\(\)]{7,})(\s|.|$)/;
+      if (!phoneRegex.test(formData.phone)) {
+        return 'Please enter a valid phone number';
+      }
+    }
+
+    return null;
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    // Validate form
+    const validationError = validateForm();
+    if (validationError) {
+      toast.error(validationError);
+      return;
+    }
 
     try {
       const response = await fetch('/api/profile', {

@@ -94,7 +94,7 @@ export default function HODDashboard() {
           </div>
           <h3 className="text-xs sm:text-sm font-medium text-neutral-600 mb-1">Team Members</h3>
           <p className="text-2xl sm:text-3xl font-bold text-neutral-900">{stats?.totalAgents || 0}</p>
-          <p className="text-xs text-neutral-500 mt-2">Agents in department</p>
+          <p className="text-xs text-neutral-500 mt-2">Team members in department</p>
         </div>
 
         <div className="stat-card">

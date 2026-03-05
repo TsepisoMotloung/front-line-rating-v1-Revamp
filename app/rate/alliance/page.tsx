@@ -57,16 +57,39 @@ export default function RateAllianceInsurancePage() {
     });
   };
 
-  const handleSubmit = async () => {
+  const validateForm = (): string | null => {
+    // Validate responses
     if (Object.keys(responses).length !== questions.length) {
-      setError('Please answer all questions');
-      toast.error('Please answer all questions');
-      return;
+      return 'Please answer all questions';
     }
 
-    if (!customerInfo.customerName.trim() && !customerInfo.isAnonymous) {
-      setError('Please enter your name or select anonymous');
-      toast.error('Please enter your name or select anonymous');
+    if (!customerInfo.isAnonymous) {
+      if (!customerInfo.customerName.trim()) {
+        return 'Please provide your name';
+      }
+      if (!customerInfo.customerContact.trim()) {
+        return 'Please provide your contact information';
+      }
+      // Basic email/phone validation
+      const contactRegex = /^(?:[^\s@]+@[^\s@]+\.[^\s@]+|[\d\s\-\+\(\)]{10,})$/;
+      if (!contactRegex.test(customerInfo.customerContact)) {
+        return 'Please provide a valid email address or phone number';
+      }
+    }
+
+    if (customerInfo.policyNumber.trim() && !/^[A-Z0-9\-]{5,}$/.test(customerInfo.policyNumber)) {
+      return 'Please enter a valid policy number (alphanumeric, at least 5 characters)';
+    }
+
+    return null;
+  };
+
+  const handleSubmit = async () => {
+    // Validate form
+    const validationError = validateForm();
+    if (validationError) {
+      setError(validationError);
+      toast.error(validationError);
       return;
     }
 

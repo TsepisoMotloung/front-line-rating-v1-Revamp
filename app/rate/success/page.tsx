@@ -1,7 +1,14 @@
+'use client';
+
+import { Suspense } from 'react';
 import Link from 'next/link';
+import { useSearchParams } from 'next/navigation';
 import { CheckCircle, Star, Home } from 'lucide-react';
 
-export default function RatingSuccessPage() {
+function SuccessContent() {
+  const searchParams = useSearchParams();
+  const type = searchParams?.get('type') || 'agent';
+
   return (
     <div className="min-h-screen bg-gradient-to-b from-white to-neutral-50">
       {/* Navigation */}
@@ -60,10 +67,12 @@ export default function RatingSuccessPage() {
                   <Home className="w-5 h-5 mr-2" />
                   Back to Home
                 </Link>
-                <Link href="/rate" className="btn btn-secondary flex items-center justify-center">
-                  <Star className="w-5 h-5 mr-2" />
-                  Rate Another Agent
-                </Link>
+                {type === 'agent' && (
+                  <Link href="/rate" className="btn btn-secondary flex items-center justify-center">
+                    <Star className="w-5 h-5 mr-2" />
+                    Rate Another Agent
+                  </Link>
+                )}
               </div>
 
               <div className="mt-8 pt-8 border-t border-neutral-200">
@@ -76,5 +85,15 @@ export default function RatingSuccessPage() {
         </div>
       </div>
     </div>
+  );
+}
+
+export const dynamic = 'force-dynamic';
+
+export default function RatingSuccessPage() {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <SuccessContent />
+    </Suspense>
   );
 }

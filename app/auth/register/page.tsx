@@ -62,11 +62,29 @@ export default function RegisterPage() {
       if (response.ok) {
         const data = await response.json();
         setDepartments(data);
+        
+        // Set Sales Department as default for AGENT role
+        if (formData.role === 'AGENT') {
+          const salesDept = data.find((d: Department) => d.name === 'Sales');
+          if (salesDept) {
+            setFormData(prev => ({ ...prev, departmentId: salesDept.id }));
+          }
+        }
       }
     } catch (error) {
       console.error('Error fetching departments:', error);
     }
   };
+
+  // Set Sales Department when role changes to AGENT
+  useEffect(() => {
+    if (formData.role === 'AGENT' && departments.length > 0) {
+      const salesDept = departments.find((d: Department) => d.name === 'Sales');
+      if (salesDept) {
+        setFormData(prev => ({ ...prev, departmentId: salesDept.id }));
+      }
+    }
+  }, [formData.role, departments]);
 
   const handleHcaptchaVerify = (token: string) => {
     setHcaptchaToken(token);
@@ -354,9 +372,10 @@ export default function RegisterPage() {
                       <select
                         id="department"
                         required
+                        disabled={formData.role === 'AGENT'}
                         value={formData.departmentId}
                         onChange={(e) => handleFieldChange('departmentId', e.target.value)}
-                        className={`input pl-10 ${fieldErrors.departmentId ? 'border-red-500' : ''}`}
+                        className={`input pl-10 ${formData.role === 'AGENT' ? 'disabled:bg-neutral-50 disabled:cursor-not-allowed' : ''} ${fieldErrors.departmentId ? 'border-red-500' : ''}`}
                       >
                         <option value="">Select Department</option>
                         {departments.map((dept) => (
@@ -366,6 +385,11 @@ export default function RegisterPage() {
                         ))}
                       </select>
                     </div>
+                    {formData.role === 'AGENT' && (
+                      <p className="text-xs text-neutral-500 mt-1">
+                        Agents are automatically assigned to the Sales Department
+                      </p>
+                    )}
                     {fieldErrors.departmentId && (
                       <p className="text-xs text-red-600 mt-1 flex items-center gap-1">
                         <AlertCircle className="w-3 h-3" />

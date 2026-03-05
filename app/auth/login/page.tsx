@@ -20,9 +20,33 @@ function LoginForm() {
     password: '',
   });
 
+  const validateForm = (): string | null => {
+    if (!formData.email.trim()) {
+      return 'Email address is required';
+    }
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
+      return 'Please enter a valid email address';
+    }
+    if (!formData.password) {
+      return 'Password is required';
+    }
+    if (formData.password.length < 1) {
+      return 'Password is required';
+    }
+    return null;
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
+    
+    // Validate form
+    const validationError = validateForm();
+    if (validationError) {
+      setError(validationError);
+      toast.error(validationError);
+      return;
+    }
     
     if (!hcaptchaToken) {
       setError('Please complete the captcha verification');
@@ -46,8 +70,15 @@ function LoginForm() {
       // This code will only run if redirect: false or if there's an error
       if (result?.error) {
         console.error('❌ Login error:', result.error);
-        setError(result.error);
-        toast.error(result.error);
+        // Map NextAuth errors to user-friendly messages
+        let friendlyError = result.error;
+        if (result.error.includes('Invalid email') || result.error.includes('Invalid credentials')) {
+          friendlyError = 'Invalid email or password. Please try again.';
+        } else if (result.error.includes('pending approval')) {
+          friendlyError = 'Your account is pending admin approval. Please check back later.';
+        }
+        setError(friendlyError);
+        toast.error(friendlyError);
         hcaptchaRef.current?.resetCaptcha();
         setHcaptchaToken(null);
         setIsLoading(false);

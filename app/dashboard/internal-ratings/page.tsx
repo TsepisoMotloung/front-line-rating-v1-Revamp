@@ -70,7 +70,11 @@ export default function InternalRatingPage() {
     if (status === 'unauthenticated') {
       router.push('/auth/login');
     }
-  }, [status, router]);
+    // Agents cannot access internal ratings
+    if (status === 'authenticated' && session?.user?.role === 'AGENT') {
+      router.push('/dashboard');
+    }
+  }, [status, router, session]);
 
   useEffect(() => {
     searchEmployees();
@@ -78,8 +82,8 @@ export default function InternalRatingPage() {
   }, [searchQuery]);
 
   useEffect(() => {
-    // For HOD/Admin: Fetch department ratings on load
-    if ((session?.user?.role === 'HOD' || session?.user?.role === 'ADMIN') && viewMode === 'view') {
+    // For HOD/Admin/Employee: Fetch department ratings on load
+    if ((session?.user?.role === 'HOD' || session?.user?.role === 'ADMIN' || session?.user?.role === 'EMPLOYEE') && viewMode === 'view') {
       fetchDepartmentRatings();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -134,6 +138,16 @@ export default function InternalRatingPage() {
       setIsLoadingRatings(true);
       
       let url = '/api/ratings/internal';
+      
+      // For employees, only fetch their own ratings (as rater and rated)
+      if (session?.user?.role === 'EMPLOYEE') {
+        url += `?viewMode=own`;
+      } 
+      // For HOD, fetch ratings of people in their department
+      else if (session?.user?.role === 'HOD') {
+        url += `?viewMode=department`;
+      }
+      // For ADMIN, fetch all ratings (no parameters needed)
       
       const response = await fetch(url);
       if (response.ok) {
@@ -333,8 +347,8 @@ export default function InternalRatingPage() {
           </div>
         </div>
 
-        {/* View Mode Toggle for HOD/Admin */}
-        {(session?.user?.role === 'HOD' || session?.user?.role === 'ADMIN') && (
+        {/* View Mode Toggle for HOD/Admin/Employee */}
+        {(session?.user?.role === 'HOD' || session?.user?.role === 'ADMIN' || session?.user?.role === 'EMPLOYEE') && (
           <div className="mb-6 flex space-x-2">
             <button
               onClick={() => setViewMode('submit')}
@@ -366,11 +380,11 @@ export default function InternalRatingPage() {
           </div>
         )}
 
-        {/* View Ratings Section for HOD/Admin */}
-        {viewMode === 'view' && (session?.user?.role === 'HOD' || session?.user?.role === 'ADMIN') && (
+        {/* View Ratings Section for HOD/Admin/Employee */}
+        {viewMode === 'view' && (session?.user?.role === 'HOD' || session?.user?.role === 'ADMIN' || session?.user?.role === 'EMPLOYEE') && (
           <div className="mb-8">
             <h2 className="text-2xl font-bold text-neutral-900 mb-4">
-              {session?.user?.role === 'HOD' ? 'Department Ratings' : 'All Internal Ratings'}
+              {session?.user?.role === 'HOD' ? 'Department Ratings' : session?.user?.role === 'ADMIN' ? 'All Internal Ratings' : 'My Ratings'}
             </h2>
             
             {isLoadingRatings ? (

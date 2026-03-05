@@ -32,7 +32,9 @@ export default function NotificationsPage() {
       const response = await fetch('/api/notifications');
       if (!response.ok) throw new Error('Failed to fetch notifications');
       const data = await response.json();
-      setNotifications(data);
+      // API returns { notifications, unreadCount }, so extract the notifications array
+      const notificationsArray = Array.isArray(data) ? data : data.notifications || [];
+      setNotifications(notificationsArray);
     } catch (error) {
       console.error('Error fetching notifications:', error);
       toast.error('Failed to load notifications');

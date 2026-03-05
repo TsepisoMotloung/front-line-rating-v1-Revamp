@@ -1,8 +1,10 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { useSession } from 'next-auth/react';
+import { useRouter } from 'next/navigation';
 import DashboardLayout from '@/components/DashboardLayout';
-import { UserCheck, UserX, Search, Edit2 } from 'lucide-react';
+import { UserCheck, UserX, Search, Edit2, AlertCircle } from 'lucide-react';
 import toast from 'react-hot-toast';
 
 interface User {
@@ -17,6 +19,8 @@ interface User {
 }
 
 export default function UsersPage() {
+  const { data: session, status } = useSession();
+  const router = useRouter();
   const [users, setUsers] = useState<User[]>([]);
   const [filteredUsers, setFilteredUsers] = useState<User[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -27,6 +31,16 @@ export default function UsersPage() {
   const [promoteModalOpen, setPromoteModalOpen] = useState(false);
   const [promoteUser, setPromoteUser] = useState<User | null>(null);
   const [newRole, setNewRole] = useState('EMPLOYEE');
+
+  useEffect(() => {
+    if (status === 'unauthenticated') {
+      router.push('/auth/login');
+    }
+    // Only ADMIN can access this page
+    if (status === 'authenticated' && session?.user?.role !== 'ADMIN') {
+      router.push('/dashboard');
+    }
+  }, [status, session, router]);
 
   useEffect(() => {
     fetchUsers();

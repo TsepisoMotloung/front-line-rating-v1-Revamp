@@ -1,6 +1,8 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { useSession } from 'next-auth/react';
+import { useRouter } from 'next/navigation';
 import DashboardLayout from '@/components/DashboardLayout';
 import { Plus, Edit, Trash2, Check, X, GripVertical } from 'lucide-react';
 import toast from 'react-hot-toast';
@@ -13,6 +15,8 @@ interface Question {
 }
 
 export default function QuestionsPage() {
+  const { data: session, status } = useSession();
+  const router = useRouter();
   const [questions, setQuestions] = useState<Question[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -21,6 +25,16 @@ export default function QuestionsPage() {
     questionText: '',
     isActive: true,
   });
+
+  useEffect(() => {
+    if (status === 'unauthenticated') {
+      router.push('/auth/login');
+    }
+    // Only HOD and ADMIN can access this page
+    if (status === 'authenticated' && !['HOD', 'ADMIN'].includes(session?.user?.role || '')) {
+      router.push('/dashboard');
+    }
+  }, [status, session, router]);
 
   useEffect(() => {
     fetchQuestions();

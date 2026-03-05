@@ -1,6 +1,8 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { useSession } from 'next-auth/react';
+import { useRouter } from 'next/navigation';
 import DashboardLayout from '@/components/DashboardLayout';
 import { Plus, Edit, Trash2, Building2, Users } from 'lucide-react';
 import toast from 'react-hot-toast';
@@ -17,6 +19,8 @@ interface Department {
 }
 
 export default function DepartmentsPage() {
+  const { data: session, status } = useSession();
+  const router = useRouter();
   const [departments, setDepartments] = useState<Department[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -26,6 +30,16 @@ export default function DepartmentsPage() {
     description: '',
     isActive: true,
   });
+
+  useEffect(() => {
+    if (status === 'unauthenticated') {
+      router.push('/auth/login');
+    }
+    // Only ADMIN can access this page
+    if (status === 'authenticated' && session?.user?.role !== 'ADMIN') {
+      router.push('/dashboard');
+    }
+  }, [status, session, router]);
 
   useEffect(() => {
     fetchDepartments();

@@ -73,17 +73,40 @@ export default function RatingFormPage({ params }: { params: { agentId: string }
     setResponses({ ...responses, [questionId]: score });
   };
 
+  const validateForm = (): string | null => {
+    // Validate responses
+    if (questions.length > 0 && Object.keys(responses).length !== questions.length) {
+      return 'Please answer all questions';
+    }
+
+    if (!formData.isAnonymous) {
+      if (!formData.customerName.trim()) {
+        return 'Please provide your name';
+      }
+      if (!formData.customerContact.trim()) {
+        return 'Please provide your contact information';
+      }
+      // Basic email/phone validation if contact is provided
+      const contactRegex = /^(?:[^\s@]+@[^\s@]+\.[^\s@]+|[\d\s\-\+\(\)]{10,})$/;
+      if (!contactRegex.test(formData.customerContact)) {
+        return 'Please provide a valid email address or phone number';
+      }
+    }
+
+    if (formData.policyNumber.trim() && !/^[A-Z0-9\-]{5,}$/.test(formData.policyNumber)) {
+      return 'Please enter a valid policy number (alphanumeric, at least 5 characters)';
+    }
+
+    return null;
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    // Validate responses
-    if (questions.length > 0 && Object.keys(responses).length !== questions.length) {
-      toast.error('Please answer all questions');
-      return;
-    }
-
-    if (!formData.isAnonymous && !formData.customerName) {
-      toast.error('Please provide your name or select anonymous');
+    // Validate form
+    const validationError = validateForm();
+    if (validationError) {
+      toast.error(validationError);
       return;
     }
 
@@ -121,7 +144,7 @@ export default function RatingFormPage({ params }: { params: { agentId: string }
       } else {
         toast.success('Thank you for your feedback!');
       }
-      router.push('/rate/success');
+      router.push('/rate/success?type=agent');
     } catch (error: any) {
       console.error('Error submitting rating:', error);
       toast.error(error.message || 'Failed to submit rating');

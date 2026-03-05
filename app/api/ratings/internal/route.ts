@@ -15,31 +15,48 @@ export async function GET(req: NextRequest) {
     const raterId = searchParams.get('raterId');
     const ratedId = searchParams.get('ratedId');
     const category = searchParams.get('category');
-    const getStats = searchParams.get('stats'); // For admin stats/reports
-
-    // Only admins can view all internal ratings stats
-    if (getStats && session.user.role !== 'ADMIN') {
-      return NextResponse.json({ error: 'Unauthorized - Admin only' }, { status: 403 });
-    }
+    const getStats = searchParams.get('stats');
+    const viewMode = searchParams.get('viewMode'); // 'own' for employees, 'department' for HOD, undefined for Admin
 
     let whereClause: any = {};
 
-    // Non-admins can only see their own ratings (given or received)
-    if (session.user.role !== 'ADMIN' && !getStats) {
+    // Role-based access control
+    if (session.user.role === 'ADMIN') {
+      // Admin sees all ratings
       if (raterId) whereClause.raterId = raterId;
       if (ratedId) whereClause.ratedId = ratedId;
-      
-      // Ensure user can only see ratings they gave or received
-      if (!raterId && !ratedId) {
+    } else if (session.user.role === 'HOD') {
+      // HOD sees ratings about employees/agents in their department
+      if (viewMode === 'department') {
+        // Need to fetch employees in HOD's department first
+        const deptEmployees = await prisma.user.findMany({
+          where: { departmentId: (session.user as any).departmentId },
+          select: { id: true },
+        });
+        const deptEmployeeIds = deptEmployees.map(e => e.id);
+        
+        // Show all ratings where the rated person is in their department
+        whereClause.ratedId = { in: deptEmployeeIds };
+      } else if (raterId) {
+        whereClause.raterId = raterId;
+      } else if (ratedId) {
+        whereClause.ratedId = ratedId;
+      }
+    } else if (session.user.role === 'EMPLOYEE') {
+      // Employee sees only their own ratings (given or received)
+      if (viewMode === 'own') {
         whereClause.OR = [
           { raterId: session.user.id },
           { ratedId: session.user.id },
         ];
+      } else if (raterId) {
+        whereClause.raterId = raterId;
+      } else if (ratedId) {
+        whereClause.ratedId = ratedId;
       }
-    } else {
-      // Admins can filter by any user
-      if (raterId) whereClause.raterId = raterId;
-      if (ratedId) whereClause.ratedId = ratedId;
+    } else if (session.user.role === 'AGENT') {
+      // Agent cannot view internal ratings - should not see this page
+      return NextResponse.json({ error: 'Agents cannot view internal ratings' }, { status: 403 });
     }
 
     if (category) whereClause.category = category;
