@@ -11,7 +11,7 @@ interface Rating {
   id: string;
   isAnonymous: boolean;
   customerName?: string;
-  agent: { name: string };
+  agent?: { name: string };
   department: { name: string };
   createdAt: string;
   feedbackText?: string;
@@ -81,7 +81,7 @@ export default function MyRatingsPage() {
         <div className="container-custom py-8">
           <div className="glass p-responsive rounded-xl shadow-lg">
             <h1 className="text-2xl font-bold text-neutral-900 mb-6">
-              {session?.user?.role === 'AGENT' ? 'Ratings Received' : 'My Ratings'}
+              {session?.user?.role === 'AGENT' || session?.user?.role === 'EMPLOYEE' ? 'Ratings Received' : 'My Ratings'}
             </h1>
             {ratings.length === 0 ? (
               <div className="text-center py-12 bg-white rounded-lg border border-neutral-200">
@@ -94,9 +94,9 @@ export default function MyRatingsPage() {
                     <div className="flex justify-between items-start mb-4">
                       <div>
                         <h3 className="font-medium text-neutral-900">
-                          {session?.user?.role === 'AGENT'
+                          {session?.user?.role === 'AGENT' || session?.user?.role === 'EMPLOYEE'
                             ? `Rated by ${rating.isAnonymous ? 'Anonymous' : rating.customerName}`
-                            : `Rating for ${rating.agent.name}`}
+                            : `Rating for ${rating.agent?.name || 'Unknown'}`}
                         </h3>
                         <p className="text-sm text-neutral-500">
                           {rating.department.name} • {formatDistanceToNow(new Date(rating.createdAt))} ago

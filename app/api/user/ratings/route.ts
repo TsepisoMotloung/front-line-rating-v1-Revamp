@@ -20,8 +20,8 @@ export async function GET(request: Request) {
     let ratings
     let total
 
-    if (session.user.role === 'AGENT') {
-      // Agents see ratings they've received
+    if (session.user.role === 'AGENT' || session.user.role === 'EMPLOYEE') {
+      // Agents and Employees see ratings they've received
       [ratings, total] = await Promise.all([
         prisma.rating.findMany({
           where: { agentId: session.user.id },
