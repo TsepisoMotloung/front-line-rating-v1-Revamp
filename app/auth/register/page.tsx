@@ -79,7 +79,7 @@ export default function RegisterPage() {
   // Set Sales Department when role changes to AGENT
   useEffect(() => {
     if (formData.role === 'AGENT' && departments.length > 0) {
-      const salesDept = departments.find((d: Department) => d.name === 'Sales');
+      const salesDept = departments.find((d: Department) => d.name === 'Sales Department');
       if (salesDept) {
         setFormData(prev => ({ ...prev, departmentId: salesDept.id }));
       }
@@ -372,17 +372,19 @@ export default function RegisterPage() {
                       <select
                         id="department"
                         required
-                        // disabled={formData.role === 'AGENT'}
+                        disabled={formData.role === 'AGENT'}
                         value={formData.departmentId}
                         onChange={(e) => handleFieldChange('departmentId', e.target.value)}
                         className={`input pl-10 ${formData.role === 'AGENT' ? 'disabled:bg-neutral-50 disabled:cursor-not-allowed' : ''} ${fieldErrors.departmentId ? 'border-red-500' : ''}`}
                       >
                         <option value="">Select Department</option>
-                        {departments.map((dept) => (
-                          <option key={dept.id} value={dept.id}>
-                            {dept.name}
-                          </option>
-                        ))}
+                        {departments
+                          .filter((dept) => formData.role === 'AGENT' ? dept.name === 'Sales Department' : true)
+                          .map((dept) => (
+                            <option key={dept.id} value={dept.id}>
+                              {dept.name}
+                            </option>
+                          ))}
                       </select>
                     </div>
                     {formData.role === 'AGENT' && (
