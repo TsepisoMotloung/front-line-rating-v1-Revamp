@@ -372,7 +372,7 @@ export default function RegisterPage() {
                       <select
                         id="department"
                         required
-                        disabled={formData.role === 'AGENT'}
+                        // disabled={formData.role === 'AGENT'}
                         value={formData.departmentId}
                         onChange={(e) => handleFieldChange('departmentId', e.target.value)}
                         className={`input pl-10 ${formData.role === 'AGENT' ? 'disabled:bg-neutral-50 disabled:cursor-not-allowed' : ''} ${fieldErrors.departmentId ? 'border-red-500' : ''}`}
