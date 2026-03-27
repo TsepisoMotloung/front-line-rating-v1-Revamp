@@ -161,7 +161,7 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
                       {session?.user?.name}
                     </p>
                     <p className="text-xs text-neutral-500">
-                      {session?.user?.role}
+                      {session?.user?.role} - {session?.user?.departmentName}
                     </p>
                   </div>
                 </button>
