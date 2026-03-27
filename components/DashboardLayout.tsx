@@ -55,12 +55,13 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
 
     const commonItems = [
       { href: '/dashboard', icon: LayoutDashboard, label: 'Dashboard' },
-      { href: '/dashboard/internal-ratings', icon: Users, label: 'Internal Ratings' },
+      
     ];
 
     if (role === 'ADMIN') {
       return [
         ...commonItems,
+        { href: '/dashboard/internal-ratings', icon: Users, label: 'Internal Ratings' },
         { href: '/dashboard/users', icon: Users, label: 'Users' },
         { href: '/dashboard/departments', icon: Building2, label: 'Departments' },
         { href: '/dashboard/ratings', icon: Star, label: 'All Ratings' },
@@ -72,6 +73,7 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
     if (role === 'HOD') {
       return [
         ...commonItems,
+        { href: '/dashboard/internal-ratings', icon: Users, label: 'Internal Ratings' },
         { href: '/dashboard/questions', icon: FileText, label: 'Questions' },
         { href: '/dashboard/ratings', icon: Star, label: 'Ratings' },
         { href: '/dashboard/complaints', icon: MessageSquare, label: 'Complaints' },
@@ -89,6 +91,7 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
     if (role === 'EMPLOYEE') {
       return [
         ...commonItems,
+        { href: '/dashboard/internal-ratings', icon: Users, label: 'Internal Ratings' },
         { href: '/dashboard/my-ratings', icon: Star, label: 'My Ratings' },
       ];
     }
