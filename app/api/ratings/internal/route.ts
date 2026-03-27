@@ -14,14 +14,30 @@ export async function GET(req: NextRequest) {
     const searchParams = req.nextUrl.searchParams;
     const raterId = searchParams.get('raterId');
     const ratedId = searchParams.get('ratedId');
+    const personId = searchParams.get('personId');
+    const filterType = searchParams.get('filterType'); // 'receivedFrom' or 'sentTo'
     const category = searchParams.get('category');
     const getStats = searchParams.get('stats');
-    const viewMode = searchParams.get('viewMode'); // 'own' for employees, 'department' for HOD, undefined for Admin
+    const viewMode = searchParams.get('viewMode'); // 'own', 'department', 'received', 'sent'
 
     let whereClause: any = {};
 
-    // Role-based access control
-    if (session.user.role === 'ADMIN') {
+    // Handle new received/sent view modes
+    if (viewMode === 'received') {
+      // Ratings received by current user
+      whereClause.ratedId = session.user.id;
+    } else if (viewMode === 'sent') {
+      // Ratings sent by current user
+      whereClause.raterId = session.user.id;
+    } else if (filterType === 'receivedFrom' && personId) {
+      // Ratings received by current user from a specific person
+      whereClause.ratedId = session.user.id;
+      whereClause.raterId = personId;
+    } else if (filterType === 'sentTo' && personId) {
+      // Ratings sent by current user to a specific person
+      whereClause.raterId = session.user.id;
+      whereClause.ratedId = personId;
+    } else if (session.user.role === 'ADMIN') {
       // Admin sees all ratings
       if (raterId) whereClause.raterId = raterId;
       if (ratedId) whereClause.ratedId = ratedId;

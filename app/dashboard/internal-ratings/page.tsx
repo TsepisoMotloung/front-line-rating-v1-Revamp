@@ -71,6 +71,7 @@ export default function InternalRatingPage() {
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   // View mode
+  const [viewType, setViewType] = useState<'received' | 'sent'>('received');
   const [ratedPersons, setRatedPersons] = useState<RatedPerson[]>([]);
   const [isLoadingPersons, setIsLoadingPersons] = useState(false);
   
@@ -86,6 +87,7 @@ export default function InternalRatingPage() {
   // Pagination
   const [personsPage, setPersonsPage] = useState(1);
   const [searchResultsPage, setSearchResultsPage] = useState(1);
+  const [sentRatingsPage, setSentRatingsPage] = useState(1);
 
   // Error and loading
   const [error, setError] = useState('');
@@ -101,13 +103,17 @@ export default function InternalRatingPage() {
     }
   }, [status, router, session]);
 
-  // Effect: Load rated persons when entering view mode
+  // Effect: Load rated persons when entering view mode or changing view type
   useEffect(() => {
     if (viewMode === 'view' && status === 'authenticated' && session?.user?.role !== 'AGENT') {
-      fetchRatedPersons();
+      if (viewType === 'received') {
+        fetchReceivedRatings();
+      } else {
+        fetchSentRatings();
+      }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [viewMode, status]);
+  }, [viewMode, viewType, status]);
 
   // Search employees for rating
   const searchEmployees = async () => {
@@ -169,20 +175,53 @@ export default function InternalRatingPage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [searchQuery]);
 
-  // Fetch all rated persons (aggregated view)
-  const fetchRatedPersons = async () => {
+  // Fetch all ratings received by current user (aggregated view)
+  const fetchReceivedRatings = async () => {
     try {
       setIsLoadingPersons(true);
       setError('');
       
-      let url = '/api/ratings/internal';
-      if (session?.user?.role === 'EMPLOYEE') {
-        url += '?viewMode=own';
-      } else if (session?.user?.role === 'HOD') {
-        url += '?viewMode=department';
-      }
+      const response = await fetch('/api/ratings/internal?viewMode=received');
+      if (!response.ok) throw new Error('Failed to fetch ratings');
+      
+      const data = await response.json();
+      
+      // Group ratings by rater
+      const grouped = new Map<string, RatedPerson>();
+      
+      data.forEach((rating: InternalRating) => {
+        const key = rating.rater.id;
+        if (!grouped.has(key)) {
+          grouped.set(key, {
+            ratedId: rating.rater.id,
+            ratedName: rating.rater.name,
+            ratedRole: rating.rater.role,
+            totalRatings: 0,
+            averageScore: 0,
+          });
+        }
+        
+        const person = grouped.get(key)!;
+        person.totalRatings += 1;
+        person.averageScore = (person.averageScore * (person.totalRatings - 1) + rating.score) / person.totalRatings;
+      });
+      
+      setRatedPersons(Array.from(grouped.values()).sort((a, b) => b.averageScore - a.averageScore));
+      setPersonsPage(1);
+    } catch (err) {
+      setError('Failed to load ratings');
+    } finally {
+      setIsLoadingPersons(false);
+    }
+  };
 
-      const response = await fetch(url);
+  // Fetch all ratings sent by current user (aggregated view)
+  const fetchSentRatings = async () => {
+    try {
+      setIsLoadingPersons(true);
+      setError('');
+      
+      const response = await fetch('/api/ratings/internal?viewMode=sent');
       if (!response.ok) throw new Error('Failed to fetch ratings');
       
       const data = await response.json();
@@ -216,25 +255,34 @@ export default function InternalRatingPage() {
     }
   };
 
-  // Fetch raters for a selected person
+  // Fetch raters/ratings for a selected person (depends on view type)
   const fetchRatersForPerson = async (personId: string) => {
     try {
       setIsLoadingRaters(true);
-      const response = await fetch(`/api/ratings/internal?ratedId=${personId}`);
+      let url = `/api/ratings/internal?personId=${personId}`;
+      if (viewType === 'received') {
+        url += '&filterType=receivedFrom';
+      } else {
+        url += '&filterType=sentTo';
+      }
+      
+      const response = await fetch(url);
       if (!response.ok) throw new Error('Failed to fetch raters');
       
       const data = await response.json();
       
-      // Group ratings by rater
+      // Group ratings by rater (for received) or just collect (for sent)
       const grouped = new Map<string, RaterGroup>();
       
       data.forEach((rating: InternalRating) => {
-        const key = rating.rater.id;
+        const key = viewType === 'received' ? rating.rater.id : rating.rated.id;
+        const rater = viewType === 'received' ? rating.rater : rating.rated;
+        
         if (!grouped.has(key)) {
           grouped.set(key, {
-            raterId: rating.rater.id,
-            raterName: rating.rater.name,
-            raterRole: rating.rater.role,
+            raterId: key,
+            raterName: rater.name,
+            raterRole: rater.role,
             isAnonymous: rating.isAnonymous,
             ratings: [],
             averageScore: 0,
@@ -540,10 +588,44 @@ export default function InternalRatingPage() {
         {/* View Mode */}
         {viewMode === 'view' && (
           <div className="space-y-8">
+            {/* View Type Toggle */}
+            <div className="flex gap-2 bg-white p-2 rounded-lg border border-neutral-200 w-fit">
+              <button
+                onClick={() => {
+                  setViewType('received');
+                  setSelectedPerson(null);
+                  setSelectedRater(null);
+                }}
+                className={`px-4 py-2 rounded font-medium transition-colors ${
+                  viewType === 'received'
+                    ? 'bg-primary-600 text-white'
+                    : 'text-neutral-600 hover:text-neutral-900'
+                }`}
+              >
+                Ratings Received
+              </button>
+              <button
+                onClick={() => {
+                  setViewType('sent');
+                  setSelectedPerson(null);
+                  setSelectedRater(null);
+                }}
+                className={`px-4 py-2 rounded font-medium transition-colors ${
+                  viewType === 'sent'
+                    ? 'bg-primary-600 text-white'
+                    : 'text-neutral-600 hover:text-neutral-900'
+                }`}
+              >
+                Ratings Sent
+              </button>
+            </div>
+
             {!selectedPerson ? (
               <>
                 <div className="bg-white rounded-lg border border-neutral-200 p-6">
-                  <h2 className="text-xl font-semibold text-neutral-900 mb-6">Rated Employees</h2>
+                  <h2 className="text-xl font-semibold text-neutral-900 mb-6">
+                    {viewType === 'received' ? 'People Who Rated Me' : 'People I Rated'}
+                  </h2>
 
                   {isLoadingPersons ? (
                     <div className="flex justify-center py-12">
@@ -626,7 +708,7 @@ export default function InternalRatingPage() {
                     className="flex items-center gap-2 text-primary-600 hover:text-primary-700 mb-6"
                   >
                     <ArrowLeft className="w-4 h-4" />
-                    Back to Employees
+                    Back to {viewType === 'received' ? 'People' : 'Employees'}
                   </button>
 
                   <div className="mb-8 p-6 bg-primary-50 border border-primary-200 rounded-lg">
@@ -663,14 +745,16 @@ export default function InternalRatingPage() {
                     </div>
                   </div>
 
-                  <h3 className="text-lg font-semibold text-neutral-900 mb-4">Who Rated This Person</h3>
+                  <h3 className="text-lg font-semibold text-neutral-900 mb-4">
+                    {viewType === 'received' ? 'Rating Details' : 'My Rating Details'}
+                  </h3>
 
                   {isLoadingRaters ? (
                     <div className="flex justify-center py-12">
                       <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary-600"></div>
                     </div>
                   ) : raters.length === 0 ? (
-                    <p className="text-center text-neutral-600 py-8">No raters found</p>
+                    <p className="text-center text-neutral-600 py-8">No ratings found</p>
                   ) : (
                     <>
                       <div className="space-y-4 mb-6">
@@ -756,7 +840,10 @@ export default function InternalRatingPage() {
 
                   <div className="mb-8 p-6 bg-primary-50 border border-primary-200 rounded-lg">
                     <h3 className="text-lg font-semibold text-neutral-900 mb-1">
-                      Rated by: {selectedRater.isAnonymous ? 'Anonymous' : selectedRater.raterName}
+                      {viewType === 'received' 
+                        ? `Rated by: ${selectedRater.isAnonymous ? 'Anonymous' : selectedRater.raterName}`
+                        : `My rating for: ${selectedRater.raterName}`
+                      }
                     </h3>
                     {!selectedRater.isAnonymous && (
                       <p className="text-neutral-600">{selectedRater.raterRole}</p>
@@ -767,7 +854,7 @@ export default function InternalRatingPage() {
                   <div className="space-y-6">
                     {selectedRater.ratings.map((rating) => (
                       <div key={rating.id} className="border border-neutral-200 rounded-lg p-6">
-                        <div className="flex items-start justify-between mb-4">
+                        <div className="flex items-start justify-between">
                           <div>
                             <h5 className="font-semibold text-neutral-900">{rating.category}</h5>
                           </div>
@@ -776,12 +863,7 @@ export default function InternalRatingPage() {
                             <p className="text-sm text-neutral-600">/5</p>
                           </div>
                         </div>
-                        {rating.feedbackText && (
-                          <div className="mb-4 p-4 bg-neutral-50 rounded">
-                            <p className="text-sm text-neutral-700">{rating.feedbackText}</p>
-                          </div>
-                        )}
-                        <p className="text-xs text-neutral-400">
+                        <p className="text-xs text-neutral-400 mt-2">
                           {new Date(rating.createdAt).toLocaleDateString('en-US', {
                             year: 'numeric',
                             month: 'long',
@@ -790,6 +872,16 @@ export default function InternalRatingPage() {
                         </p>
                       </div>
                     ))}
+                    
+                    {/* Feedback Card - shown only if feedback exists */}
+                    {selectedRater.ratings.some(r => r.feedbackText) && (
+                      <div className="border border-primary-200 bg-primary-50 rounded-lg p-6">
+                        <h5 className="font-semibold text-neutral-900 mb-3">Feedback</h5>
+                        <p className="text-neutral-700">
+                          {selectedRater.ratings.find(r => r.feedbackText)?.feedbackText}
+                        </p>
+                      </div>
+                    )}
                   </div>
                 </div>
               </>
