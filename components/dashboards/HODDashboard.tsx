@@ -77,9 +77,9 @@ export default function HODDashboard() {
           <Link href="/dashboard/questions" className="btn btn-outline text-xs sm:text-sm">
             Questions
           </Link>
-          <Link href="/dashboard/reports" className="btn btn-primary text-xs sm:text-sm">
+          {/* <Link href="/dashboard/reports" className="btn btn-primary text-xs sm:text-sm">
             Generate Report
-          </Link>
+          </Link> */}
         </div>
       </div>
 
