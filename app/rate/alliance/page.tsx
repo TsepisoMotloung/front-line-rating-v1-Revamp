@@ -73,12 +73,12 @@ export default function RateAllianceInsurancePage() {
       // Basic email/phone validation
       const contactRegex = /^(?:[^\s@]+@[^\s@]+\.[^\s@]+|[\d\s\-\+\(\)]{10,})$/;
       if (!contactRegex.test(customerInfo.customerContact)) {
-        return 'Please provide a valid email address or phone number';
+        return 'Please provide a valid phone number';
       }
     }
 
-    if (customerInfo.policyNumber.trim() && !/^[A-Z0-9\-]{5,}$/.test(customerInfo.policyNumber)) {
-      return 'Please enter a valid policy number (alphanumeric, at least 5 characters)';
+    if (customerInfo.policyNumber.trim() && !/^[A-Z0-9\-]{4,}$/.test(customerInfo.policyNumber)) {
+      return 'Please enter a valid policy number (alphanumeric, at least 4 characters)';
     }
 
     return null;
