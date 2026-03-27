@@ -6,7 +6,7 @@ const prisma = new PrismaClient();
 async function main() {
   console.log('🌱 Starting database seed...');
 
-  // Clear existing data (optional - comment out in production)
+  // Clear existing data
   console.log('🗑️  Clearing existing data...');
   await prisma.response.deleteMany();
   await prisma.rating.deleteMany();
@@ -18,15 +18,46 @@ async function main() {
   await prisma.user.deleteMany();
   await prisma.department.deleteMany();
   await prisma.systemSettings.deleteMany();
+  console.log('✅ Database cleared');
+
+  // Create Departments
+  console.log('🏢 Creating departments...');
+  const salesDept = await prisma.department.create({
+    data: {
+      name: 'Sales',
+      description: 'Sales Department',
+      isActive: true,
+    },
+  });
+
+  const hrDept = await prisma.department.create({
+    data: {
+      name: 'Human Resources',
+      description: 'HR Department',
+      isActive: true,
+    },
+  });
+
+  const operationsDept = await prisma.department.create({
+    data: {
+      name: 'Operations',
+      description: 'Operations Department',
+      isActive: true,
+    },
+  });
+
+  console.log('✅ Departments created');
+
+  // Hash password for all users
+  const hashedPassword = await bcrypt.hash('Pass@123', 10);
 
   // Create Admin User
   console.log('👤 Creating admin user...');
-  const hashedAdminPassword = await bcrypt.hash('Admin@123', 10);
   const admin = await prisma.user.create({
     data: {
-      email: 'admin@frontlinerating.com',
-      name: 'System Administrator',
-      password: hashedAdminPassword,
+      email: 'mseqhobane@alliance.co.ls',
+      name: 'Max Seqhobane',
+      password: hashedPassword,
       role: 'ADMIN',
       status: 'APPROVED',
       emailVerified: new Date(),
@@ -35,409 +66,79 @@ async function main() {
   });
   console.log('✅ Admin created:', admin.email);
 
-  // Create Departments
-  console.log('🏢 Creating departments...');
-  const salesDept = await prisma.department.create({
+  // Create HOD User
+  console.log('👔 Creating HOD user...');
+  const hod = await prisma.user.create({
     data: {
-      name: 'Sales Department',
-      description: 'Handles all sales and customer acquisition activities',
-      isActive: true,
-    },
-  });
-
-  const customerServiceDept = await prisma.department.create({
-    data: {
-      name: 'Customer Service',
-      description: 'Handles customer inquiries and support',
-      isActive: true,
-    },
-  });
-
-  const claimsDept = await prisma.department.create({
-    data: {
-      name: 'Claims Department',
-      description: 'Processes insurance claims and related services',
-      isActive: true,
-    },
-  });
-
-  console.log('✅ Departments created');
-
-  // Create HOD Users
-  console.log('👔 Creating HOD users...');
-  const hashedHodPassword = await bcrypt.hash('Hod@123', 10);
-  
-  const salesHod = await prisma.user.create({
-    data: {
-      email: 'hod.sales@frontlinerating.com',
-      name: 'Mamello Molefe',
-      password: hashedHodPassword,
+      email: 'pmalehi@alliance.co.ls',
+      name: 'Paballo Malehi',
+      password: hashedPassword,
       role: 'HOD',
       status: 'APPROVED',
       departmentId: salesDept.id,
       emailVerified: new Date(),
       employeeId: 'HOD001',
-      phone: '+266 5000 1001',
+      phone: '+266 2000 0001',
     },
   });
+  console.log('✅ HOD created:', hod.email);
 
-  const csHod = await prisma.user.create({
+  // Create Sales Agent (AGENT role)
+  console.log('🧑‍💼 Creating sales agent...');
+  const salesAgent = await prisma.user.create({
     data: {
-      email: 'hod.cs@frontlinerating.com',
-      name: 'Thabo Mokoena',
-      password: hashedHodPassword,
-      role: 'HOD',
+      email: 'rmojakisane@alliance.co.ls',
+      name: 'Ramonaheng Mojakisane',
+      password: hashedPassword,
+      role: 'AGENT',
       status: 'APPROVED',
-      departmentId: customerServiceDept.id,
+      departmentId: salesDept.id,
       emailVerified: new Date(),
-      employeeId: 'HOD002',
-      phone: '+266 5000 1002',
+      employeeId: 'AGENT001',
+      phone: '+266 2000 0002',
     },
   });
+  console.log('✅ Sales Agent created:', salesAgent.email);
 
-  const claimsHod = await prisma.user.create({
+  // Create Employee
+  console.log('👥 Creating employee...');
+  const employee = await prisma.user.create({
     data: {
-      email: 'hod.claims@frontlinerating.com',
-      name: 'Lineo Sekhonyana',
-      password: hashedHodPassword,
-      role: 'HOD',
+      email: 'tmotloung@alliance.co.ls',
+      name: 'Tsepiso Motloung',
+      password: hashedPassword,
+      role: 'EMPLOYEE',
       status: 'APPROVED',
-      departmentId: claimsDept.id,
+      departmentId: salesDept.id,
       emailVerified: new Date(),
-      employeeId: 'HOD003',
-      phone: '+266 5000 1003',
+      employeeId: 'EMP001',
+      phone: '+266 2000 0003',
     },
   });
-
-  console.log('✅ HODs created');
-
-  // Create Agent Users
-  console.log('👥 Creating agent users...');
-  const hashedAgentPassword = await bcrypt.hash('Agent@123', 10);
-  
-  const agents = await Promise.all([
-    prisma.user.create({
-      data: {
-        email: 'agent1.sales@frontlinerating.com',
-        name: 'Thabiso Makhetha',
-        password: hashedAgentPassword,
-        role: 'AGENT',
-        status: 'APPROVED',
-        departmentId: salesDept.id,
-        emailVerified: new Date(),
-        employeeId: 'AGT001',
-        phone: '+266 5000 2001',
-      },
-    }),
-    prisma.user.create({
-      data: {
-        email: 'agent2.sales@frontlinerating.com',
-        name: 'Puleng Mofolo',
-        password: hashedAgentPassword,
-        role: 'AGENT',
-        status: 'APPROVED',
-        departmentId: salesDept.id,
-        emailVerified: new Date(),
-        employeeId: 'AGT002',
-        phone: '+266 5000 2002',
-      },
-    }),
-    prisma.user.create({
-      data: {
-        email: 'agent1.cs@frontlinerating.com',
-        name: 'Lebohang Nkoane',
-        password: hashedAgentPassword,
-        role: 'AGENT',
-        status: 'APPROVED',
-        departmentId: customerServiceDept.id,
-        emailVerified: new Date(),
-        employeeId: 'AGT003',
-        phone: '+266 5000 2003',
-      },
-    }),
-    prisma.user.create({
-      data: {
-        email: 'agent2.cs@frontlinerating.com',
-        name: 'Nthabiseng Tshabalala',
-        password: hashedAgentPassword,
-        role: 'AGENT',
-        status: 'APPROVED',
-        departmentId: customerServiceDept.id,
-        emailVerified: new Date(),
-        employeeId: 'AGT004',
-        phone: '+266 5000 2004',
-      },
-    }),
-    prisma.user.create({
-      data: {
-        email: 'agent1.claims@frontlinerating.com',
-        name: 'Motloheloa Mokone',
-        password: hashedAgentPassword,
-        role: 'AGENT',
-        status: 'APPROVED',
-        departmentId: claimsDept.id,
-        emailVerified: new Date(),
-        employeeId: 'AGT005',
-        phone: '+266 5000 2005',
-      },
-    }),
-  ]);
-
-  console.log('✅ Agents created');
-
-  // Create Questions for Each Department
-  console.log('❓ Creating rating questions...');
-  
-  // Sales Department Questions
-  await prisma.question.createMany({
-    data: [
-      {
-        departmentId: salesDept.id,
-        questionText: 'How would you rate the agent\'s product knowledge?',
-        order: 1,
-        isActive: true,
-      },
-      {
-        departmentId: salesDept.id,
-        questionText: 'How satisfied are you with the clarity of information provided?',
-        order: 2,
-        isActive: true,
-      },
-      {
-        departmentId: salesDept.id,
-        questionText: 'How would you rate the agent\'s professionalism?',
-        order: 3,
-        isActive: true,
-      },
-      {
-        departmentId: salesDept.id,
-        questionText: 'How likely are you to recommend our services based on this interaction?',
-        order: 4,
-        isActive: true,
-      },
-    ],
-  });
-
-  // Customer Service Questions
-  await prisma.question.createMany({
-    data: [
-      {
-        departmentId: customerServiceDept.id,
-        questionText: 'How would you rate the agent\'s responsiveness?',
-        order: 1,
-        isActive: true,
-      },
-      {
-        departmentId: customerServiceDept.id,
-        questionText: 'How satisfied are you with the resolution provided?',
-        order: 2,
-        isActive: true,
-      },
-      {
-        departmentId: customerServiceDept.id,
-        questionText: 'How would you rate the agent\'s communication skills?',
-        order: 3,
-        isActive: true,
-      },
-      {
-        departmentId: customerServiceDept.id,
-        questionText: 'How professional was the agent during your interaction?',
-        order: 4,
-        isActive: true,
-      },
-    ],
-  });
-
-  // Claims Department Questions
-  await prisma.question.createMany({
-    data: [
-      {
-        departmentId: claimsDept.id,
-        questionText: 'How would you rate the speed of claims processing?',
-        order: 1,
-        isActive: true,
-      },
-      {
-        departmentId: claimsDept.id,
-        questionText: 'How clear was the explanation of the claims process?',
-        order: 2,
-        isActive: true,
-      },
-      {
-        departmentId: claimsDept.id,
-        questionText: 'How would you rate the agent\'s empathy and understanding?',
-        order: 3,
-        isActive: true,
-      },
-      {
-        departmentId: claimsDept.id,
-        questionText: 'How satisfied are you with the overall claims experience?',
-        order: 4,
-        isActive: true,
-      },
-    ],
-  });
-
-  console.log('✅ Questions created');
-
-  // Create Alliance Insurance Questions
-  console.log('🏢 Creating Alliance Insurance rating questions...');
-  await prisma.allianceInsuranceQuestion.createMany({
-    data: [
-      {
-        questionText: 'How would you rate the overall quality of our insurance products?',
-        order: 1,
-        isActive: true,
-      },
-      {
-        questionText: 'How satisfied are you with our premium pricing?',
-        order: 2,
-        isActive: true,
-      },
-      {
-        questionText: 'How would you rate the transparency of our policy terms and conditions?',
-        order: 3,
-        isActive: true,
-      },
-      {
-        questionText: 'How likely are you to recommend Alliance Insurance to others?',
-        order: 4,
-        isActive: true,
-      },
-      {
-        questionText: 'How satisfied are you with the claims processing experience?',
-        order: 5,
-        isActive: true,
-      },
-    ],
-  });
-  console.log('✅ Alliance Insurance questions created');
-
-  // Create Sample Ratings
-  console.log('⭐ Creating sample ratings...');
-  
-  const salesQuestions = await prisma.question.findMany({
-    where: { departmentId: salesDept.id },
-  });
-
-  const csQuestions = await prisma.question.findMany({
-    where: { departmentId: customerServiceDept.id },
-  });
-
-  // Sample rating for Sales Agent 1
-  const rating1 = await prisma.rating.create({
-    data: {
-      agentId: agents[0].id,
-      departmentId: salesDept.id,
-      customerName: 'Palesa Mohapi',
-      customerContact: '+266 5800 0001',
-      policyNumber: 'POL001234',
-      feedbackText: 'Excellent service! Very knowledgeable and helpful.',
-      isComplaint: false,
-      responses: {
-        create: salesQuestions.map((q, idx) => ({
-          questionId: q.id,
-          score: idx % 2 === 0 ? 5 : 4,
-        })),
-      },
-    },
-  });
-
-  // Sample rating for Customer Service Agent 1
-  const rating2 = await prisma.rating.create({
-    data: {
-      agentId: agents[2].id,
-      departmentId: customerServiceDept.id,
-      customerName: 'Mpho Letsoela',
-      customerContact: '+266 5800 0002',
-      policyNumber: 'POL001235',
-      feedbackText: 'Quick response and resolved my issue efficiently.',
-      isComplaint: false,
-      responses: {
-        create: csQuestions.map((q) => ({
-          questionId: q.id,
-          score: 5,
-        })),
-      },
-    },
-  });
-
-  // Sample complaint
-  const complaint = await prisma.rating.create({
-    data: {
-      agentId: agents[1].id,
-      departmentId: salesDept.id,
-      customerName: 'Tshepo Ramokoena',
-      customerContact: '+266 5800 0003',
-      feedbackText: 'Agent was not very helpful and seemed rushed.',
-      isComplaint: true,
-      complaintStatus: 'OPEN',
-      responses: {
-        create: salesQuestions.map((q) => ({
-          questionId: q.id,
-          score: 2,
-        })),
-      },
-    },
-  });
-
-  console.log('✅ Sample ratings created');
-
-  // Create System Settings
-  console.log('⚙️ Creating system settings...');
-  await prisma.systemSettings.createMany({
-    data: [
-      {
-        key: 'app_name',
-        value: 'Service Feedback Platform',
-      },
-      {
-        key: 'allow_anonymous_ratings',
-        value: 'true',
-      },
-      {
-        key: 'require_policy_number',
-        value: 'false',
-      },
-      {
-        key: 'email_notifications_enabled',
-        value: 'true',
-      },
-    ],
-  });
-
-  console.log('✅ System settings created');
+  console.log('✅ Employee created:', employee.email);
 
   console.log('\n✨ Database seed completed successfully!\n');
-  console.log('📝 Default Login Credentials:');
+  console.log('📝 User Credentials:');
   console.log('─────────────────────────────────────────');
   console.log('Admin:');
-  console.log('  Email: admin@frontlinerating.com');
-  console.log('  Password: Admin@123');
+  console.log('  Email: mseqhobane@alliance.co.ls');
+  console.log('  Name: Max Seqhobane');
+  console.log('  Password: Pass@123');
   console.log('');
   console.log('HOD (Sales):');
-  console.log('  Email: hod.sales@frontlinerating.com');
-  console.log('  Password: Hod@123');
+  console.log('  Email: pmalehi@alliance.co.ls');
+  console.log('  Name: Paballo Malehi');
+  console.log('  Password: Pass@123');
   console.log('');
-  console.log('HOD (Customer Service):');
-  console.log('  Email: hod.cs@frontlinerating.com');
-  console.log('  Password: Hod@123');
+  console.log('Sales Agent:');
+  console.log('  Email: rmojakisane@alliance.co.ls');
+  console.log('  Name: Ramonaheng Mojakisane');
+  console.log('  Password: Pass@123');
   console.log('');
-  console.log('HOD (Claims):');
-  console.log('  Email: hod.claims@frontlinerating.com');
-  console.log('  Password: Hod@123');
-  console.log('');
-  console.log('Agent (Sales):');
-  console.log('  Email: agent1.sales@frontlinerating.com');
-  console.log('  Password: Agent@123');
-  console.log('');
-  console.log('Agent (Customer Service):');
-  console.log('  Email: agent1.cs@frontlinerating.com');
-  console.log('  Password: Agent@123');
-  console.log('');
-  console.log('Agent (Claims):');
-  console.log('  Email: agent1.claims@frontlinerating.com');
-  console.log('  Password: Agent@123');
+  console.log('Employee (HR):');
+  console.log('  Email: tmotloung@alliance.co.ls');
+  console.log('  Name: Tsepiso Motloung');
+  console.log('  Password: Pass@123');
   console.log('─────────────────────────────────────────\n');
 }
 

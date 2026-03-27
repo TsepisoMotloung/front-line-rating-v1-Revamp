@@ -91,12 +91,12 @@ export default function RatingFormPage({ params }: { params: { agentId: string }
       // Basic email/phone validation if contact is provided
       const contactRegex = /^(?:[^\s@]+@[^\s@]+\.[^\s@]+|[\d\s\-\+\(\)]{10,})$/;
       if (!contactRegex.test(formData.customerContact)) {
-        return 'Please provide a valid email address or phone number';
+        return 'Please provide a valid phone number. Make sure to include country code.';
       }
     }
 
-    if (formData.policyNumber.trim() && !/^[A-Z0-9\-]{5,}$/.test(formData.policyNumber)) {
-      return 'Please enter a valid policy number (alphanumeric, at least 5 characters)';
+    if (formData.policyNumber.trim() && !/^[A-Z0-9\-]{4,}$/.test(formData.policyNumber)) {
+      return 'Please enter a valid policy number (alphanumeric, at least 4 characters)';
     }
 
     return null;
