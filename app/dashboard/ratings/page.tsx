@@ -172,18 +172,16 @@ export default function RatingsPage() {
                     className="w-full pl-10 pr-4 py-3 border border-neutral-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
                   />
                 </div>
-                
+                <select
+                  value={complaintFilter}
+                  onChange={(e) => setComplaintFilter(e.target.value)}
+                  className="w-full px-4 py-3 border border-neutral-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                >
+                  <option value="ALL">All Items</option>
+                  <option value="RATINGS">Ratings Only</option>
+                  <option value="COMPLAINTS">Complaints Only</option>
+                </select>
               </div>
-
-              <select
-                value={complaintFilter}
-                onChange={(e) => setComplaintFilter(e.target.value)}
-                className="w-full px-4 py-3 border border-neutral-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
-              >
-                <option value="ALL">All Items</option>
-                <option value="RATINGS">Ratings Only</option>
-                <option value="COMPLAINTS">Complaints Only</option>
-              </select>
             </div>
 
             {filteredRatings.length > 0 ? (
