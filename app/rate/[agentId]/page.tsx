@@ -98,6 +98,9 @@ export default function RatingFormPage({ params }: { params: { agentId: string }
     if (formData.policyNumber.trim() && !/^[A-Z0-9\-]{4,}$/.test(formData.policyNumber)) {
       return 'Please enter a valid policy number (alphanumeric, at least 4 characters)';
     }
+    if (formData.policyNumber.trim() && !/^(?=.{4,}$)[A-Z0-9]+(-[A-Z0-9]+)*$/i.test(formData.policyNumber.trim())) {
+      return 'Please enter a valid policy number (alphanumeric, at least 4 characters, no leading/trailing or consecutive hyphens)';
+    }
 
     return null;
   };
