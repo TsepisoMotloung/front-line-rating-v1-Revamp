@@ -85,14 +85,15 @@ export default function RatingFormPage({ params }: { params: { agentId: string }
       if (!formData.customerName.trim()) {
         return 'Please provide your name';
       }
-      if (!formData.customerContact.trim()) {
-        return 'Please provide your contact information';
-      }
-      // Basic email/phone validation if contact is provided
-      const contactRegex = /^(?:[^\s@]+@[^\s@]+\.[^\s@]+|[\d\s\-\+\(\)]{10,})$/;
-      if (!contactRegex.test(formData.customerContact)) {
-        return 'Please provide a valid phone number. Make sure to include country code.';
-      }
+    }
+
+    if (!formData.customerContact.trim()) {
+      return 'Please provide your phone number';
+    }
+
+    const contactRegex = /^(?:[^\s@]+@[^\s@]+\.[^\s@]+|[\d\s\-\+\(\)]{10,})$/;
+    if (!contactRegex.test(formData.customerContact)) {
+      return 'Please provide a valid phone number. Make sure to include country code.';
     }
 
     if (formData.policyNumber.trim() && !/^[A-Z0-9\-]{4,}$/.test(formData.policyNumber)) {
@@ -121,7 +122,7 @@ export default function RatingFormPage({ params }: { params: { agentId: string }
       const payload = {
         agentId: params.agentId,
         customerName: formData.isAnonymous ? 'Anonymous' : formData.customerName,
-        customerContact: formData.isAnonymous ? null : formData.customerContact,
+        customerContact: formData.customerContact,
         policyNumber: formData.policyNumber || null,
         isAnonymous: formData.isAnonymous,
         isComplaint: formData.isComplaint,
@@ -283,56 +284,54 @@ export default function RatingFormPage({ params }: { params: { agentId: string }
                       type="checkbox"
                       id="anonymous"
                       checked={formData.isAnonymous}
-                      onChange={(e) => setFormData({ ...formData, isAnonymous: e.target.checked })}
+                      onChange={(e) => setFormData({ ...formData, isAnonymous: e.target.checked, customerName: e.target.checked ? '' : formData.customerName })}
                       className="h-4 w-4 text-primary-600 focus:ring-primary-500 border-neutral-300 rounded"
                     />
                     <label htmlFor="anonymous" className="ml-2 text-sm text-neutral-700">
-                      Submit anonymously (optional)
+                      Submit anonymously (name hidden, phone still collected)
                     </label>
                   </div>
 
                   {!formData.isAnonymous && (
-                    <div className="space-y-4">
-                      <div>
-                        <label htmlFor="customerName" className="label">
-                          Full Name *
-                        </label>
-                        <div className="relative">
-                          <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                            <User className="h-5 w-5 text-neutral-400" />
-                          </div>
-                          <input
-                            id="customerName"
-                            type="text"
-                            required={!formData.isAnonymous}
-                            value={formData.customerName}
-                            onChange={(e) => setFormData({ ...formData, customerName: e.target.value })}
-                            className="input pl-10"
-                            placeholder="Tsepiso Motloung"
-                          />
+                    <div>
+                      <label htmlFor="customerName" className="label">
+                        Full Name *
+                      </label>
+                      <div className="relative">
+                        <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                          <User className="h-5 w-5 text-neutral-400" />
                         </div>
-                      </div>
-
-                      <div>
-                        <label htmlFor="customerContact" className="label">
-                          Phone Number *
-                        </label>
-                        <div className="relative">
-                          <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                            <Phone className="h-5 w-5 text-neutral-400" />
-                          </div>
-                          <input
-                            id="customerContact"
-                            type="text"
-                            value={formData.customerContact}
-                            onChange={(e) => setFormData({ ...formData, customerContact: e.target.value })}
-                            className="input pl-10"
-                            placeholder="+266 5000 0000"
-                          />
-                        </div>
+                        <input
+                          id="customerName"
+                          type="text"
+                          required={!formData.isAnonymous}
+                          value={formData.customerName}
+                          onChange={(e) => setFormData({ ...formData, customerName: e.target.value })}
+                          className="input pl-10"
+                          placeholder="Tsepiso Motloung"
+                        />
                       </div>
                     </div>
                   )}
+
+                  <div>
+                    <label htmlFor="customerContact" className="label">
+                      Phone Number *
+                    </label>
+                    <div className="relative">
+                      <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                        <Phone className="h-5 w-5 text-neutral-400" />
+                      </div>
+                      <input
+                        id="customerContact"
+                        type="text"
+                        value={formData.customerContact}
+                        onChange={(e) => setFormData({ ...formData, customerContact: e.target.value })}
+                        className="input pl-10"
+                        placeholder="+266 5000 0000"
+                      />
+                    </div>
+                  </div>
 
                   <div className="mt-4">
                     <label htmlFor="policyNumber" className="label">

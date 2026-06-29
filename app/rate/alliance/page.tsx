@@ -63,18 +63,17 @@ export default function RateAllianceInsurancePage() {
       return 'Please answer all questions';
     }
 
-    if (!customerInfo.isAnonymous) {
-      if (!customerInfo.customerName.trim()) {
-        return 'Please provide your name';
-      }
-      if (!customerInfo.customerContact.trim()) {
-        return 'Please provide your contact information';
-      }
-      // Basic email/phone validation
-      const contactRegex = /^(?:[^\s@]+@[^\s@]+\.[^\s@]+|[\d\s\-\+\(\)]{10,})$/;
-      if (!contactRegex.test(customerInfo.customerContact)) {
-        return 'Please provide a valid phone number';
-      }
+    if (!customerInfo.isAnonymous && !customerInfo.customerName.trim()) {
+      return 'Please provide your name';
+    }
+
+    if (!customerInfo.customerContact.trim()) {
+      return 'Please provide your phone number';
+    }
+
+    const contactRegex = /^(?:[^\s@]+@[^\s@]+\.[^\s@]+|[\d\s\-\+\(\)]{10,})$/;
+    if (!contactRegex.test(customerInfo.customerContact)) {
+      return 'Please provide a valid phone number';
     }
 
     if (customerInfo.policyNumber.trim() && !/^[A-Z0-9\-]{4,}$/.test(customerInfo.policyNumber)) {
@@ -201,20 +200,21 @@ export default function RateAllianceInsurancePage() {
                 <div>
                   <h2 className="text-xl font-semibold text-neutral-900 mb-4">Your Information</h2>
                   <div className="space-y-4">
-                    <div>
-                      <label htmlFor="customerName" className="label">
-                        Full Name *
-                      </label>
-                      <input
-                        id="customerName"
-                        type="text"
-                        value={customerInfo.customerName}
-                        onChange={(e) => setCustomerInfo({ ...customerInfo, customerName: e.target.value })}
-                        className="input"
-                        placeholder="Your name"
-                        disabled={customerInfo.isAnonymous}
-                      />
-                    </div>
+                    {!customerInfo.isAnonymous && (
+                      <div>
+                        <label htmlFor="customerName" className="label">
+                          Full Name *
+                        </label>
+                        <input
+                          id="customerName"
+                          type="text"
+                          value={customerInfo.customerName}
+                          onChange={(e) => setCustomerInfo({ ...customerInfo, customerName: e.target.value })}
+                          className="input"
+                          placeholder="Your name"
+                        />
+                      </div>
+                    )}
 
                     <div>
                       <label htmlFor="customerContact" className="label">
@@ -244,18 +244,18 @@ export default function RateAllianceInsurancePage() {
                       />
                     </div>
 
-                    {/* <div className="flex items-center space-x-2">
+                    <div className="flex items-center space-x-2 pt-1">
                       <input
                         id="isAnonymous"
                         type="checkbox"
                         checked={customerInfo.isAnonymous}
-                        onChange={(e) => setCustomerInfo({ ...customerInfo, isAnonymous: e.target.checked, customerName: '' })}
-                        className="h-4 w-4 text-primary-600"
+                        onChange={(e) => setCustomerInfo({ ...customerInfo, isAnonymous: e.target.checked, customerName: e.target.checked ? '' : customerInfo.customerName })}
+                        className="h-4 w-4 text-primary-600 border-neutral-300 rounded focus:ring-primary-500"
                       />
                       <label htmlFor="isAnonymous" className="text-sm text-neutral-700">
-                        Submit this rating anonymously
+                        Submit anonymously (name hidden, phone still collected)
                       </label>
-                    </div> */}
+                    </div>
                   </div>
                 </div>
 
