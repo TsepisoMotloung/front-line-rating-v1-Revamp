@@ -303,6 +303,12 @@ export default function RatingsPage() {
                     {new Date(selectedRating.createdAt).toLocaleDateString()}
                   </p>
                 </div>
+                {selectedRating.customerContact && (
+                  <div>
+                    <p className="text-xs text-neutral-600 mb-1">Contact</p>
+                    <p className="font-semibold text-sm">{selectedRating.customerContact}</p>
+                  </div>
+                )}
                 {selectedRating.agent && (
                   <div>
                     <p className="text-xs text-neutral-600 mb-1">Agent</p>
