@@ -76,9 +76,27 @@ function SuccessContent() {
               </div>
 
               <div className="mt-8 pt-8 border-t border-neutral-200">
-                <p className="text-sm text-neutral-500">
-                  Need to contact us? Visit our support page or speak with any of our agents.
+                <p className="text-sm text-neutral-500 mb-4">
+                  Need more information or want to contact Alliance Insurance directly? Use one of the options below.
                 </p>
+                <div className="flex flex-col sm:flex-row gap-3 justify-center">
+                  <a
+                    href="https://wa.me/26662005600"
+                    target="_blank"
+                    rel="noreferrer"
+                    className="btn btn-outline flex items-center justify-center"
+                  >
+                    WhatsApp us
+                  </a>
+                  <a
+                    href="https://www.facebook.com/AllianceInsuranceLS"
+                    target="_blank"
+                    rel="noreferrer"
+                    className="btn btn-secondary flex items-center justify-center"
+                  >
+                    Visit Facebook Page
+                  </a>
+                </div>
               </div>
             </div>
           </div>

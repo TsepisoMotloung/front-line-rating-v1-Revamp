@@ -303,9 +303,27 @@ export default function Home() {
 
             <div className="sm:col-span-2 md:col-span-1">
               <h3 className="font-bold text-base sm:text-lg mb-4 sm:mb-6">Contact</h3>
-              <p className="text-sm sm:text-base text-neutral-400 leading-relaxed">
-                For support or inquiries, please contact your system administrator
+              <p className="text-sm sm:text-base text-neutral-400 leading-relaxed mb-4">
+                Need help or want to reach Alliance Insurance directly? Use one of the options below.
               </p>
+              <div className="flex flex-col gap-3">
+                <a
+                  href="https://wa.me/26662005600"
+                  target="_blank"
+                  rel="noreferrer"
+                  className="inline-flex items-center justify-center rounded-lg border border-emerald-500/30 bg-emerald-500/10 px-4 py-2 text-sm font-medium text-emerald-300 hover:bg-emerald-500/20 transition-colors"
+                >
+                  WhatsApp us
+                </a>
+                <a
+                  href="https://www.facebook.com/AllianceInsuranceLS"
+                  target="_blank"
+                  rel="noreferrer"
+                  className="inline-flex items-center justify-center rounded-lg border border-primary-500/30 bg-primary-500/10 px-4 py-2 text-sm font-medium text-primary-300 hover:bg-primary-500/20 transition-colors"
+                >
+                  Visit our Facebook page
+                </a>
+              </div>
             </div>
           </div>
 
